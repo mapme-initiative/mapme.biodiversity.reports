@@ -134,6 +134,9 @@ if (!"ORIG_NAME" %in% names(wdpa_allPAs)) {
 }
 cat("✓ wdpa_allPAs has ORIG_NAME column\n")
 
+# Add total area in hectares (GIS_AREA is in sq km, convert to ha by multiplying by 100)
+wdpa_allPAs$total_area_ha <- wdpa_allPAs$GIS_AREA * 100
+
 # Note: All geometries in this dataset are MULTIPOLYGON, no geometry type filtering needed
 
 # Calculate forest statistics (only if we have data)
@@ -336,13 +339,14 @@ coords <- st_coordinates(wdpa_allPAs_lossdata_subset)
 wdpa_temp$X <- coords[, "X"]
 wdpa_temp$Y <- coords[, "Y"]
 
-# Create HTML label using the temp data frame
+# Create HTML label using the temp data frame with consistent information
 wdpa_temp$label <- paste(
   "<p><b>", wdpa_temp$ORIG_NAME, "</b></br>",
+  "Total Area:", format(round(wdpa_temp$total_area_ha, 0), big.mark = ","), "ha</br>",
   "Primary Forests (2000):", format(round(wdpa_temp$max_forest, 0), big.mark = ","), "ha</br>",
-  "Burned Area (2000-2024):", format(round(wdpa_temp$total_burned_area_ha, 0), big.mark = ","), "ha</br>",
-  "Absolute Loss (2000-2024):", format(round(wdpa_temp$absolute_loss, 0), big.mark = ","), "ha</br>",
-  "Relative Loss (2000-2024):", round(wdpa_temp$relative_loss * 100, 2), "%",
+  "Absolute Loss (2001-2024):", format(round(wdpa_temp$absolute_loss, 0), big.mark = ","), "ha</br>",
+  "Relative Loss (2001-2024):", round(wdpa_temp$relative_loss * 100, 2), "%</br>",
+  "Burned Area (2015-2022):", format(round(wdpa_temp$total_burned_area_ha, 0), big.mark = ","), "ha",
   "</p>"
 )
 
@@ -583,16 +587,20 @@ p <- ggplot(
 ggplotly(p, tooltip = "text")
 ```
 
-## Burned Area Analysis (2000-2022)
+## Burned Area Analysis (2015-2022)
 
 ::: {.callout-important}
-## Methodology Update
-This analysis uses **burned area in hectares** from the MODIS MCD64A1 product (Giglio et al., 2018). This provides a more accurate measure of actual fire impact on ecosystems compared to active fire counts, as it quantifies the spatial extent of burned areas rather than just the number of fire detections.
+## Methodology Note: Comparing Burned Area and Forest Cover Loss
+This analysis uses **burned area in hectares** from the MODIS MCD64A1 product (Giglio et al., 2018). It is important to understand the methodological differences between burned area and forest cover loss data:
 
-**Note:** MCD64A1 burned area data is available through 2022. Forest cover loss analysis covers 2000-2024, while burned area analysis covers 2000-2022.
+- **Burned Area (MCD64A1)**: Cumulative sum of all fire-affected areas. If the same area burns multiple times over the analysis period, each burn event is counted separately. This means burned area totals can exceed the total land area of a protected area.
+
+- **Forest Cover Loss (Global Forest Watch)**: Each forest pixel is only counted once when it transitions from forest to non-forest. Even if an area burns multiple times or experiences repeated disturbances, the loss is recorded only at the initial deforestation event.
+
+**Implication for interpretation:** Burned area values are typically higher than forest cover loss values because they represent cumulative fire exposure, not permanent land cover change. High burned area with low forest loss may indicate recurrent fires in grasslands or savannas, while matching high values in both metrics suggest fire-driven deforestation.
 :::
 
-Fire is a significant threat to protected areas, whether from natural causes (e.g., El Niño-related droughts) or human activities (land clearing, agricultural burning). The MODIS MCD64A1 burned area product provides monthly burned area detection at 500m resolution, allowing us to quantify the total hectares affected by fire within each protected area over the analysis period (2000-2022).
+Fire is a significant threat to protected areas, whether from natural causes (e.g., El Niño-related droughts) or human activities (land clearing, agricultural burning). The MODIS MCD64A1 burned area product provides monthly burned area detection at 500m resolution, allowing us to quantify the total hectares affected by fire within each protected area over the analysis period (2015-2022).
 
 ### Interactive Map
 
@@ -626,12 +634,14 @@ if (!"ORIG_NAME" %in% names(wdpa_allPAs_lossdata_subset)) {
   wdpa_allPAs_lossdata_subset <- st_sf(wdpa_temp, geometry = st_geometry(wdpa_allPAs_lossdata_subset))
 }
 
-# Update label with burned area
+# Update label with consistent information (same as forest loss map)
 wdpa_allPAs_lossdata_subset$label_fire <- paste(
   "<p><b>", wdpa_allPAs_lossdata_subset$ORIG_NAME, "</b></br>",
-  "Total Burned Area (2000-2022):", format(round(wdpa_allPAs_lossdata_subset$total_burned_area_ha, 0), big.mark = ","), "ha</br>",
+  "Total Area:", format(round(wdpa_allPAs_lossdata_subset$total_area_ha, 0), big.mark = ","), "ha</br>",
   "Primary Forests (2000):", format(round(wdpa_allPAs_lossdata_subset$max_forest, 0), big.mark = ","), "ha</br>",
-  "Forest Loss (2000-2024):", format(round(wdpa_allPAs_lossdata_subset$absolute_loss, 0), big.mark = ","), "ha",
+  "Absolute Loss (2001-2024):", format(round(wdpa_allPAs_lossdata_subset$absolute_loss, 0), big.mark = ","), "ha</br>",
+  "Relative Loss (2001-2024):", round(wdpa_allPAs_lossdata_subset$relative_loss * 100, 2), "%</br>",
+  "Burned Area (2015-2022):", format(round(wdpa_allPAs_lossdata_subset$total_burned_area_ha, 0), big.mark = ","), "ha",
   "</p>"
 )
 
@@ -758,16 +768,17 @@ if (nrow(lollipop_data_fire) > 0) {
 #| fig-height: 10
 #| fig-width: 10
 
-# Load annual burned area data if it exists (2000-2022)
+# Load annual burned area data if it exists (2015-2022)
 if (file.exists("../data/bolivia_burned_area_annual_2000_2022.csv")) {
   burned_annual <- read_csv(
     "../data/bolivia_burned_area_annual_2000_2022.csv",
     show_col_types = FALSE
   )
   
-  # Filter for target areas
+  # Filter for target areas - select only needed columns to avoid name conflicts
   burned_annual <- burned_annual %>%
-    filter(wdpa_id %in% bol_wdpa_ids)
+    filter(wdpa_id %in% bol_wdpa_ids) %>%
+    select(wdpa_id, year, burned_area_ha)  # Don't include ORIG_NAME from CSV
   
   # Get total burned area for sorting
   burned_total_for_sort <- burned_annual %>%
@@ -775,8 +786,7 @@ if (file.exists("../data/bolivia_burned_area_annual_2000_2022.csv")) {
     group_by(wdpa_id) %>%
     summarise(total_burned_area_ha = sum(burned_area_ha, na.rm = TRUE), .groups = "drop")
   
-  # Add names and total for sorting
-  # Load names directly from source
+  # Load names directly from source (fresh, no conflicts)
   wdpa_names <- st_read(
     "../data/wdpa.gdb", 
     layer = "WDPA_WDOECM_poly_Jan2026_BOL",
@@ -785,7 +795,7 @@ if (file.exists("../data/bolivia_burned_area_annual_2000_2022.csv")) {
     st_drop_geometry() %>%
     transmute(WDPAID = as.character(SITE_ID), ORIG_NAME = NAME)
   
-  # Convert wdpa_id to character to match WDPAID type
+  # Convert wdpa_id to character and join names
   burned_annual <- burned_annual %>%
     mutate(wdpa_id = as.character(wdpa_id)) %>%
     left_join(wdpa_names, by = c("wdpa_id" = "WDPAID")) %>%
