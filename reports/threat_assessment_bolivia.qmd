@@ -362,8 +362,13 @@ map <- leaflet() %>%
   addProviderTiles(providers$Esri.WorldImagery, group = "Satellite") %>%
   addProviderTiles(providers$Esri.WorldShadedRelief, group = "Topography") %>%
   addTiles(
-    "https://tiles.globalforestwatch.org/umd_tree_cover_loss/latest/dynamic/{z}/{x}/{y}.png",
-    group = "Forest Cover Loss (2001-2024)",
+    "https://tiles.globalforestwatch.org/umd_tree_cover_loss/latest/dynamic/{z}/{x}/{y}.png?&start_year=2001&end_year=2014&render_type=true_color",
+    group = "Forest Cover Loss (2001-2014)",
+    attribution = "Hansen et al., 2013"
+  ) %>%
+  addTiles(
+    "https://tiles.globalforestwatch.org/umd_tree_cover_loss/latest/dynamic/{z}/{x}/{y}.png?&start_year=2014&end_year=2024&render_type=true_color",
+    group = "Forest Cover Loss (2014-2024)",
     attribution = "Hansen et al., 2013"
   ) %>%
   addTiles(
@@ -399,32 +404,20 @@ if (nrow(wdpa_nonSupportPA) > 0 && inherits(wdpa_nonSupportPA, "sf")) {
   )
 }
 
-if (nrow(bolivia_suggested_PAs) > 0 && inherits(bolivia_suggested_PAs, "sf")) {
-  map <- map %>% addPolygons(
-    data = bolivia_suggested_PAs, opacity = 1, fillOpacity = 0.1,
-    color = "#7d0f02", group = "PAs Analyzed", label = ~ORIG_NAME, weight = 2
-  )
-}
-
+# Add circle markers for forest loss statistics (separate group from tile layers)
 map <- map %>%
   addCircleMarkers(
     data = wdpa_allPAs_lossdata_subset,
     color = ~pal_relative_loss(relative_loss_categorized),
-    group = "Forest Cover Loss (2001-2024)",
+    group = "Forest Loss Statistics",
     radius = ~ifelse(absolute_loss_categorized == ">10,000 ha", 12,
               ifelse(absolute_loss_categorized == "1,000-10,000 ha", 6,
               ifelse(absolute_loss_categorized == "100-1,000 ha", 4,
               ifelse(absolute_loss_categorized == "10-100 ha", 2, 1)))),
     popup = ~label,
     stroke = FALSE,
-    fillOpacity = 0.5
+    fillOpacity = 0.7
   ) %>%
-  # Label markers temporarily disabled due to data structure issues
-  # addLabelOnlyMarkers(
-  #   data = wdpa_allPAs_lossdata_subset,
-  #   lng = ~X, lat = ~Y, label = ~ORIG_NAME, group = "Labels (PA Names)",
-  #   labelOptions = labelOptions(noHide = TRUE, direction = 'top', textOnly = TRUE)
-  # ) %>%
   addFullscreenControl() %>%
   addLegend(
     "bottomright",
@@ -436,12 +429,14 @@ map <- map %>%
   ) %>%
   addLayersControl(
     baseGroups = c("CartoDB", "OpenStreetMap", "Satellite", "Topography"),
-    overlayGroups = c("PAs Analyzed", "PAs KfW-supported", "PAs (Others)",
-                     "Forest Cover Loss (2001-2024)",
+    overlayGroups = c("PAs KfW-supported", "PAs (Others)",
+                     "Forest Loss Statistics",
+                     "Forest Cover Loss (2001-2014)",
+                     "Forest Cover Loss (2014-2024)",
                      "Regional Primary Forests (2001)"),
     options = layersControlOptions(collapsed = FALSE)
   ) %>%
-  hideGroup(c("PAs (Others)", "Forest Cover Loss (2001-2024)",
+  hideGroup(c("Forest Cover Loss (2001-2014)", "Forest Cover Loss (2014-2024)",
               "Regional Primary Forests (2001)"))
 
 map
