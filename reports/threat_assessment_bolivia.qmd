@@ -2,7 +2,7 @@
 title: "Threat Assessment for Protected Areas in Bolivia"
 subtitle: "Analysis of Forest Cover Loss and Burned Areas (2000-2024)"
 author: 
-  - name: "Johannes Schielein & Andreas Petutschnig"
+  - name: "Johannes Schielein"
     affiliations: "MAPME Initiative"
 date: "2026-01-12"
 date-modified: last-modified
@@ -134,10 +134,7 @@ if (!"ORIG_NAME" %in% names(wdpa_allPAs)) {
 }
 cat("✓ wdpa_allPAs has ORIG_NAME column\n")
 
-# Add GEOMETRY_TYPE column if not present
-if (!"GEOMETRY_TYPE" %in% names(wdpa_allPAs)) {
-  wdpa_allPAs$GEOMETRY_TYPE <- st_geometry_type(wdpa_allPAs)
-}
+# Note: All geometries in this dataset are MULTIPOLYGON, no geometry type filtering needed
 
 # Calculate forest statistics (only if we have data)
 if (nrow(gfw_lossstats_area) > 0) {
@@ -197,9 +194,10 @@ if (file.exists("../data/bolivia_burned_area_total_2000_2022.csv")) {
     show_col_types = FALSE
   )
   # Convert wdpa_id to character to match WDPAID type in wdpa_allPAs
+  # Select only WDPAID and total_burned_area_ha to avoid column name conflicts
   burned_area_data <- burned_area_data %>%
-    mutate(wdpa_id = as.character(wdpa_id))
-  names(burned_area_data)[1] <- "WDPAID"
+    mutate(WDPAID = as.character(wdpa_id)) %>%
+    select(WDPAID, total_burned_area_ha)
   
   # Use left_join to preserve sf object
   wdpa_allPAs <- wdpa_allPAs %>% left_join(burned_area_data, by = "WDPAID")
@@ -229,7 +227,6 @@ wdpa_allPAs <- wdpa_allPAs %>%
 # Filter for valid data
 wdpa_allPAs_lossdata <- wdpa_allPAs %>%
   filter(DESIG_ENG != 'UNESCO-MAB Biosphere Reserve' | is.na(DESIG_ENG)) %>%
-  filter(as.character(GEOMETRY_TYPE) != 'POINT') %>%
   filter(!is.na(relative_loss) & !is.nan(relative_loss))
 
 # Only compute centroid if we have data
@@ -242,13 +239,15 @@ if (nrow(wdpa_allPAs_lossdata) > 0) {
 
 # Filter for non-supported areas (those without KfW support)
 # bmz_n_1 was already joined to wdpa_allPAs above (lines 213-220)
+# Note: All data is already MULTIPOLYGON, no need to filter by geometry type
 wdpa_nonSupportPA <- wdpa_allPAs %>%
   filter(DESIG_ENG != 'UNESCO-MAB Biosphere Reserve' | is.na(DESIG_ENG)) %>%
-  filter(as.character(GEOMETRY_TYPE) != 'POINT') %>%
-  filter(is.na(bmz_n_1))
+  filter(WDPAID %in% as.character(bol_wdpa_ids)) %>%  # Include only target areas
+  filter(is.na(bmz_n_1))  # Exclude KfW-supported areas
 
 bolivia_suggested_PAs <- wdpa_kfw %>%
   filter(WDPAID %in% as.character(bol_wdpa_ids))
+
 ```
 
 ## Introduction
@@ -320,7 +319,9 @@ The map below depicts relative and absolute forest cover loss in the selected ar
 #| fig-height: 8
 
 # Prepare data for mapping
-wdpa_kfw_treated <- wdpa_kfw %>%
+# Get KfW-supported areas from wdpa_allPAs (which has bmz_n_1 joined)
+wdpa_kfw_treated <- wdpa_allPAs %>%
+  filter(WDPAID %in% as.character(bol_wdpa_ids)) %>%
   filter(!is.na(bmz_n_1))
 
 wdpa_allPAs_lossdata_subset <- wdpa_allPAs_lossdata %>%
@@ -371,22 +372,34 @@ map <- leaflet() %>%
     attribution = "Hansen et al., 2013"
   )
 
-# Add polygon layers only if they have data
-if (nrow(wdpa_kfw_treated) > 0 && "ORIG_NAME" %in% names(wdpa_kfw_treated)) {
+# Add polygon layers only if they have data and valid geometry
+if (nrow(wdpa_kfw_treated) > 0 && inherits(wdpa_kfw_treated, "sf")) {
   map <- map %>% addPolygons(
-    data = wdpa_kfw_treated, opacity = 0.9, color = "#2b8cbe",
-    group = "PAs KfW-supported", label = ~ORIG_NAME, weight = 1
+    data = wdpa_kfw_treated,
+    fillColor = "darkgreen",
+    fillOpacity = 0.3,
+    color = "red",
+    weight = 2,
+    opacity = 1,
+    group = "PAs KfW-supported",
+    label = ~ORIG_NAME
   )
 }
 
-if (nrow(wdpa_nonSupportPA) > 0 && "ORIG_NAME" %in% names(wdpa_nonSupportPA)) {
+if (nrow(wdpa_nonSupportPA) > 0 && inherits(wdpa_nonSupportPA, "sf")) {
   map <- map %>% addPolygons(
-    data = wdpa_nonSupportPA, opacity = 0.9, color = "darkgrey",
-    group = "PAs (Others)", label = ~ORIG_NAME, weight = 2
+    data = wdpa_nonSupportPA,
+    fillColor = "lightgreen",
+    fillOpacity = 0.8,
+    color = "lightgreen",
+    weight = 1,
+    opacity = 0.9,
+    group = "PAs (Others)",
+    label = ~ORIG_NAME
   )
 }
 
-if (nrow(bolivia_suggested_PAs) > 0 && "ORIG_NAME" %in% names(bolivia_suggested_PAs)) {
+if (nrow(bolivia_suggested_PAs) > 0 && inherits(bolivia_suggested_PAs, "sf")) {
   map <- map %>% addPolygons(
     data = bolivia_suggested_PAs, opacity = 1, fillOpacity = 0.1,
     color = "#7d0f02", group = "PAs Analyzed", label = ~ORIG_NAME, weight = 2
@@ -430,6 +443,8 @@ map <- map %>%
   ) %>%
   hideGroup(c("PAs (Others)", "Forest Cover Loss (2001-2024)",
               "Regional Primary Forests (2001)"))
+
+map
 ```
 
 ### Absolute Forest Cover Loss
@@ -625,37 +640,37 @@ wdpa_allPAs_lossdata_subset$label_fire <- paste(
   "</p>"
 )
 
-# Create map - build conditionally
+# Create map - build conditionally (simplified for burned area focus)
 map2 <- leaflet() %>%
   addTiles(group = "OpenStreetMap") %>%
   addProviderTiles(providers$CartoDB.Positron, group = "CartoDB") %>%
   addProviderTiles(providers$Esri.WorldImagery, group = "Satellite") %>%
-  addProviderTiles(providers$Esri.WorldShadedRelief, group = "Topography") %>%
-  addTiles(
-    "https://tiles.globalforestwatch.org/umd_tree_cover_loss/latest/dynamic/{z}/{x}/{y}.png",
-    group = "Forest Cover Loss (2001-2024)",
-    attribution = "Hansen et al., 2013"
-  )
+  addProviderTiles(providers$Esri.WorldShadedRelief, group = "Topography")
 
 # Add polygon layers only if they have data
 if (nrow(wdpa_kfw_treated) > 0 && "ORIG_NAME" %in% names(wdpa_kfw_treated)) {
   map2 <- map2 %>% addPolygons(
-    data = wdpa_kfw_treated, opacity = 0.9, color = "#2b8cbe",
-    group = "PAs KfW-supported", label = ~ORIG_NAME, weight = 1
+    data = wdpa_kfw_treated,
+    fillColor = "darkgreen",
+    fillOpacity = 0.3,
+    color = "red",
+    weight = 2,
+    opacity = 1,
+    group = "PAs KfW-supported",
+    label = ~ORIG_NAME
   )
 }
 
 if (nrow(wdpa_nonSupportPA) > 0 && "ORIG_NAME" %in% names(wdpa_nonSupportPA)) {
   map2 <- map2 %>% addPolygons(
-    data = wdpa_nonSupportPA, opacity = 0.9, color = "darkgrey",
-    group = "PAs (Others)", label = ~ORIG_NAME, weight = 2
-  )
-}
-
-if (nrow(bolivia_suggested_PAs) > 0 && "ORIG_NAME" %in% names(bolivia_suggested_PAs)) {
-  map2 <- map2 %>% addPolygons(
-    data = bolivia_suggested_PAs, opacity = 1, fillOpacity = 0.1,
-    color = "#7d0f02", group = "PAs Analyzed", label = ~ORIG_NAME, weight = 2
+    data = wdpa_nonSupportPA,
+    fillColor = "lightgreen",
+    fillOpacity = 0.8,
+    color = "lightgreen",
+    weight = 1,
+    opacity = 0.9,
+    group = "PAs (Others)",
+    label = ~ORIG_NAME
   )
 }
 
@@ -663,18 +678,12 @@ map2 <- map2 %>%
   addCircleMarkers(
     data = wdpa_allPAs_lossdata_subset,
     color = ~pal_burned(burned_area_categorized),
-    group = "Burned Area (2000-2024)",
+    group = "Burned Area (2000-2022)",
     radius = 8,
     popup = ~label_fire,
     stroke = FALSE,
     fillOpacity = 0.8
   ) %>%
-  # Label markers temporarily disabled
-  # addLabelOnlyMarkers(
-  #   data = wdpa_allPAs_lossdata_subset,
-  #   lng = ~X, lat = ~Y, label = ~ORIG_NAME, group = "Labels (PA Names)",
-  #   labelOptions = labelOptions(noHide = TRUE, direction = 'top', textOnly = TRUE)
-  # ) %>%
   addFullscreenControl() %>%
   addLegend(
     "bottomright",
@@ -686,13 +695,9 @@ map2 <- map2 %>%
   ) %>%
   addLayersControl(
     baseGroups = c("CartoDB", "OpenStreetMap", "Satellite", "Topography"),
-    overlayGroups = c("PAs Analyzed", "PAs KfW-supported", "PAs (Others)",
-                     "Labels (PA Names)", "Burned Area (2000-2022)",
-                     "Forest Cover Loss (2001-2024)"),
+    overlayGroups = c("PAs KfW-supported", "PAs (Others)", "Burned Area (2000-2022)"),
     options = layersControlOptions(collapsed = FALSE)
-  ) %>%
-  hideGroup(c("PAs (Others)", "PAs KfW-supported", "Forest Cover Loss (2001-2024)",
-              "Labels (PA Names)"))
+  )
 
 map2
 ```
