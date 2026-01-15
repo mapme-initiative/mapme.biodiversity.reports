@@ -190,10 +190,10 @@ wdpa_allPAs$absolute_loss_categorized <- cut(
 )
 
 # ----- Load Burned Area Data -----
-# MCD64A1 data available for 2000-2022
-if (file.exists("../data/bolivia_burned_area_total_2000_2022.csv")) {
+# MCD64A1 data available for 2015-2022 (complete tile coverage)
+if (file.exists("../data/bolivia_burned_area_total_2015_2022.csv")) {
   burned_area_data <- read_csv(
-    "../data/bolivia_burned_area_total_2000_2022.csv",
+    "../data/bolivia_burned_area_total_2015_2022.csv",
     show_col_types = FALSE
   )
   # Convert wdpa_id to character to match WDPAID type in wdpa_allPAs
@@ -347,8 +347,8 @@ wdpa_temp$label <- paste(
   "Absolute Loss (2001-2024):", format(round(wdpa_temp$absolute_loss, 0), big.mark = ","), "ha</br>",
   "Relative Loss (2001-2024):", round(wdpa_temp$relative_loss * 100, 2), "%</br>",
   "Burned Area (2015-2022):", format(round(wdpa_temp$total_burned_area_ha, 0), big.mark = ","), "ha",
-  "</p>"
-)
+    "</p>"
+  )
 
 # Add geometry back
 wdpa_allPAs_lossdata_subset <- st_sf(wdpa_temp, geometry = st_geometry(wdpa_allPAs_lossdata_subset))
@@ -538,7 +538,7 @@ if("absolute_loss" %in% names(wdpa_allPAs)) {
   loss_lookup <- wdpa_allPAs %>%
     st_drop_geometry() %>%
     select(WDPAID, absolute_loss) %>%
-    mutate(WDPAID = as.character(WDPAID))
+  mutate(WDPAID = as.character(WDPAID))
   
   names_auxdata <- names_auxdata %>%
     left_join(loss_lookup, by = "WDPAID")
@@ -642,7 +642,7 @@ wdpa_allPAs_lossdata_subset$label_fire <- paste(
   "Absolute Loss (2001-2024):", format(round(wdpa_allPAs_lossdata_subset$absolute_loss, 0), big.mark = ","), "ha</br>",
   "Relative Loss (2001-2024):", round(wdpa_allPAs_lossdata_subset$relative_loss * 100, 2), "%</br>",
   "Burned Area (2015-2022):", format(round(wdpa_allPAs_lossdata_subset$total_burned_area_ha, 0), big.mark = ","), "ha",
-  "</p>"
+    "</p>"
 )
 
 # Create map - build conditionally (simplified for burned area focus)
@@ -683,7 +683,7 @@ map2 <- map2 %>%
   addCircleMarkers(
     data = wdpa_allPAs_lossdata_subset,
     color = ~pal_burned(burned_area_categorized),
-    group = "Burned Area (2000-2022)",
+    group = "Burned Area (2015-2022)",
     radius = 8,
     popup = ~label_fire,
     stroke = FALSE,
@@ -695,12 +695,12 @@ map2 <- map2 %>%
     data = wdpa_allPAs_lossdata,
     pal = pal_burned,
     values = ~burned_area_categorized,
-    title = "Total Burned Area<br>(2000-2022)",
+    title = "Total Burned Area<br>(2015-2022)",
     opacity = 1
   ) %>%
   addLayersControl(
     baseGroups = c("CartoDB", "OpenStreetMap", "Satellite", "Topography"),
-    overlayGroups = c("PAs KfW-supported", "PAs (Others)", "Burned Area (2000-2022)"),
+    overlayGroups = c("PAs KfW-supported", "PAs (Others)", "Burned Area (2015-2022)"),
     options = layersControlOptions(collapsed = FALSE)
   )
 
@@ -745,7 +745,7 @@ if (nrow(lollipop_data_fire) > 0) {
     coord_flip() +
     labs(
       x = "",
-      y = "Total Burned Area in ha (2000-2022)",
+      y = "Total Burned Area in ha (2015-2022)",
       color = "KfW Project Number"
     ) +
     scale_y_continuous(labels = comma) +
@@ -769,9 +769,9 @@ if (nrow(lollipop_data_fire) > 0) {
 #| fig-width: 10
 
 # Load annual burned area data if it exists (2015-2022)
-if (file.exists("../data/bolivia_burned_area_annual_2000_2022.csv")) {
+if (file.exists("../data/bolivia_burned_area_annual_2015_2022.csv")) {
   burned_annual <- read_csv(
-    "../data/bolivia_burned_area_annual_2000_2022.csv",
+    "../data/bolivia_burned_area_annual_2015_2022.csv",
     show_col_types = FALSE
   )
   

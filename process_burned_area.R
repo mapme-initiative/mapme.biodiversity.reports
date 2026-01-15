@@ -45,6 +45,10 @@ mapme_options(
 )
 
 # Analysis years for burned area
+# MCD64A1 data is available from 2000 to present
+# Using 2015-2022 - this period has complete and consistent tile coverage
+# Note: Earlier years (2000-2014) and recent years (2023-2024) often have
+# incomplete tile coverage causing "unequal tiles per timestep" errors
 analysis_years <- 2015:2022
 
 cat("Configuration:\n")
@@ -171,12 +175,12 @@ if (length(all_results) > 0) {
       .groups = "drop"
     )
   
-  # Save files
-  write.csv(burned_annual, "data/bolivia_burned_area_annual_2000_2022.csv", row.names = FALSE)
-  write.csv(burned_total, "data/bolivia_burned_area_total_2000_2022.csv", row.names = FALSE)
+  # Save files - date range in filename reflects analysis_years
+  write.csv(burned_annual, "data/bolivia_burned_area_annual_2015_2022.csv", row.names = FALSE)
+  write.csv(burned_total, "data/bolivia_burned_area_total_2015_2022.csv", row.names = FALSE)
   
-  cat("      ✓ Saved: data/bolivia_burned_area_annual_2000_2022.csv\n")
-  cat("      ✓ Saved: data/bolivia_burned_area_total_2000_2022.csv\n")
+  cat("      ✓ Saved: data/bolivia_burned_area_annual_2015_2022.csv\n")
+  cat("      ✓ Saved: data/bolivia_burned_area_total_2015_2022.csv\n")
   cat("      ✓ Protected areas with data:", length(unique(burned_annual$wdpa_id)), "\n")
   cat("      ✓ Years covered:", paste(sort(unique(burned_annual$year)), collapse = ", "), "\n")
   cat("      ✓ Total records:", nrow(burned_annual), "\n")
