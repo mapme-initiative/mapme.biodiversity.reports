@@ -1,0 +1,83 @@
+---
+title: "About"
+---
+
+## The MAPME Initiative
+
+**MAPME** (Measuring and Advancing the Protection of Ecosystems) is an initiative that develops open-source tools and methodologies for conservation monitoring and impact evaluation.
+
+### Goals
+
+1. **Reproducible Analysis**: Create transparent, reproducible workflows for processing global biodiversity and environmental data
+2. **Open Tools**: Develop open-source R packages that enable anyone to analyze conservation effectiveness
+3. **Evidence-Based Conservation**: Support data-driven decision making in protected area management
+
+### Partners
+
+- **KfW Development Bank**: Financial cooperation projects for protected areas worldwide
+- **GIZ**: Technical cooperation and capacity building
+- **Academic Partners**: Collaboration on methodology development and validation
+
+## The mapme.biodiversity Package
+
+The [mapme.biodiversity](https://github.com/mapme-initiative/mapme.biodiversity) R package is the technical foundation for these analyses. It provides:
+
+- **Resource Functions**: Download and manage global environmental datasets
+- **Indicator Functions**: Calculate standardized indicators for any polygon geometry
+- **Efficient Processing**: Parallel computation support for large portfolios
+- **Standardized Output**: Consistent data formats across all indicators
+
+### Supported Indicators
+
+The package supports numerous indicators including:
+
+- Forest cover and forest loss (Global Forest Watch)
+- Burned areas (MODIS MCD64A1)
+- Landcover classification (ESA WorldCover)
+- Population density (WorldPop)
+- Climate variables (CHELSA, WorldClim)
+- And many more...
+
+## Data Sources
+
+### Global Forest Watch
+
+Forest cover data from Hansen et al. (2013) provides:
+
+- **Tree Cover 2000**: Baseline forest extent
+- **Year of Loss**: Annual forest loss detection (2001-present)
+- **Resolution**: 30m Landsat-derived
+
+> Hansen, M. C., et al. (2013). High-Resolution Global Maps of 21st-Century Forest Cover Change. *Science*, 342(6160), 850-853.
+
+### MODIS Burned Area (MCD64A1)
+
+The MCD64A1 product provides:
+
+- **Burned Area**: Monthly burned area detection
+- **Burn Date**: Julian day of burning
+- **Resolution**: 500m MODIS-derived
+
+> Giglio, L., et al. (2018). The Collection 6 MODIS burned area mapping algorithm and product. *Remote Sensing of Environment*, 217, 72-85.
+
+### World Database on Protected Areas (WDPA)
+
+Protected area boundaries from UNEP-WCMC and IUCN:
+
+- **Polygons**: Official protected area boundaries
+- **Attributes**: Governance, management, IUCN category
+- **Updates**: Monthly data releases
+
+> UNEP-WCMC and IUCN (2024), Protected Planet: The World Database on Protected Areas (WDPA).
+
+## Contact
+
+For questions about these analyses or the MAPME Initiative:
+
+- **GitHub**: [openkfw/mapme.protectedareas](https://github.com/openkfw/mapme.protectedareas)
+- **Package Issues**: [mapme-initiative/mapme.biodiversity](https://github.com/mapme-initiative/mapme.biodiversity/issues)
+
+## License
+
+This project is open source. Code is available under the MIT License. Data sources have their own licensing terms - please refer to the original data providers for details.
+

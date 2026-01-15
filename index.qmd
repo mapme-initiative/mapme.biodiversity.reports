@@ -1,0 +1,87 @@
+---
+title: "MAPME Biodiversity Reports"
+subtitle: "Threat Assessment and Conservation Analysis for Protected Areas"
+page-layout: full
+---
+
+```{=html}
+<div class="hero-section">
+  <div class="hero-content">
+    <h1 class="hero-title">MAPME Biodiversity Reports</h1>
+    <p class="hero-subtitle">Open-source geospatial analysis for conservation monitoring</p>
+  </div>
+</div>
+```
+
+## Welcome
+
+This website hosts threat assessment reports and conservation analyses for protected areas worldwide. The analyses leverage open geospatial data and the [mapme.biodiversity](https://github.com/mapme-initiative/mapme.biodiversity) R package to generate reproducible insights on ecosystem health and conservation pressures.
+
+## Available Reports
+
+::: {.grid}
+
+::: {.g-col-12 .g-col-md-6}
+### 🇧🇴 Bolivia Threat Assessment
+
+**Period:** 2000-2024  
+**Focus:** Forest Cover Loss & Burned Areas
+
+Analysis of threat levels in Bolivian protected areas, examining:
+
+- Primary forest cover loss trends
+- Burned area dynamics (MODIS MCD64A1)
+- Comparison between supported and non-supported areas
+
+[View Report →](reports/threat_assessment_bolivia.qmd)
+
+:::
+
+::: {.g-col-12 .g-col-md-6}
+### 📊 Coming Soon
+
+Additional reports for other regions are in development:
+
+- Central America portfolio analysis
+- Ecuador mangrove assessment
+- Selva Maya cross-border analysis
+
+:::
+
+:::
+
+## Data Sources
+
+Our analyses rely on globally consistent, openly available datasets:
+
+| Dataset | Source | Resolution |
+|---------|--------|------------|
+| Forest Cover | Global Forest Watch (Hansen et al., 2013) | 30m |
+| Burned Areas | MODIS MCD64A1 | 500m |
+| Protected Areas | WDPA/IUCN | Vector |
+
+## Methodology
+
+The reports in this repository use the **mapme.biodiversity** R package, which provides:
+
+- Standardized access to global environmental datasets
+- Efficient zonal statistics computation
+- Reproducible indicator calculations
+- Support for parallel processing
+
+Learn more about the package at: [mapme-initiative.github.io/mapme.biodiversity](https://mapme-initiative.github.io/mapme.biodiversity/)
+
+## About This Project
+
+This project is part of the **MAPME Initiative** (Measuring and Advancing the Protection of Ecosystems), supporting KfW and partners in monitoring and evaluating conservation projects worldwide.
+
+::: {.callout-note}
+## Reproducibility
+
+All code and data processing scripts are available in this repository. The analyses can be reproduced using the provided R scripts and openly available data sources.
+:::
+
+---
+
+*Last updated: January 2026*
+

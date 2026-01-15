@@ -1,0 +1,67 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "MAPME Biodiversity Reports"
+  description: "Threat Assessment Reports for Protected Areas"
+  favicon: "assets/favicon.ico"
+  
+  navbar:
+    background: "#1a472a"
+    foreground: light
+    left:
+      - text: "Home"
+        href: index.qmd
+      - text: "Reports"
+        menu:
+          - text: "Bolivia Threat Assessment"
+            href: reports/threat_assessment_bolivia.qmd
+      - text: "About"
+        href: about.qmd
+    right:
+      - icon: github
+        href: https://github.com/openkfw/mapme.protectedareas
+  
+  sidebar:
+    - title: "Reports"
+      style: "docked"
+      background: light
+      contents:
+        - reports/threat_assessment_bolivia.qmd
+  
+  page-footer:
+    left: |
+      © 2026 MAPME Initiative
+    center: |
+      Built with [Quarto](https://quarto.org/)
+    right: |
+      [GitHub](https://github.com/openkfw/mapme.protectedareas)
+
+format:
+  html:
+    theme:
+      light: [cosmo, assets/custom.scss]
+    toc: true
+    toc-depth: 3
+    toc-location: right
+    code-fold: true
+    code-summary: "Show code"
+    code-tools: true
+    code-overflow: wrap
+    highlight-style: github
+    df-print: paged
+    fig-width: 10
+    fig-height: 7
+    fig-dpi: 150
+
+execute:
+  freeze: auto
+  warning: false
+  message: false
+
+knitr:
+  opts_chunk:
+    fig.retina: 2
+    out.width: "100%"
+

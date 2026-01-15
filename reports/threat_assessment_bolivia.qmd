@@ -1,0 +1,883 @@
+---
+title: "Threat Assessment for Protected Areas in Bolivia"
+subtitle: "Analysis of Forest Cover Loss and Burned Areas (2000-2024)"
+author: 
+  - name: "Johannes Schielein & Andreas Petutschnig"
+    affiliations: "MAPME Initiative"
+date: "2026-01-12"
+date-modified: last-modified
+abstract: |
+  This report analyzes threat levels in protected areas (PAs) of the Bolivian Amazon Basin, 
+  examining forest cover loss and burned area dynamics from 2000 to 2024. The analysis 
+  utilizes Global Forest Watch data and MODIS burned area products to identify high-priority 
+  areas for conservation investment and support project preparation activities.
+categories: [Bolivia, Protected Areas, Forest Loss, Burned Areas, Threat Assessment]
+bibliography: references.bib
+---
+
+```{r setup}
+#| include: false
+#| cache: false
+
+# Load libraries
+library(tidyverse)
+library(sf)
+library(leaflet)
+library(leaflet.extras)
+library(leaflet.extras2)
+library(ggsci)
+library(scales)
+library(htmltools)
+library(RColorBrewer)
+library(plotly)
+library(DT)
+
+options(scipen = 10000)
+
+# Define Bolivian WDPA IDs for analysis
+bol_wdpa_ids <- c(
+  303891, 555592639, 555592671, 555592663, 555592664, 342481, 9308,
+  342482, 342484, 555592677, 555592678, 555592685, 342466,
+  555592641, 555592656, 555592600, 342494, 342495, 342496, 342497,
+  342498, 555592646, 555592673, 555592608, 20037, 31, 2037, 303887,
+  9779, 303884, 303894, 98183, 303885, 303883, 30, 342464, 35,
+  342483, 555592593, 342484, 555592669, 342490, 555592668, 342465,
+  555592608
+)
+
+# Areas that are only points (buffered circles)
+wdpa_noarea <- c(555558388, 555558386, 555558387, 166865, 900565, 900566, 900567, 900783)
+```
+
+```{r data-loading}
+#| include: false
+#| cache: false
+
+# ----- Load Protected Areas Data -----
+# Load KfW/GIZ portfolio
+wdpa_kfw <- read_sf("../data/portfolio.gpkg")
+
+# Filter for Bolivia (portfolio uses lowercase columns)
+wdpa_kfw <- wdpa_kfw %>%
+  filter(
+    country == "Bolivia" | grepl("BOL", country, ignore.case = TRUE)
+  ) %>%
+  filter(!is_point) %>%
+  filter(wdpaid %in% bol_wdpa_ids) %>%
+  filter(!wdpaid %in% wdpa_noarea)
+
+# Rename columns for compatibility with rest of script
+wdpa_kfw <- wdpa_kfw %>%
+  rename(
+    WDPAID = wdpaid,
+    ORIG_NAME = locationname,
+    bmz_n_1 = bmz_nrs  # Rename to match expected column name
+  ) %>%
+  mutate(WDPAID = as.character(WDPAID))
+
+# Add bmz_n_1 from bmz_nrs if not present
+if (!"bmz_n_1" %in% names(wdpa_kfw)) {
+  wdpa_kfw$bmz_n_1 <- wdpa_kfw$bmz_nrs
+}
+
+# Create area categories (using area_ha converted to km²)
+wdpa_kfw$REP_AREA <- wdpa_kfw$area_ha / 100  # Convert ha to km²
+wdpa_kfw$REP_AREA_cat <- cut(
+  wdpa_kfw$REP_AREA,
+  c(0, 1000, 5000, 10000, 20000, max(wdpa_kfw$REP_AREA, na.rm = TRUE)),
+  c("< 1,000 km²", "1,001-5,000 km²", "5,001-10,000 km²", 
+    "10,001-20,000 km²", paste0("20,001-", round(max(wdpa_kfw$REP_AREA, na.rm = TRUE)), " km²"))
+)
+
+# ----- Load Forest Loss Statistics -----
+# Check if processed data exists, otherwise use placeholder
+if (file.exists("../data/bolivia_forest_loss_2000_2024.csv")) {
+  gfw_lossstats <- read_csv(
+    "../data/bolivia_forest_loss_2000_2024.csv",
+    show_col_types = FALSE
+  )
+} else {
+  # Create placeholder for rendering test
+  warning("Forest loss data not found. Run processing.R first!")
+  gfw_lossstats <- tibble(
+    WDPA_PID = character(),
+    year = integer(),
+    value = numeric(),
+    name = character()
+  )
+}
+
+# Filter for area statistics
+gfw_lossstats_area <- gfw_lossstats %>%
+  filter(name == "area")
+
+# ----- Load All PAs Data -----
+wdpa_allPAs <- st_read(
+  "../data/wdpa.gdb", 
+  layer = "WDPA_WDOECM_poly_Jan2026_BOL",
+  quiet = TRUE
+)
+
+# Rename columns to match expected names
+wdpa_allPAs <- wdpa_allPAs %>%
+  rename(
+    WDPAID = SITE_ID,
+    WDPA_PID = SITE_PID,
+    ORIG_NAME = NAME
+  ) %>%
+  # Convert WDPAID to character for consistent joins
+  mutate(WDPAID = as.character(WDPAID))
+
+# Verify ORIG_NAME exists
+if (!"ORIG_NAME" %in% names(wdpa_allPAs)) {
+  stop("ORIG_NAME column is missing from wdpa_allPAs after rename!")
+}
+cat("✓ wdpa_allPAs has ORIG_NAME column\n")
+
+# Add GEOMETRY_TYPE column if not present
+if (!"GEOMETRY_TYPE" %in% names(wdpa_allPAs)) {
+  wdpa_allPAs$GEOMETRY_TYPE <- st_geometry_type(wdpa_allPAs)
+}
+
+# Calculate forest statistics (only if we have data)
+if (nrow(gfw_lossstats_area) > 0) {
+  # Use WDPAID for merging (more reliable than WDPA_PID)
+  max_forest <- gfw_lossstats_area %>%
+    mutate(WDPAID = as.character(WDPAID)) %>%
+    group_by(WDPAID) %>%
+    summarise(max_forest = max(value, na.rm = TRUE), .groups = "drop")
+  
+  # Use left_join to preserve sf object
+  wdpa_allPAs <- wdpa_allPAs %>% left_join(max_forest, by = "WDPAID")
+  
+  # Calculate relative and absolute loss (2000-2024)
+  relative_loss <- gfw_lossstats_area %>%
+    mutate(WDPAID = as.character(WDPAID)) %>%
+    group_by(WDPAID) %>%
+    summarise(
+      relative_loss = 1 - min(value, na.rm = TRUE) / max(value, na.rm = TRUE),
+      absolute_loss = max(value, na.rm = TRUE) - min(value, na.rm = TRUE),
+      .groups = "drop"
+    )
+  
+  # Use left_join to preserve sf object
+  wdpa_allPAs <- wdpa_allPAs %>% left_join(relative_loss, by = "WDPAID")
+} else {
+  # Add placeholder columns
+  wdpa_allPAs$max_forest <- NA_real_
+  wdpa_allPAs$relative_loss <- NA_real_
+  wdpa_allPAs$absolute_loss <- NA_real_
+}
+
+# Categorize forest area
+wdpa_allPAs$max_forest_categorized <- cut(
+  wdpa_allPAs$max_forest,
+  breaks = c(-1, 100, 1000, 10000, 100000, max(wdpa_allPAs$max_forest, na.rm = TRUE)),
+  labels = c("0-100 ha", "101-1,000 ha", "1,001-10,000 ha", "10,001-100,000 ha", ">100,000 ha")
+)
+
+# Categorize losses
+wdpa_allPAs$relative_loss_categorized <- cut(
+  wdpa_allPAs$relative_loss,
+  breaks = c(-1, 0.02, 0.05, 0.1, 0.2, 1),
+  labels = c("0-2%", "2-5%", "5-10%", "10-20%", ">20%")
+)
+
+wdpa_allPAs$absolute_loss_categorized <- cut(
+  wdpa_allPAs$absolute_loss,
+  breaks = c(-1, 10, 100, 1000, 10000, max(wdpa_allPAs$absolute_loss, na.rm = TRUE)),
+  labels = c("0-10 ha", "10-100 ha", "100-1,000 ha", "1,000-10,000 ha", ">10,000 ha")
+)
+
+# ----- Load Burned Area Data -----
+# MCD64A1 data available for 2000-2022
+if (file.exists("../data/bolivia_burned_area_total_2000_2022.csv")) {
+  burned_area_data <- read_csv(
+    "../data/bolivia_burned_area_total_2000_2022.csv",
+    show_col_types = FALSE
+  )
+  # Convert wdpa_id to character to match WDPAID type in wdpa_allPAs
+  burned_area_data <- burned_area_data %>%
+    mutate(wdpa_id = as.character(wdpa_id))
+  names(burned_area_data)[1] <- "WDPAID"
+  
+  # Use left_join to preserve sf object
+  wdpa_allPAs <- wdpa_allPAs %>% left_join(burned_area_data, by = "WDPAID")
+} else {
+  warning("Burned area data not found. Run process_burned_area.R first!")
+  wdpa_allPAs$total_burned_area_ha <- NA_real_
+}
+
+# Categorize burned area
+wdpa_allPAs$burned_area_categorized <- cut(
+  wdpa_allPAs$total_burned_area_ha,
+  breaks = c(0, 1000, 10000, 50000, 100000, 1e8),
+  labels = c("0-1,000 ha", "1,001-10,000 ha", "10,001-50,000 ha", "50,001-100,000 ha", ">100,000 ha")
+)
+
+# ----- Add bmz_n_1 column to wdpa_allPAs by joining with portfolio -----
+portfolio_bmz <- wdpa_kfw %>%
+  st_drop_geometry() %>%
+  select(WDPAID, bmz_n_1) %>%
+  mutate(WDPAID = as.character(WDPAID))
+
+wdpa_allPAs <- wdpa_allPAs %>%
+  mutate(WDPAID = as.character(WDPAID)) %>%
+  left_join(portfolio_bmz, by = "WDPAID")
+
+# ----- Prepare Data Subsets -----
+# Filter for valid data
+wdpa_allPAs_lossdata <- wdpa_allPAs %>%
+  filter(DESIG_ENG != 'UNESCO-MAB Biosphere Reserve' | is.na(DESIG_ENG)) %>%
+  filter(as.character(GEOMETRY_TYPE) != 'POINT') %>%
+  filter(!is.na(relative_loss) & !is.nan(relative_loss))
+
+# Only compute centroid if we have data
+# Keep as sf object (st_centroid preserves all attributes)
+if (nrow(wdpa_allPAs_lossdata) > 0) {
+  wdpa_allPAs_lossdata <- st_centroid(wdpa_allPAs_lossdata)
+  # Ensure it's still an sf object
+  wdpa_allPAs_lossdata <- st_as_sf(wdpa_allPAs_lossdata)
+}
+
+# Filter for non-supported areas (those without KfW support)
+# bmz_n_1 was already joined to wdpa_allPAs above (lines 213-220)
+wdpa_nonSupportPA <- wdpa_allPAs %>%
+  filter(DESIG_ENG != 'UNESCO-MAB Biosphere Reserve' | is.na(DESIG_ENG)) %>%
+  filter(as.character(GEOMETRY_TYPE) != 'POINT') %>%
+  filter(is.na(bmz_n_1))
+
+bolivia_suggested_PAs <- wdpa_kfw %>%
+  filter(WDPAID %in% as.character(bol_wdpa_ids))
+```
+
+## Introduction
+
+This analysis supports peer-discussion on the threat level of protected areas (PAs) in the Bolivian Amazon Basin. The goal is to assist KfW and its partners in the project preparation phase and to derive information about the current portfolio's relevance for protecting the most threatened areas.
+
+The analysis examines a set of predefined PAs, ranks them according to their threat level, and compares them to past KfW support. We utilize publicly available data from:
+
+- **World Database of Protected Areas (WDPA/IUCN)** - For protected area boundaries and metadata
+- **Global Forest Watch (Hansen et al., 2013)** - For forest cover loss detection
+- **MODIS MCD64A1** - For burned area mapping
+
+::: {.callout-note}
+## Analysis Period Update
+This report has been updated to cover the period **2000-2024**, extending the original analysis by 4 years. Additionally, fire analysis now uses **burned area in hectares** instead of active fire counts, providing a more accurate measure of fire impact.
+:::
+
+## Analyzed Protected Areas
+
+Below is an overview of the analyzed areas from the WDPA database. The table provides insights into governance variables and management characteristics.
+
+```{r table-pas}
+#| echo: false
+#| fig-height: 8
+
+# Select columns that exist in the portfolio data
+available_cols <- intersect(
+  names(bolivia_suggested_PAs),
+  c("WDPAID", "ORIG_NAME", "DESIG", "IUCN_CAT", "STATUS", "STATUS_YR",
+    "GOV_TYPE", "OWN_TYPE", "MANG_AUTH", "ISO3", "MANG_PLAN", "AREA_KM2",
+    "country", "region", "subregion", "area_ha", "bmz_nrs", "agency")
+)
+
+bolivia_suggested_PAs %>%
+  st_drop_geometry() %>%
+  arrange(ORIG_NAME) %>%
+  select(any_of(available_cols)) %>%
+  datatable(
+    filter = 'top',
+    options = list(
+      dom = 'Bfrtip',
+      scrollX = TRUE,
+      scrollY = "500px",
+      pageLength = 15,
+      buttons = c('csv', 'excel')
+    ),
+    caption = "Protected Areas analyzed in this report"
+  )
+```
+
+## Forest Cover Loss (2000-2024)
+
+Forest cover loss is quantified using Global Forest Watch data (Hansen et al., 2013). Forest cover loss is defined as *"a stand-replacement disturbance, or a change from a forest to non-forest state."* Loss can result from human activities or natural factors such as droughts, forest fires, or hurricanes.
+
+### Key Indicators
+
+We focus on two primary outcome indicators:
+
+1. **Total forest cover loss**: Measures the cumulative loss area in hectares. This identifies PAs with the highest primary forest cover loss, useful for targeting areas where we might achieve the largest impact in *reducing emissions from deforestation and forest degradation*.
+
+2. **Relative forest cover loss**: Measures the percentage of primary forest cover lost compared to the total primary forest area in 2000. PAs with high relative losses may have lost large parts of their functional forest habitat, making them priorities for protecting *floral biodiversity, fauna, and dependent human communities*.
+
+### Interactive Map
+
+The map below depicts relative and absolute forest cover loss in the selected areas. Circle size indicates total loss (larger = more loss), and color indicates relative loss (red = higher percentage lost). From a threat perspective, **large red circles indicate especially relevant areas for conservation**.
+
+```{r map-forest-loss}
+#| echo: false
+#| fig-height: 8
+
+# Prepare data for mapping
+wdpa_kfw_treated <- wdpa_kfw %>%
+  filter(!is.na(bmz_n_1))
+
+wdpa_allPAs_lossdata_subset <- wdpa_allPAs_lossdata %>%
+  filter(WDPAID %in% as.character(bol_wdpa_ids))
+
+# Extract coordinates and convert to regular data frame temporarily
+wdpa_temp <- wdpa_allPAs_lossdata_subset %>% 
+  st_drop_geometry()
+
+# Add coordinates back
+coords <- st_coordinates(wdpa_allPAs_lossdata_subset)
+wdpa_temp$X <- coords[, "X"]
+wdpa_temp$Y <- coords[, "Y"]
+
+# Create HTML label using the temp data frame
+wdpa_temp$label <- paste(
+  "<p><b>", wdpa_temp$ORIG_NAME, "</b></br>",
+  "Primary Forests (2000):", format(round(wdpa_temp$max_forest, 0), big.mark = ","), "ha</br>",
+  "Burned Area (2000-2024):", format(round(wdpa_temp$total_burned_area_ha, 0), big.mark = ","), "ha</br>",
+  "Absolute Loss (2000-2024):", format(round(wdpa_temp$absolute_loss, 0), big.mark = ","), "ha</br>",
+  "Relative Loss (2000-2024):", round(wdpa_temp$relative_loss * 100, 2), "%",
+  "</p>"
+)
+
+# Add geometry back
+wdpa_allPAs_lossdata_subset <- st_sf(wdpa_temp, geometry = st_geometry(wdpa_allPAs_lossdata_subset))
+
+# Color palettes
+pal_relative_loss <- colorFactor(
+  palette = rev(brewer.pal(5, "RdYlGn")),
+  domain = wdpa_allPAs$relative_loss_categorized
+)
+
+# Create map - build conditionally
+map <- leaflet() %>%
+  addTiles(group = "OpenStreetMap") %>%
+  addProviderTiles(providers$CartoDB.Positron, group = "CartoDB") %>%
+  addProviderTiles(providers$Esri.WorldImagery, group = "Satellite") %>%
+  addProviderTiles(providers$Esri.WorldShadedRelief, group = "Topography") %>%
+  addTiles(
+    "https://tiles.globalforestwatch.org/umd_tree_cover_loss/latest/dynamic/{z}/{x}/{y}.png",
+    group = "Forest Cover Loss (2001-2024)",
+    attribution = "Hansen et al., 2013"
+  ) %>%
+  addTiles(
+    "https://tiles.globalforestwatch.org/umd_regional_primary_forest_2001/latest/dynamic/{z}/{x}/{y}.png",
+    group = "Regional Primary Forests (2001)",
+    attribution = "Hansen et al., 2013"
+  )
+
+# Add polygon layers only if they have data
+if (nrow(wdpa_kfw_treated) > 0 && "ORIG_NAME" %in% names(wdpa_kfw_treated)) {
+  map <- map %>% addPolygons(
+    data = wdpa_kfw_treated, opacity = 0.9, color = "#2b8cbe",
+    group = "PAs KfW-supported", label = ~ORIG_NAME, weight = 1
+  )
+}
+
+if (nrow(wdpa_nonSupportPA) > 0 && "ORIG_NAME" %in% names(wdpa_nonSupportPA)) {
+  map <- map %>% addPolygons(
+    data = wdpa_nonSupportPA, opacity = 0.9, color = "darkgrey",
+    group = "PAs (Others)", label = ~ORIG_NAME, weight = 2
+  )
+}
+
+if (nrow(bolivia_suggested_PAs) > 0 && "ORIG_NAME" %in% names(bolivia_suggested_PAs)) {
+  map <- map %>% addPolygons(
+    data = bolivia_suggested_PAs, opacity = 1, fillOpacity = 0.1,
+    color = "#7d0f02", group = "PAs Analyzed", label = ~ORIG_NAME, weight = 2
+  )
+}
+
+map <- map %>%
+  addCircleMarkers(
+    data = wdpa_allPAs_lossdata_subset,
+    color = ~pal_relative_loss(relative_loss_categorized),
+    group = "Forest Cover Loss (2001-2024)",
+    radius = ~ifelse(absolute_loss_categorized == ">10,000 ha", 12,
+              ifelse(absolute_loss_categorized == "1,000-10,000 ha", 6,
+              ifelse(absolute_loss_categorized == "100-1,000 ha", 4,
+              ifelse(absolute_loss_categorized == "10-100 ha", 2, 1)))),
+    popup = ~label,
+    stroke = FALSE,
+    fillOpacity = 0.5
+  ) %>%
+  # Label markers temporarily disabled due to data structure issues
+  # addLabelOnlyMarkers(
+  #   data = wdpa_allPAs_lossdata_subset,
+  #   lng = ~X, lat = ~Y, label = ~ORIG_NAME, group = "Labels (PA Names)",
+  #   labelOptions = labelOptions(noHide = TRUE, direction = 'top', textOnly = TRUE)
+  # ) %>%
+  addFullscreenControl() %>%
+  addLegend(
+    "bottomright",
+    data = wdpa_allPAs,
+    pal = pal_relative_loss,
+    values = ~relative_loss_categorized,
+    title = "Relative Forest Cover Loss<br>(2001-2024)",
+    opacity = 1
+  ) %>%
+  addLayersControl(
+    baseGroups = c("CartoDB", "OpenStreetMap", "Satellite", "Topography"),
+    overlayGroups = c("PAs Analyzed", "PAs KfW-supported", "PAs (Others)",
+                     "Forest Cover Loss (2001-2024)",
+                     "Regional Primary Forests (2001)"),
+    options = layersControlOptions(collapsed = FALSE)
+  ) %>%
+  hideGroup(c("PAs (Others)", "Forest Cover Loss (2001-2024)",
+              "Regional Primary Forests (2001)"))
+```
+
+### Absolute Forest Cover Loss
+
+The lollipop plot below ranks protected areas by total forest cover loss (2000-2024). Areas supported by KfW projects are highlighted.
+
+```{r lollipop-forest}
+#| echo: false
+#| fig-height: 10
+#| fig-width: 10
+
+lollipop_data <- wdpa_allPAs_lossdata %>%
+  filter(WDPAID %in% bol_wdpa_ids)
+
+lollipop_data$display_name <- paste0(
+  lollipop_data$ORIG_NAME, " (WDPA-ID: ", lollipop_data$WDPAID, ")"
+)
+
+p <- lollipop_data %>%
+  ggplot() +
+  geom_point(aes(
+    x = reorder(display_name, -absolute_loss),
+    y = absolute_loss,
+    color = factor(bmz_n_1),
+    text = paste(
+      "Area Name:", display_name,
+      "\nForest cover loss:", format(round(absolute_loss, 0), big.mark = ","), "ha",
+      "\nBMZ-Number:", bmz_n_1
+    )
+  )) +
+  geom_segment(aes(
+    x = reorder(display_name, -absolute_loss),
+    xend = reorder(display_name, -absolute_loss),
+    y = 0,
+    yend = absolute_loss,
+    color = factor(bmz_n_1)
+  )) +
+  coord_flip() +
+  labs(
+    x = "",
+    y = "Absolute Forest Cover Loss in ha (2000-2024)",
+    color = "KfW Project Number"
+  ) +
+  scale_y_continuous(labels = comma) +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    panel.grid.minor = element_blank()
+  )
+
+ggplotly(p, tooltip = "text")
+```
+
+### Annual Forest Cover Loss Trends
+
+The heatmap below shows annual forest cover loss trends for each protected area. Green indicates low loss, red indicates high loss. This visualization helps identify:
+
+- **Sudden large loss events** (potential natural disasters or land clearing)
+- **Continuous loss patterns** (ongoing anthropogenic conversion)
+
+```{r heatmap-forest}
+#| echo: false
+#| fig-height: 10
+#| fig-width: 10
+
+# Load loss data
+gfw_lossstats_loss <- gfw_lossstats %>%
+  filter(name == "loss") %>%
+  group_by(WDPAID, year) %>%
+  summarise(value = sum(value, na.rm = TRUE), .groups = "drop") %>%
+  mutate(WDPAID = as.character(WDPAID))
+
+gfw_lossstats_loss <- gfw_lossstats_loss %>%
+  filter(WDPAID %in% as.character(bol_wdpa_ids))
+
+# Load names directly from source to avoid any column name issues
+wdpa_source <- st_read(
+  "../data/wdpa.gdb", 
+  layer = "WDPA_WDOECM_poly_Jan2026_BOL",
+  quiet = TRUE
+)
+
+names_auxdata <- wdpa_source %>%
+  st_drop_geometry() %>%
+  transmute(
+    WDPAID = as.character(SITE_ID),
+    ORIG_NAME = NAME
+  )
+
+# Add absolute_loss if wdpa_allPAs has it
+if("absolute_loss" %in% names(wdpa_allPAs)) {
+  loss_lookup <- wdpa_allPAs %>%
+    st_drop_geometry() %>%
+    select(WDPAID, absolute_loss) %>%
+    mutate(WDPAID = as.character(WDPAID))
+  
+  names_auxdata <- names_auxdata %>%
+    left_join(loss_lookup, by = "WDPAID")
+} else {
+  names_auxdata$absolute_loss <- 0
+}
+
+gfw_lossstats_loss <- gfw_lossstats_loss %>%
+  left_join(names_auxdata, by = "WDPAID")
+
+gfw_lossstats_loss$name_unique <- paste0(
+  gfw_lossstats_loss$ORIG_NAME, " (WDPA-ID: ", gfw_lossstats_loss$WDPAID, ")"
+)
+
+# Create heatmap
+p <- ggplot(
+  gfw_lossstats_loss,
+  aes(
+    x = year,
+    y = reorder(name_unique, -absolute_loss),
+    fill = value,
+    text = paste(
+      "Area Name:", ORIG_NAME,
+      "\nForest cover loss:", format(round(value, 0), big.mark = ","), "ha",
+      "\nYear:", year
+    )
+  )
+) +
+  geom_tile() +
+  scale_fill_distiller(
+    palette = "RdYlGn",
+    na.value = 'black',
+    trans = "log",
+    labels = comma
+  ) +
+  labs(
+    x = "Year",
+    y = "",
+    fill = "Loss (ha)"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+ggplotly(p, tooltip = "text")
+```
+
+## Burned Area Analysis (2000-2022)
+
+::: {.callout-important}
+## Methodology Update
+This analysis uses **burned area in hectares** from the MODIS MCD64A1 product (Giglio et al., 2018). This provides a more accurate measure of actual fire impact on ecosystems compared to active fire counts, as it quantifies the spatial extent of burned areas rather than just the number of fire detections.
+
+**Note:** MCD64A1 burned area data is available through 2022. Forest cover loss analysis covers 2000-2024, while burned area analysis covers 2000-2022.
+:::
+
+Fire is a significant threat to protected areas, whether from natural causes (e.g., El Niño-related droughts) or human activities (land clearing, agricultural burning). The MODIS MCD64A1 burned area product provides monthly burned area detection at 500m resolution, allowing us to quantify the total hectares affected by fire within each protected area over the analysis period (2000-2022).
+
+### Interactive Map
+
+The map shows burned area totals for analyzed protected areas. Larger circles indicate greater cumulative burned area.
+
+```{r map-burned-area}
+#| echo: false
+#| fig-height: 8
+
+# Color palette for burned area
+pal_burned <- colorFactor(
+  palette = rev(brewer.pal(5, "RdYlBu")),
+  domain = wdpa_allPAs_lossdata$burned_area_categorized
+)
+
+# Ensure ORIG_NAME exists in subset (reload if necessary)
+if (!"ORIG_NAME" %in% names(wdpa_allPAs_lossdata_subset)) {
+  wdpa_source_names <- st_read(
+    "../data/wdpa.gdb", 
+    layer = "WDPA_WDOECM_poly_Jan2026_BOL",
+    quiet = TRUE
+  ) %>%
+    st_drop_geometry() %>%
+    transmute(WDPAID = as.character(SITE_ID), ORIG_NAME = NAME)
+  
+  # Join ORIG_NAME back to subset
+  wdpa_temp <- wdpa_allPAs_lossdata_subset %>% 
+    st_drop_geometry() %>%
+    left_join(wdpa_source_names, by = "WDPAID")
+  
+  wdpa_allPAs_lossdata_subset <- st_sf(wdpa_temp, geometry = st_geometry(wdpa_allPAs_lossdata_subset))
+}
+
+# Update label with burned area
+wdpa_allPAs_lossdata_subset$label_fire <- paste(
+  "<p><b>", wdpa_allPAs_lossdata_subset$ORIG_NAME, "</b></br>",
+  "Total Burned Area (2000-2022):", format(round(wdpa_allPAs_lossdata_subset$total_burned_area_ha, 0), big.mark = ","), "ha</br>",
+  "Primary Forests (2000):", format(round(wdpa_allPAs_lossdata_subset$max_forest, 0), big.mark = ","), "ha</br>",
+  "Forest Loss (2000-2024):", format(round(wdpa_allPAs_lossdata_subset$absolute_loss, 0), big.mark = ","), "ha",
+  "</p>"
+)
+
+# Create map - build conditionally
+map2 <- leaflet() %>%
+  addTiles(group = "OpenStreetMap") %>%
+  addProviderTiles(providers$CartoDB.Positron, group = "CartoDB") %>%
+  addProviderTiles(providers$Esri.WorldImagery, group = "Satellite") %>%
+  addProviderTiles(providers$Esri.WorldShadedRelief, group = "Topography") %>%
+  addTiles(
+    "https://tiles.globalforestwatch.org/umd_tree_cover_loss/latest/dynamic/{z}/{x}/{y}.png",
+    group = "Forest Cover Loss (2001-2024)",
+    attribution = "Hansen et al., 2013"
+  )
+
+# Add polygon layers only if they have data
+if (nrow(wdpa_kfw_treated) > 0 && "ORIG_NAME" %in% names(wdpa_kfw_treated)) {
+  map2 <- map2 %>% addPolygons(
+    data = wdpa_kfw_treated, opacity = 0.9, color = "#2b8cbe",
+    group = "PAs KfW-supported", label = ~ORIG_NAME, weight = 1
+  )
+}
+
+if (nrow(wdpa_nonSupportPA) > 0 && "ORIG_NAME" %in% names(wdpa_nonSupportPA)) {
+  map2 <- map2 %>% addPolygons(
+    data = wdpa_nonSupportPA, opacity = 0.9, color = "darkgrey",
+    group = "PAs (Others)", label = ~ORIG_NAME, weight = 2
+  )
+}
+
+if (nrow(bolivia_suggested_PAs) > 0 && "ORIG_NAME" %in% names(bolivia_suggested_PAs)) {
+  map2 <- map2 %>% addPolygons(
+    data = bolivia_suggested_PAs, opacity = 1, fillOpacity = 0.1,
+    color = "#7d0f02", group = "PAs Analyzed", label = ~ORIG_NAME, weight = 2
+  )
+}
+
+map2 <- map2 %>%
+  addCircleMarkers(
+    data = wdpa_allPAs_lossdata_subset,
+    color = ~pal_burned(burned_area_categorized),
+    group = "Burned Area (2000-2024)",
+    radius = 8,
+    popup = ~label_fire,
+    stroke = FALSE,
+    fillOpacity = 0.8
+  ) %>%
+  # Label markers temporarily disabled
+  # addLabelOnlyMarkers(
+  #   data = wdpa_allPAs_lossdata_subset,
+  #   lng = ~X, lat = ~Y, label = ~ORIG_NAME, group = "Labels (PA Names)",
+  #   labelOptions = labelOptions(noHide = TRUE, direction = 'top', textOnly = TRUE)
+  # ) %>%
+  addFullscreenControl() %>%
+  addLegend(
+    "bottomright",
+    data = wdpa_allPAs_lossdata,
+    pal = pal_burned,
+    values = ~burned_area_categorized,
+    title = "Total Burned Area<br>(2000-2022)",
+    opacity = 1
+  ) %>%
+  addLayersControl(
+    baseGroups = c("CartoDB", "OpenStreetMap", "Satellite", "Topography"),
+    overlayGroups = c("PAs Analyzed", "PAs KfW-supported", "PAs (Others)",
+                     "Labels (PA Names)", "Burned Area (2000-2022)",
+                     "Forest Cover Loss (2001-2024)"),
+    options = layersControlOptions(collapsed = FALSE)
+  ) %>%
+  hideGroup(c("PAs (Others)", "PAs KfW-supported", "Forest Cover Loss (2001-2024)",
+              "Labels (PA Names)"))
+
+map2
+```
+
+### Total Burned Area by Protected Area
+
+```{r lollipop-burned}
+#| echo: false
+#| fig-height: 10
+#| fig-width: 10
+
+lollipop_data_fire <- wdpa_allPAs_lossdata %>%
+  filter(WDPAID %in% as.character(bol_wdpa_ids)) %>%
+  filter(!is.na(total_burned_area_ha))
+
+if (nrow(lollipop_data_fire) > 0) {
+  lollipop_data_fire$display_name <- paste0(
+    lollipop_data_fire$ORIG_NAME, " (WDPA-ID: ", lollipop_data_fire$WDPAID, ")"
+  )
+  
+  p <- lollipop_data_fire %>%
+    ggplot() +
+    geom_point(aes(
+      x = reorder(display_name, -total_burned_area_ha),
+      y = total_burned_area_ha,
+      color = factor(bmz_n_1),
+      text = paste(
+        "Area Name:", display_name,
+        "\nTotal Burned Area:", format(round(total_burned_area_ha, 0), big.mark = ","), "ha",
+        "\nBMZ-Number:", bmz_n_1
+      )
+    )) +
+    geom_segment(aes(
+      x = reorder(display_name, -total_burned_area_ha),
+      xend = reorder(display_name, -total_burned_area_ha),
+      y = 0,
+      yend = total_burned_area_ha,
+      color = factor(bmz_n_1)
+    )) +
+    coord_flip() +
+    labs(
+      x = "",
+      y = "Total Burned Area in ha (2000-2022)",
+      color = "KfW Project Number"
+    ) +
+    scale_y_continuous(labels = comma) +
+    theme_minimal() +
+    theme(
+      legend.position = "bottom",
+      panel.grid.minor = element_blank()
+    )
+  
+  ggplotly(p, tooltip = "text")
+} else {
+  cat("**Note:** Burned area data not yet available. Run `process_burned_area.R` to generate this data.")
+}
+```
+
+### Annual Burned Area Trends
+
+```{r heatmap-burned}
+#| echo: false
+#| fig-height: 10
+#| fig-width: 10
+
+# Load annual burned area data if it exists (2000-2022)
+if (file.exists("../data/bolivia_burned_area_annual_2000_2022.csv")) {
+  burned_annual <- read_csv(
+    "../data/bolivia_burned_area_annual_2000_2022.csv",
+    show_col_types = FALSE
+  )
+  
+  # Filter for target areas
+  burned_annual <- burned_annual %>%
+    filter(wdpa_id %in% bol_wdpa_ids)
+  
+  # Get total burned area for sorting
+  burned_total_for_sort <- burned_annual %>%
+    mutate(wdpa_id = as.character(wdpa_id)) %>%
+    group_by(wdpa_id) %>%
+    summarise(total_burned_area_ha = sum(burned_area_ha, na.rm = TRUE), .groups = "drop")
+  
+  # Add names and total for sorting
+  # Load names directly from source
+  wdpa_names <- st_read(
+    "../data/wdpa.gdb", 
+    layer = "WDPA_WDOECM_poly_Jan2026_BOL",
+    quiet = TRUE
+  ) %>%
+    st_drop_geometry() %>%
+    transmute(WDPAID = as.character(SITE_ID), ORIG_NAME = NAME)
+  
+  # Convert wdpa_id to character to match WDPAID type
+  burned_annual <- burned_annual %>%
+    mutate(wdpa_id = as.character(wdpa_id)) %>%
+    left_join(wdpa_names, by = c("wdpa_id" = "WDPAID")) %>%
+    left_join(burned_total_for_sort, by = "wdpa_id")
+  
+  burned_annual$name_unique <- paste0(
+    burned_annual$ORIG_NAME, " (WDPA-ID: ", burned_annual$wdpa_id, ")"
+  )
+  
+  # Pre-create the tooltip text to avoid evaluation issues in aes()
+  burned_annual$tooltip_text <- paste(
+    "Area Name:", burned_annual$ORIG_NAME,
+    "\nBurned Area:", format(round(burned_annual$burned_area_ha, 0), big.mark = ","), "ha",
+    "\nYear:", burned_annual$year
+  )
+  
+  p <- ggplot(
+    burned_annual,
+    aes(
+      x = year,
+      y = reorder(name_unique, -total_burned_area_ha),
+      fill = burned_area_ha,
+      text = tooltip_text
+    )
+  ) +
+    geom_tile() +
+    scale_fill_distiller(
+      palette = "RdYlBu",
+      na.value = 'grey',
+      trans = "log",
+      labels = comma,
+      direction = -1
+    ) +
+    labs(
+      x = "Year",
+      y = "",
+      fill = "Burned Area (ha)"
+    ) +
+    theme_minimal() +
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1)
+    )
+  
+  ggplotly(p, tooltip = "text")
+} else {
+  cat("**Note:** Annual burned area data not yet generated. Run `process_burned_area.R` first.")
+}
+```
+
+## Interpretation & Discussion
+
+### Forest Cover Loss
+
+The GFW methodology defines forest cover loss as *"a stand-replacement disturbance, or a change from a forest to non-forest state."* Loss can result from human or natural factors. **Key interpretation considerations:**
+
+- **Sudden spikes** in annual loss may indicate natural events (wildfires, storms) - verify with news sources
+- **Continuous growth** in loss likely indicates ongoing conversion for agriculture
+- GFW does not yet differentiate between natural and human-caused loss
+
+::: {.callout-tip}
+## Notable Findings
+- **Otuquis National Park** shows extreme loss events in 2019, 2020, and subsequent years, largely attributed to wildfires
+- Areas near the Brazilian border (Rondonia) show high continuous loss, suggesting agricultural pressure
+- Several analyzed areas show "fishbone" patterns visible in satellite imagery, indicating systematic deforestation
+:::
+
+### Burned Area Analysis
+
+The MODIS MCD64A1 burned area product provides hectares actually affected by fire, which is more meaningful than fire count data. Key considerations:
+
+- **Spatial accuracy**: The 500m resolution captures the actual extent of burned areas, not just fire detections
+- **Ecosystem context**: Fire impacts vary by ecosystem - savannas may tolerate fire better than moist rainforests
+- **Fire types**: Some fires are natural and ecologically important; others indicate land clearing or agricultural burning
+- **Temporal patterns**: The correlation between forest loss and burned area is notable but not perfect - some burned areas may regenerate while others represent permanent conversion
+
+### Possible Improvements
+
+1. **Land cover analysis**: Overlay loss areas with land cover data to distinguish permanent conversion from natural regeneration
+2. **Buffer zone analysis**: Examine threats in PA surroundings
+3. **Spatial hotspot mapping**: Create fine-resolution heatmaps for large PAs
+4. **Temporal baseline comparison**: Compare fire patterns to historical norms
+
+## Data Sources & References
+
+::: {#refs}
+:::
+
+- **WDPA**: UNEP-WCMC and IUCN (2024), Protected Planet: The World Database on Protected Areas (WDPA)
+- **GFW**: Hansen, M. C., et al. (2013). High-Resolution Global Maps of 21st-Century Forest Cover Change. *Science*, 342(15 November): 850–53. Data version: GFC-2024-v1.12.
+- **MODIS MCD64A1**: Giglio, L., Boschetti, L., Roy, D. P., Humber, M. L., & Justice, C. O. (2018). The Collection 6 MODIS burned area mapping algorithm and product. *Remote Sensing of Environment*, 217, 72-85. Available at: https://modis-fire.umd.edu/ba.html
+
+---
+
+*Report generated: `r Sys.Date()`*
+

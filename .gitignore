@@ -1,0 +1,31 @@
+# R/RStudio files
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj
+
+# Quarto rendering artifacts
+/.quarto/
+_freeze/
+
+# macOS
+.DS_Store
+
+# Data files (too large for git) - exclude entire data folder
+data/
+
+# Temporary files
+*.tmp
+*.temp
+
+# IDE files
+.vscode/
+.idea/
+
+# Output files (generated, can be regenerated)
+# Uncomment if you don't want docs in version control
+# docs/
+
+
+**/*.quarto_ipynb
