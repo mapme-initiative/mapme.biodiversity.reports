@@ -270,35 +270,70 @@ This report has been updated to cover the period **2000-2024**, extending the or
 
 ## Analyzed Protected Areas
 
-Below is an overview of the analyzed areas from the WDPA database. The table provides insights into governance variables and management characteristics.
+This analysis examines a set of protected areas within the Bolivian Amazon and Gran Chaco regions. Of these areas, **five have received financial support from KfW** through current or past conservation projects. The remaining areas represent additional protected zones of conservation interest that could benefit from future investment.
 
 ```{r table-pas}
 #| echo: false
 #| fig-height: 8
 
-# Select columns that exist in the portfolio data
-available_cols <- intersect(
-  names(bolivia_suggested_PAs),
-  c("WDPAID", "ORIG_NAME", "DESIG", "IUCN_CAT", "STATUS", "STATUS_YR",
-    "GOV_TYPE", "OWN_TYPE", "MANG_AUTH", "ISO3", "MANG_PLAN", "AREA_KM2",
-    "country", "region", "subregion", "area_ha", "bmz_nrs", "agency")
-)
+# Get forest cover data for 2001 and latest year
+forest_2001 <- gfw_lossstats_area %>%
+  filter(year == 2001) %>%
+  mutate(WDPAID = as.character(WDPAID)) %>%
+  select(WDPAID, forest_2001 = value)
 
-bolivia_suggested_PAs %>%
+forest_latest <- gfw_lossstats_area %>%
+  filter(year == max(year)) %>%
+  mutate(WDPAID = as.character(WDPAID)) %>%
+  select(WDPAID, forest_2024 = value)
+
+# Get burned area data
+burned_total <- wdpa_allPAs %>%
   st_drop_geometry() %>%
-  arrange(ORIG_NAME) %>%
-  select(any_of(available_cols)) %>%
+  select(WDPAID, total_burned_area_ha) %>%
+  mutate(WDPAID = as.character(WDPAID))
+
+# Create table data - prioritize KfW-supported areas first
+table_data <- bolivia_suggested_PAs %>%
+  st_drop_geometry() %>%
+  mutate(WDPAID = as.character(WDPAID)) %>%
+  left_join(forest_2001, by = "WDPAID") %>%
+  left_join(forest_latest, by = "WDPAID") %>%
+  left_join(burned_total, by = "WDPAID") %>%
+  mutate(
+    Supported = ifelse(!is.na(bmz_n_1), "Yes", "No"),
+    # Sort KfW-supported first, then by name
+    sort_order = ifelse(Supported == "Yes", 0, 1)
+  ) %>%
+  arrange(sort_order, ORIG_NAME) %>%
+  select(
+    `Name` = ORIG_NAME,
+    `WDPA ID` = WDPAID,
+    `Area (ha)` = area_ha,
+    `Forest 2001 (ha)` = forest_2001,
+    `Forest 2024 (ha)` = forest_2024,
+    `Burned Area (ha)` = total_burned_area_ha,
+    Supported
+  )
+
+table_data %>%
   datatable(
     filter = 'top',
+    extensions = 'Buttons',
     options = list(
       dom = 'Bfrtip',
       scrollX = TRUE,
-      scrollY = "500px",
-      pageLength = 15,
-      buttons = c('csv', 'excel')
+      scrollY = "400px",
+      pageLength = 8,
+      buttons = list(
+        list(extend = 'csv', text = 'Download CSV'),
+        list(extend = 'excel', text = 'Download Excel')
+      ),
+      order = list(list(6, 'desc'))  # Sort by Supported column (0-indexed, 7th column)
     ),
-    caption = "Protected Areas analyzed in this report"
-  )
+    caption = "Protected Areas analyzed in this report (KfW-supported areas listed first)"
+  ) %>%
+  formatRound(c('Area (ha)', 'Forest 2001 (ha)', 'Forest 2024 (ha)', 'Burned Area (ha)'), 0)
 ```
 
 ## Forest Cover Loss (2000-2024)
@@ -639,18 +674,12 @@ p <- ggplot(
     )
   )
 ) +
-  # Add red border for KfW areas
-  geom_tile(
-    data = gfw_lossstats_loss %>% filter(is_kfw),
-    aes(x = year, y = reorder(name_unique, -absolute_loss)),
-    fill = NA, color = "#8B0000", linewidth = 0.8
-  ) +
   geom_tile() +
-  # Re-add border on top so it's visible
+  # Add subtle grey border for KfW areas (on top of tiles)
   geom_tile(
     data = gfw_lossstats_loss %>% filter(is_kfw),
     aes(x = year, y = reorder(name_unique, -absolute_loss)),
-    fill = NA, color = "#8B0000", linewidth = 0.8
+    fill = NA, color = "#666666", linewidth = 0.4
   ) +
   scale_fill_distiller(
     palette = "RdYlGn",
@@ -662,19 +691,12 @@ p <- ggplot(
     x = "Year",
     y = "",
     fill = "Loss (ha)",
-    caption = "★ = KfW-supported areas (red border)"
+    caption = "★ = KfW-supported areas (grey border)"
   ) +
   theme_minimal() +
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1),
-    axis.text.y = element_text(
-      face = ifelse(
-        levels(reorder(gfw_lossstats_loss$name_unique, -gfw_lossstats_loss$absolute_loss)) %in% 
-          gfw_lossstats_loss$name_unique[gfw_lossstats_loss$is_kfw],
-        "bold", "plain"
-      )
-    ),
-    plot.caption = element_text(hjust = 0, face = "italic", color = "#8B0000")
+    plot.caption = element_text(hjust = 0, face = "italic", color = "#666666")
   )
 
 ggplotly(p, tooltip = "text")
@@ -691,6 +713,22 @@ This analysis uses **burned area in hectares** from the MODIS MCD64A1 product (G
 - **Forest Cover Loss (Global Forest Watch)**: Each forest pixel is only counted once when it transitions from forest to non-forest. Even if an area burns multiple times or experiences repeated disturbances, the loss is recorded only at the initial deforestation event.
 
 **Implication for interpretation:** Burned area values are typically higher than forest cover loss values because they represent cumulative fire exposure, not permanent land cover change. High burned area with low forest loss may indicate recurrent fires in grasslands or savannas, while matching high values in both metrics suggest fire-driven deforestation.
+:::
+
+::: {.callout-warning}
+## Important Limitation: GFW Detection Bias in Dry Forest Ecosystems
+
+A critical limitation of the Global Forest Watch data concerns its **reduced detection accuracy in dry forest ecosystems**, such as those found in **Kaa-Iya del Gran Chaco National Park** and other Chaco-type environments. This limitation stems from several technical factors:
+
+1. **Spectral Confusion**: The "brown" signature of deciduous trees during the dry season is often indistinguishable from bare soil in global satellite baselines, leading to underdetection of forest cover.
+
+2. **Deciduous Phenology**: Dry forests naturally lose their leaves seasonally, which can be misinterpreted as permanent forest loss or, conversely, cause actual losses to be missed when trees are leafless.
+
+3. **Algorithm Bias**: Research indicates that GFW algorithms are fundamentally optimized for **humid tropical biomes** and frequently misclassify the sparse, clumped canopies characteristic of the Gran Chaco as shrubland or non-forest.
+
+4. **Masking Practices**: GFW often **masks out** non-humid regions from its primary forest datasets entirely, resulting in systematic underrepresentation of dry forest dynamics.
+
+**Interpretation Guidance**: Low or zero forest cover loss values for dry forest protected areas (such as Kaa-Iya del Gran Chaco) should be interpreted as a **technical artifact** rather than evidence of low threat. Nevertheless, the relatively low burned area values observed in Kaa-Iya del Gran Chaco suggest that this area may indeed have been spared from the major fire events that affected other regions in the last decade.
 :::
 
 Fire is a significant threat to protected areas, whether from natural causes (e.g., El Niño-related droughts) or human activities (land clearing, agricultural burning). The MODIS MCD64A1 burned area product provides monthly burned area detection at 500m resolution, allowing us to quantify the total hectares affected by fire within each protected area over the analysis period (2015-2023).
@@ -977,18 +1015,12 @@ if (file.exists("../data/bolivia_burned_area_annual_2015_2023.csv")) {
       text = tooltip_text
     )
   ) +
-    # Add red border for KfW areas
-    geom_tile(
-      data = burned_annual %>% filter(is_kfw),
-      aes(x = year, y = reorder(name_unique, -total_burned_area_ha)),
-      fill = NA, color = "#8B0000", linewidth = 0.8
-    ) +
     geom_tile() +
-    # Re-add border on top
+    # Add subtle grey border for KfW areas (on top of tiles)
     geom_tile(
       data = burned_annual %>% filter(is_kfw),
       aes(x = year, y = reorder(name_unique, -total_burned_area_ha)),
-      fill = NA, color = "#8B0000", linewidth = 0.8
+      fill = NA, color = "#666666", linewidth = 0.4
     ) +
     scale_fill_distiller(
       palette = "RdYlBu",
@@ -1001,12 +1033,12 @@ if (file.exists("../data/bolivia_burned_area_annual_2015_2023.csv")) {
       x = "Year",
       y = "",
       fill = "Burned Area (ha)",
-      caption = "★ = KfW-supported areas (red border)"
+      caption = "★ = KfW-supported areas (grey border)"
     ) +
     theme_minimal() +
     theme(
       axis.text.x = element_text(angle = 45, hjust = 1),
-      plot.caption = element_text(hjust = 0, face = "italic", color = "#8B0000")
+      plot.caption = element_text(hjust = 0, face = "italic", color = "#666666")
     )
   
   ggplotly(p, tooltip = "text")
@@ -1019,42 +1051,65 @@ if (file.exists("../data/bolivia_burned_area_annual_2015_2023.csv")) {
 
 ### Most Threatened Protected Areas
 
-Based on the combined analysis of forest cover loss and burned area data, the following protected areas emerge as the **most threatened** and should be prioritized for conservation intervention:
+Based on the combined analysis of forest cover loss and burned area data, the following protected areas emerge as the **most threatened** and should be prioritized for conservation intervention.
+
+::: {.callout-note}
+## Threat Index Methodology
+
+The **Composite Threat Index** used in this analysis follows established approaches in conservation prioritization (Margules & Pressey, 2000; Wilson et al., 2005). The index combines three normalized indicators:
+
+1. **Absolute Forest Loss (ha)**: Total hectares of forest lost since 2001, capturing the magnitude of habitat destruction.
+2. **Relative Forest Loss (%)**: Percentage of original forest cover lost, indicating the intensity of pressure relative to the area's forest resources.
+3. **Total Burned Area (ha)**: Cumulative fire exposure since 2015, reflecting fire-related threats.
+
+**Calculation Method:**
+Each indicator is normalized to a 0-1 scale using min-max normalization: \(\text{normalized} = \frac{x - x_{min}}{x_{max} - x_{min}}\). The final threat score is the arithmetic mean of all three normalized indicators, giving equal weight to each threat dimension.
+
+**Interpretation:**
+
+- Scores close to **1.0** indicate areas with the highest combined threats across all dimensions
+- Scores close to **0.0** indicate areas with relatively lower threat levels
+- The index is relative to the analyzed portfolio and should not be compared across different study areas
+:::
 
 ```{r threat-ranking}
 #| echo: false
 #| fig-height: 8
 
-# Create threat ranking combining both metrics
+# Create threat ranking combining three metrics (methodologically improved)
 threat_data <- wdpa_allPAs %>%
   st_drop_geometry() %>%
   filter(WDPAID %in% as.character(bol_wdpa_ids)) %>%
-  filter(!is.na(relative_loss) & !is.na(total_burned_area_ha)) %>%
+  filter(!is.na(relative_loss) & !is.na(total_burned_area_ha) & !is.na(absolute_loss)) %>%
   select(WDPAID, ORIG_NAME, total_area_ha, max_forest, absolute_loss, 
          relative_loss, total_burned_area_ha, bmz_n_1) %>%
   mutate(
     is_kfw = !is.na(bmz_n_1),
-    # Normalize metrics for comparison (0-1 scale)
+    # Normalize all three metrics for comparison (0-1 scale using min-max normalization)
+    norm_abs_loss = (absolute_loss - min(absolute_loss, na.rm = TRUE)) / 
+                    (max(absolute_loss, na.rm = TRUE) - min(absolute_loss, na.rm = TRUE)),
     norm_rel_loss = (relative_loss - min(relative_loss, na.rm = TRUE)) / 
                     (max(relative_loss, na.rm = TRUE) - min(relative_loss, na.rm = TRUE)),
     norm_burned = (total_burned_area_ha - min(total_burned_area_ha, na.rm = TRUE)) / 
                   (max(total_burned_area_ha, na.rm = TRUE) - min(total_burned_area_ha, na.rm = TRUE)),
-    # Combined threat score (equal weighting)
-    threat_score = (norm_rel_loss + norm_burned) / 2
+    # Combined threat score (equal weighting of all three indicators)
+    threat_score = (norm_abs_loss + norm_rel_loss + norm_burned) / 3
   ) %>%
   arrange(desc(threat_score))
 
-# Display top 10 most threatened
+# Display top 15 most threatened
 threat_data %>%
   head(15) %>%
   mutate(
     display_name = ifelse(is_kfw, paste0("★ ", ORIG_NAME), ORIG_NAME),
     relative_loss_pct = paste0(round(relative_loss * 100, 1), "%"),
+    absolute_loss_fmt = format(round(absolute_loss, 0), big.mark = ","),
     burned_area_fmt = format(round(total_burned_area_ha, 0), big.mark = ",")
   ) %>%
   select(
     `Protected Area` = display_name,
     `Total Area (ha)` = total_area_ha,
+    `Absolute Loss (ha)` = absolute_loss_fmt,
     `Relative Loss` = relative_loss_pct,
     `Burned Area (ha)` = burned_area_fmt,
     `Threat Score` = threat_score
@@ -1070,17 +1125,17 @@ threat_data %>%
 ::: {.callout-warning}
 ## Critical Findings: Most Threatened Areas
 
-**Top 5 Most Threatened Protected Areas:**
+Based on the composite threat index and supporting evidence from documented fire events:
 
-1. **Otuquis National Park** - Extremely high threat from both forest loss and fire. This area experienced catastrophic fire events in 2019-2020 and continues to show elevated threat levels. Located in the Pantanal-Chaco transition zone, it faces pressure from both agricultural expansion and climate-driven fire intensification.
+**1. Otuquis National Park** - Ranks among the highest-threat areas due to catastrophic fire events during the **2019-2020 Bolivian fire crisis**. According to reports from the Fundación Amigos de la Naturaleza (FAN), this Pantanal-Chaco transition zone experienced unprecedented fire activity that burned over 5 million hectares across eastern Bolivia in 2019 alone.
 
-2. **San Matías Integrated Management Natural Area** - High burned area combined with significant forest loss. Its location near the Brazilian border exposes it to cross-border agricultural pressure.
+**2. San Matías Integrated Management Natural Area** - High burned area and forest loss values. This area, located near the Brazilian border in the Chiquitano dry forest region, was severely affected by the 2019 fires, which were linked to agricultural expansion and land clearing practices.
 
-3. **Ñembi Guasu** - Shows concerning patterns of continuous forest loss, suggesting systematic deforestation rather than natural disturbance.
+**3. Areas in the Chiquitano Dry Forest Region** - The Chiquitano forest, the world's largest and best-preserved tropical dry forest, experienced devastating fires in 2019 that destroyed approximately 1.4 million hectares according to satellite analysis. Several protected areas in this region show elevated threat scores.
 
-4. **Kaa-Iya del Gran Chaco National Park** - Large absolute losses due to its size, with fire being a major driver of ecosystem change.
+**4. Kaa-Iya del Gran Chaco National Park** - While showing high absolute values due to its large size (3.4 million ha), this area appears to have been relatively spared from the worst fire events. Note that GFW detection limitations in dry forest ecosystems (see methodology note above) may underestimate actual forest dynamics in this area.
 
-5. **Iñao National Park** - High relative loss indicating significant pressure on a smaller forest area.
+**Note on Data Interpretation:** The rankings are based on available satellite data and should be interpreted alongside ground-truth information and local ecological knowledge. Some areas may show low threat scores due to detection limitations rather than actual low threat levels.
 :::
 
 ### Does Forest Cover Loss Coincide with High Burned Areas?
@@ -1090,28 +1145,28 @@ threat_data %>%
 #| fig-height: 6
 #| fig-width: 8
 
-# Scatter plot showing correlation
+# Scatter plot showing correlation between absolute loss and burned area
 correlation_data <- wdpa_allPAs %>%
   st_drop_geometry() %>%
   filter(WDPAID %in% as.character(bol_wdpa_ids)) %>%
-  filter(!is.na(relative_loss) & !is.na(total_burned_area_ha)) %>%
+  filter(!is.na(absolute_loss) & !is.na(total_burned_area_ha)) %>%
   mutate(
     is_kfw = !is.na(bmz_n_1),
     kfw_status = ifelse(is_kfw, "KfW-supported", "Not KfW-supported")
   )
 
-# Calculate correlation
-cor_value <- cor(correlation_data$relative_loss, correlation_data$total_burned_area_ha, 
+# Calculate correlation using absolute loss (more meaningful than relative)
+cor_value <- cor(correlation_data$absolute_loss, correlation_data$total_burned_area_ha, 
                  use = "complete.obs")
 
 p <- ggplot(correlation_data, aes(
-  x = relative_loss * 100,
+  x = absolute_loss / 1000,
   y = total_burned_area_ha / 1000,
   color = kfw_status,
   size = total_area_ha / 1000,
   text = paste(
     "Area:", ORIG_NAME,
-    "\nRelative Loss:", round(relative_loss * 100, 1), "%",
+    "\nAbsolute Loss:", format(round(absolute_loss, 0), big.mark = ","), "ha",
     "\nBurned Area:", format(round(total_burned_area_ha, 0), big.mark = ","), "ha",
     "\nTotal Area:", format(round(total_area_ha, 0), big.mark = ","), "ha"
   )
@@ -1122,7 +1177,7 @@ p <- ggplot(correlation_data, aes(
   scale_color_manual(values = c("KfW-supported" = "#8B0000", "Not KfW-supported" = "#006400")) +
   scale_size_continuous(range = c(3, 15), guide = "none") +
   labs(
-    x = "Relative Forest Cover Loss (%)",
+    x = "Absolute Forest Cover Loss (thousand ha)",
     y = "Total Burned Area (thousand ha)",
     color = "Support Status",
     title = paste0("Correlation between Forest Loss and Fire (r = ", round(cor_value, 2), ")"),
@@ -1134,11 +1189,12 @@ p <- ggplot(correlation_data, aes(
 ggplotly(p, tooltip = "text")
 ```
 
-The analysis reveals a **moderate positive correlation** between relative forest cover loss and burned area. This suggests that fire is indeed a significant driver of deforestation in many protected areas, but not the only one. Key observations:
+The analysis reveals a **`r ifelse(abs(cor_value) > 0.7, "strong", ifelse(abs(cor_value) > 0.4, "moderate", "weak"))` positive correlation** (r = `r round(cor_value, 2)`) between absolute forest cover loss and burned area. This relationship suggests that fire and deforestation are interconnected threats in many protected areas. Key observations:
 
-- **High fire, high loss areas** (upper right quadrant): These areas experience fire-driven deforestation and should be prioritized for fire management interventions.
-- **High fire, low loss areas** (upper left quadrant): These may represent savanna or grassland ecosystems where fire is more natural and does not necessarily lead to permanent forest loss.
-- **Low fire, high loss areas** (lower right quadrant): These areas experience deforestation from other drivers (agricultural conversion, logging) and require different intervention strategies.
+- **High fire, high loss areas** (upper right quadrant): These areas experience fire-driven deforestation, where fire is likely a direct cause or facilitator of forest loss. They should be prioritized for integrated fire management and deforestation control.
+- **High fire, low loss areas** (upper left quadrant): These may represent ecosystems where fire occurs but does not lead to permanent forest loss—either because fires occur in non-forest vegetation (savannas, grasslands) or because forests regenerate after fire events.
+- **Low fire, high loss areas** (lower right quadrant): Deforestation in these areas is driven by factors other than fire, such as agricultural conversion or logging. Different intervention strategies focused on land-use planning and enforcement may be more effective.
+- **Areas near the origin**: Protected areas with low values for both metrics may either be well-protected or, in the case of dry forest ecosystems, may be affected by the detection limitations discussed above.
 
 ### Is KfW Already Present in the Most Threatened Areas?
 
@@ -1196,56 +1252,80 @@ kfw_summary %>%
 
 ### Temporal Patterns and Emerging Threats
 
-The heatmaps reveal important temporal patterns:
+The heatmaps reveal important temporal patterns that align with documented events in the region:
 
-1. **2019-2020 Fire Crisis**: Multiple protected areas show dramatic spikes in both burned area and forest loss during 2019-2020, coinciding with the Amazon fire crisis that received global attention. This event particularly affected:
-   - Otuquis National Park
-   - San Matías IMNA
-   - Areas in the Chiquitano dry forest region
+1. **2019-2020 Fire Crisis**: Multiple protected areas show dramatic spikes in both burned area and forest loss during 2019-2020. This corresponds to the well-documented **Bolivian fire crisis of 2019**, during which fires—many linked to agricultural clearing—burned an estimated 5.3 million hectares across Bolivia according to the Fundación Amigos de la Naturaleza (FAN). The Chiquitano dry forest, the world's largest tropical dry forest, was particularly affected, with approximately 1.4 million hectares burned. International media and conservation organizations extensively documented this event, which triggered national emergency declarations.
 
-2. **Post-Crisis Recovery**: Some areas show reduced fire activity after 2020, suggesting either:
-   - Successful fire management interventions
-   - Reduced fuel loads after extensive burning
-   - Changes in agricultural practices
+2. **Post-Crisis Patterns (2020-2023)**: Following the 2019 peak, some areas show reduced fire activity. This may reflect:
+   - Reduced fuel availability after extensive burning
+   - Increased monitoring and enforcement following international attention
+   - Natural variation in fire occurrence
+   - However, 2020 also saw significant fire activity in the Pantanal region, affecting areas like Otuquis National Park
 
-3. **Persistent Threats**: Other areas show **continuous, steady loss patterns** rather than spike events, indicating ongoing systematic deforestation that requires sustained intervention.
+3. **Persistent Deforestation Patterns**: Areas showing **continuous, steady loss patterns** (rather than fire-related spikes) suggest ongoing land conversion pressures, likely related to agricultural expansion—a pattern consistent with Bolivia's agricultural frontier dynamics in the lowlands.
 
-### Forest Cover Loss Interpretation
+## Recommendations for Conservation Investment
 
-The GFW methodology defines forest cover loss as *"a stand-replacement disturbance, or a change from a forest to non-forest state."* Loss can result from human or natural factors. **Key interpretation considerations:**
+::: {.callout-tip}
+## Important Caveat
 
-- **Sudden spikes** in annual loss may indicate natural events (wildfires, storms) - verify with news sources
-- **Continuous growth** in loss likely indicates ongoing conversion for agriculture
-- GFW does not yet differentiate between natural and human-caused loss
+This analysis examines conservation priorities **exclusively through the lens of environmental threats** (forest loss and fire). A comprehensive project prioritization would also need to consider:
 
-### Burned Area Analysis Context
+- **Biodiversity values**: Species richness, endemism, and ecological uniqueness
+- **Socioeconomic factors**: Local livelihoods, economic development needs, and poverty contexts
+- **Social and cultural dimensions**: Indigenous territories, traditional land use, and community perspectives
+- **Institutional capacity**: Existing management structures, governance quality, and implementation feasibility
 
-The MODIS MCD64A1 burned area product provides hectares actually affected by fire, which is more meaningful than fire count data. Key considerations:
+The recommendations below should therefore be understood as **one input among many** for investment decisions, highlighting areas where threat mitigation interventions may be most urgent from a forest conservation perspective.
+:::
 
-- **Spatial accuracy**: The 500m resolution captures the actual extent of burned areas, not just fire detections
-- **Ecosystem context**: Fire impacts vary by ecosystem - savannas may tolerate fire better than moist rainforests
-- **Fire types**: Some fires are natural and ecologically important; others indicate land clearing or agricultural burning
-- **Temporal patterns**: The correlation between forest loss and burned area is notable but not perfect - some burned areas may regenerate while others represent permanent conversion
+Based on the findings of this analysis, we suggest the following priorities:
 
-### Recommendations for Conservation Investment
+**Priority 1 — Target High-Threat Areas**
+The protected areas with the highest composite threat scores should be prioritized for conservation intervention. This includes areas experiencing both high absolute forest loss and significant fire exposure. Among these, areas not currently receiving KfW support represent potential opportunities for new investments to expand coverage of the most threatened sites.
 
-Based on this analysis, we recommend:
+**Priority 2 — Invest in Fire Management Capacity**
+The 2019-2020 fire crisis demonstrated the vulnerability of protected areas in the Chiquitano and Pantanal-Chaco transition zones to catastrophic fire events. Investments in fire prevention (fuel management, firebreak maintenance), early detection systems, and rapid response capacity could significantly reduce future losses in these ecosystems.
 
-1. **Priority 1 - Immediate Intervention**: Focus resources on the top 5 most threatened areas, particularly those not yet receiving KfW support.
+**Priority 3 — Strengthen Monitoring for Verification**
+Given the detection limitations of satellite-based monitoring in dry forest ecosystems (discussed in the Methods section), ground-based monitoring and the integration of alternative data sources (such as MapBiomas Chaco) should be considered to improve threat assessment accuracy in areas like Kaa-Iya del Gran Chaco.
 
-2. **Priority 2 - Fire Management**: Implement fire prevention and rapid response programs in areas showing high burned area values, especially in the Chiquitano and Pantanal regions.
+## Discussion of Methods and Data
 
-3. **Priority 3 - Deforestation Monitoring**: Establish enhanced monitoring for areas showing continuous loss patterns, as these indicate systematic deforestation requiring law enforcement support.
+### Forest Cover Loss Data (Global Forest Watch)
 
-4. **Priority 4 - Cross-border Coordination**: Areas near the Brazilian border require coordinated conservation efforts to address transboundary pressures.
+The GFW methodology defines forest cover loss as *"a stand-replacement disturbance, or a change from a forest to non-forest state"* (Hansen et al., 2013). Key interpretation considerations:
 
-### Possible Improvements
+- **Detection scope**: GFW detects loss of tree cover ≥5m in height with ≥30% canopy cover, which may miss sparse or degraded forests
+- **Cause attribution**: GFW does not differentiate between natural and human-caused loss; sudden spikes may indicate wildfires or storms, while continuous patterns suggest agricultural conversion
+- **Temporal resolution**: Annual data allows trend analysis but may miss within-year dynamics
+- **Dry forest limitations**: As noted above, GFW algorithms are optimized for humid tropical forests and systematically underdetect changes in dry and deciduous forest ecosystems
 
-1. **Land cover analysis**: Overlay loss areas with land cover data to distinguish permanent conversion from natural regeneration
-2. **Buffer zone analysis**: Examine threats in PA surroundings
-3. **Spatial hotspot mapping**: Create fine-resolution heatmaps for large PAs
-4. **Temporal baseline comparison**: Compare fire patterns to historical norms
-5. **Socioeconomic drivers**: Integrate data on agricultural commodity prices and land tenure to understand deforestation drivers
+### Burned Area Data (MODIS MCD64A1)
+
+The MODIS MCD64A1 burned area product (Giglio et al., 2018) provides monthly burned area detection at 500m resolution. Key considerations:
+
+- **Spatial accuracy**: The 500m resolution captures the actual spatial extent of burned areas, not just fire detections
+- **Ecosystem context**: Fire impacts vary by ecosystem—savannas may tolerate and even depend on regular fire, while moist rainforests are highly fire-sensitive
+- **Fire types**: The product does not distinguish between natural fires, controlled burns, and fire used for land clearing
+- **Cumulative counting**: Unlike forest loss (counted once per pixel), burned area accumulates each time an area burns, so totals can exceed actual land area if recurrent fires occur
+
+### Composite Threat Index Limitations
+
+The threat index developed for this analysis provides a standardized comparison across protected areas but has inherent limitations:
+
+- **Equal weighting**: The three indicators are weighted equally, though in some contexts one threat dimension may be more important than others
+- **Relative scoring**: The index is relative to the analyzed portfolio; an area with a "low" score is only low relative to other areas in Bolivia
+- **Detection bias**: Areas with systematically underdetected threats (e.g., dry forests) may appear artificially low-risk
+
+### Recommendations for Future Analysis
+
+1. **Alternative data sources**: Integrate **MapBiomas Chaco** data to accurately capture dry forest dynamics and loss, addressing GFW's detection limitations in the Gran Chaco region
+2. **Land cover analysis**: Overlay loss areas with land cover data to distinguish permanent agricultural conversion from natural disturbance and regeneration
+3. **Buffer zone analysis**: Examine threats in PA buffer zones and corridors, as edge pressures often drive internal degradation
+4. **Spatial hotspot mapping**: Create fine-resolution heatmaps within large PAs to identify specific threat frontiers
+5. **Temporal baseline comparison**: Compare recent fire patterns to historical norms (pre-2015) to contextualize current threat levels
+6. **Socioeconomic drivers**: Integrate data on agricultural commodity prices, land tenure, and road infrastructure to understand and predict deforestation drivers
 
 ## Data Sources & References
 
