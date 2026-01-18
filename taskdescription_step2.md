@@ -12,3 +12,18 @@ What I need you to do specifically is:
 - confirm, that the text interpretation in the report is in line with your observations from the data patterns
 - draw further conclusions from the data that do not appear in the text yet. These can be general trends, highlighting examples with a larger explanatory power for general patterns, pointing to outliers or other observations that deviate from general trends.
 -  
+
+Feedback on current report
+
+Maps: 
+
+In both maps, the PAs (Others) layer should have a dark-green outline and be 20% transparent. In addition it would be nice if you could see if it is possible to add the names as labels of both PA layers in the map. If so, add labels in very dark green color. offset them a bit from the centroid because currently we have the point data at the centroid location. 
+
+
+
+Interpretation: It seems to me that we could extend much more the intepretation of the results. The goal of the analysis is to analyse the threat level of different areas. So interpretation could cover: 
+- which are the most affected / threatened areas
+- does forest cover loss coincide with those areas with high losses?
+- is KfW already present in the most threatened areas? 
+
+think of further interpretation lines that could be relevant. Then analysis the results yourself in detail and add the interpretations. 
