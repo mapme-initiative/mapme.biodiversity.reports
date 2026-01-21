@@ -45,7 +45,11 @@ mapme_options(
 )
 
 # Analysis years for burned area
-analysis_years <- 2015:2022
+# MCD64A1 data is available from 2000 to present
+# Using 2015-2023 - this period has complete tile coverage
+# Note: 2024 data has inconsistent tile counts per month (NASA processing delays)
+#       and cannot be processed until the server-side data is complete
+analysis_years <- 2015:2023
 
 cat("Configuration:\n")
 cat("  Output directory:", output_dir, "\n")
@@ -171,12 +175,12 @@ if (length(all_results) > 0) {
       .groups = "drop"
     )
   
-  # Save files
-  write.csv(burned_annual, "data/bolivia_burned_area_annual_2000_2022.csv", row.names = FALSE)
-  write.csv(burned_total, "data/bolivia_burned_area_total_2000_2022.csv", row.names = FALSE)
+  # Save files - date range in filename reflects analysis_years
+  write.csv(burned_annual, "data/bolivia_burned_area_annual_2015_2023.csv", row.names = FALSE)
+  write.csv(burned_total, "data/bolivia_burned_area_total_2015_2023.csv", row.names = FALSE)
   
-  cat("      ✓ Saved: data/bolivia_burned_area_annual_2000_2022.csv\n")
-  cat("      ✓ Saved: data/bolivia_burned_area_total_2000_2022.csv\n")
+  cat("      ✓ Saved: data/bolivia_burned_area_annual_2015_2023.csv\n")
+  cat("      ✓ Saved: data/bolivia_burned_area_total_2015_2023.csv\n")
   cat("      ✓ Protected areas with data:", length(unique(burned_annual$wdpa_id)), "\n")
   cat("      ✓ Years covered:", paste(sort(unique(burned_annual$year)), collapse = ", "), "\n")
   cat("      ✓ Total records:", nrow(burned_annual), "\n")
