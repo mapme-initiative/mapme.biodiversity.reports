@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>MAPME Biodiversity Reports</title>
+<title>About</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -76,7 +76,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-d2e67a73dbe628ec5690ab14e54da055.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-3683cb27119965e196f256d1b3bcd338.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dec292a8870567fddd6287873c0cd494.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -138,6 +138,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="./reports/threat_assessment_bolivia.html">
  <span class="dropdown-text">Bolivia Threat Assessment</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="./reports/evaluation_laos_forest_cover.html">
+ <span class="dropdown-text">Laos Forest Cover Evaluation</span></a>
+  </li>  
     </ul>
   </li>
   <li class="nav-item">
@@ -147,7 +151,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/openkfw/mapme.protectedareas"> <i class="bi bi-github" role="img">
+    <a class="nav-link" href="https://github.com/mapme-initiative/mapme.biodiversity.reports"> <i class="bi bi-github" role="img">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
@@ -172,6 +176,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#data-sources" id="toc-data-sources" class="nav-link" data-scroll-target="#data-sources">Data Sources</a></li>
   <li><a href="#methodology" id="toc-methodology" class="nav-link" data-scroll-target="#methodology">Methodology</a></li>
   <li><a href="#about-this-project" id="toc-about-this-project" class="nav-link" data-scroll-target="#about-this-project">About This Project</a></li>
+  <li><a href="#the-mapme-initiative" id="toc-the-mapme-initiative" class="nav-link" data-scroll-target="#the-mapme-initiative">The MAPME Initiative</a>
+  <ul class="collapse">
+  <li><a href="#goals" id="toc-goals" class="nav-link" data-scroll-target="#goals">Goals</a></li>
+  <li><a href="#partners" id="toc-partners" class="nav-link" data-scroll-target="#partners">Partners</a></li>
+  </ul></li>
+  <li><a href="#the-mapme.biodiversity-package" id="toc-the-mapme.biodiversity-package" class="nav-link" data-scroll-target="#the-mapme.biodiversity-package">The mapme.biodiversity Package</a>
+  <ul class="collapse">
+  <li><a href="#supported-indicators" id="toc-supported-indicators" class="nav-link" data-scroll-target="#supported-indicators">Supported Indicators</a></li>
+  </ul></li>
+  <li><a href="#data-sources-1" id="toc-data-sources-1" class="nav-link" data-scroll-target="#data-sources-1">Data Sources</a>
+  <ul class="collapse">
+  <li><a href="#global-forest-watch" id="toc-global-forest-watch" class="nav-link" data-scroll-target="#global-forest-watch">Global Forest Watch</a></li>
+  <li><a href="#modis-burned-area-mcd64a1" id="toc-modis-burned-area-mcd64a1" class="nav-link" data-scroll-target="#modis-burned-area-mcd64a1">MODIS Burned Area (MCD64A1)</a></li>
+  <li><a href="#world-database-on-protected-areas-wdpa" id="toc-world-database-on-protected-areas-wdpa" class="nav-link" data-scroll-target="#world-database-on-protected-areas-wdpa">World Database on Protected Areas (WDPA)</a></li>
+  </ul></li>
+  <li><a href="#contact" id="toc-contact" class="nav-link" data-scroll-target="#contact">Contact</a></li>
+  <li><a href="#license" id="toc-license" class="nav-link" data-scroll-target="#license">License</a></li>
   </ul>
 </nav>
     </div>
@@ -180,7 +201,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title">MAPME Biodiversity Reports</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+<div class="quarto-title-block"><div><h1 class="title">About</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
 <p class="subtitle lead">Threat Assessment and Conservation Analysis for Protected Areas</p>
 </div>
 
@@ -201,7 +222,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="hero-section">
   <div class="hero-content">
     <h1 class="hero-title">MAPME Biodiversity Reports</h1>
-    <p class="hero-subtitle">Open-source geospatial analysis for conservation monitoring</p>
+    <p class="hero-subtitle">Open-source geospatial analysis for conservation impact management</p>
   </div>
 </div>
 <section id="welcome" class="level2">
@@ -223,14 +244,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 <p><a href="./reports/threat_assessment_bolivia.html">View Report →</a></p>
 </section>
-<section id="coming-soon" class="level3 g-col-12 g-col-md-6">
-<h3 class="anchored" data-anchor-id="coming-soon">📊 Coming Soon</h3>
-<p>Additional reports for other regions are in development:</p>
+<section id="laos-forest-cover-evaluation" class="level3 g-col-12 g-col-md-6">
+<h3 class="anchored" data-anchor-id="laos-forest-cover-evaluation">🇱🇦 Laos Forest Cover Evaluation</h3>
+<p><strong>Period:</strong> 2000-2024<br>
+<strong>Focus:</strong> Forest Cover Loss &amp; Conservation Outcomes</p>
+<p>Evaluation of forest cover development in Lao protected areas, examining:</p>
 <ul>
-<li>Central America portfolio analysis</li>
-<li>Ecuador mangrove assessment</li>
-<li>Selva Maya cross-border analysis</li>
+<li>Forest cover loss trends (2000-2024)</li>
+<li>Comparative analysis between project and non-project areas</li>
+<li>Temporal dynamics during project phases</li>
 </ul>
+<p><a href="./reports/evaluation_laos_forest_cover.html">View Report →</a></p>
 </section>
 </div>
 </section>
@@ -277,7 +301,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="about-this-project" class="level2">
 <h2 class="anchored" data-anchor-id="about-this-project">About This Project</h2>
-<p>This project is part of the <strong>MAPME Initiative</strong> (Measuring and Advancing the Protection of Ecosystems), supporting KfW and partners in monitoring and evaluating conservation projects worldwide.</p>
+<p>This project is part of the <strong>MAPME Initiative</strong> (Maps for Planning, Monitoring and Evaluation in Development Cooperation), supporting KfW and partners with data based products to improve impact management of their projects. For more information see <a href="https://www.mapme-initiative.org/">https://www.mapme-initiative.org/</a>.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -297,6 +321,99 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <!-- -->
 
+</section>
+<section id="the-mapme-initiative" class="level2">
+<h2 class="anchored" data-anchor-id="the-mapme-initiative">The MAPME Initiative</h2>
+<p><strong>MAPME</strong> (Maps for Planning, Monitoring and Evaluation in Development Cooperation) is an initiative that develops open-source tools and methodologies for conservation monitoring and impact evaluation.</p>
+<section id="goals" class="level3">
+<h3 class="anchored" data-anchor-id="goals">Goals</h3>
+<ol type="1">
+<li><strong>Reproducible Analysis</strong>: Create transparent, reproducible workflows for processing global biodiversity and environmental data</li>
+<li><strong>Open Tools</strong>: Develop open-source R packages that enable anyone to analyze conservation effectiveness</li>
+<li><strong>Evidence-Based Conservation</strong>: Support data-driven decision making in protected area management</li>
+</ol>
+</section>
+<section id="partners" class="level3">
+<h3 class="anchored" data-anchor-id="partners">Partners</h3>
+<ul>
+<li><strong>KfW Development Bank</strong>: Financial cooperation projects for protected areas worldwide</li>
+<li><strong>GIZ</strong>: Technical cooperation and capacity building</li>
+<li><strong>Academic Partners</strong>: Collaboration on methodology development and validation</li>
+</ul>
+</section>
+</section>
+<section id="the-mapme.biodiversity-package" class="level2">
+<h2 class="anchored" data-anchor-id="the-mapme.biodiversity-package">The mapme.biodiversity Package</h2>
+<p>The <a href="https://github.com/mapme-initiative/mapme.biodiversity">mapme.biodiversity</a> R package is the technical foundation for these analyses. It provides:</p>
+<ul>
+<li><strong>Resource Functions</strong>: Download and manage global environmental datasets</li>
+<li><strong>Indicator Functions</strong>: Calculate standardized indicators for any polygon geometry</li>
+<li><strong>Efficient Processing</strong>: Parallel computation support for large portfolios</li>
+<li><strong>Standardized Output</strong>: Consistent data formats across all indicators</li>
+</ul>
+<section id="supported-indicators" class="level3">
+<h3 class="anchored" data-anchor-id="supported-indicators">Supported Indicators</h3>
+<p>The package supports numerous indicators including:</p>
+<ul>
+<li>Forest cover and forest loss (Global Forest Watch)</li>
+<li>Burned areas (MODIS MCD64A1)</li>
+<li>Landcover classification (ESA WorldCover)</li>
+<li>Population density (WorldPop)</li>
+<li>Climate variables (CHELSA, WorldClim)</li>
+<li>And many more…</li>
+</ul>
+</section>
+</section>
+<section id="data-sources-1" class="level2">
+<h2 class="anchored" data-anchor-id="data-sources-1">Data Sources</h2>
+<section id="global-forest-watch" class="level3">
+<h3 class="anchored" data-anchor-id="global-forest-watch">Global Forest Watch</h3>
+<p>Forest cover data from Hansen et al.&nbsp;(2013) provides:</p>
+<ul>
+<li><strong>Tree Cover 2000</strong>: Baseline forest extent</li>
+<li><strong>Year of Loss</strong>: Annual forest loss detection (2001-present)</li>
+<li><strong>Resolution</strong>: 30m Landsat-derived</li>
+</ul>
+<blockquote class="blockquote">
+<p>Hansen, M. C., et al.&nbsp;(2013). High-Resolution Global Maps of 21st-Century Forest Cover Change. <em>Science</em>, 342(6160), 850-853.</p>
+</blockquote>
+</section>
+<section id="modis-burned-area-mcd64a1" class="level3">
+<h3 class="anchored" data-anchor-id="modis-burned-area-mcd64a1">MODIS Burned Area (MCD64A1)</h3>
+<p>The MCD64A1 product provides:</p>
+<ul>
+<li><strong>Burned Area</strong>: Monthly burned area detection</li>
+<li><strong>Burn Date</strong>: Julian day of burning</li>
+<li><strong>Resolution</strong>: 500m MODIS-derived</li>
+</ul>
+<blockquote class="blockquote">
+<p>Giglio, L., et al.&nbsp;(2018). The Collection 6 MODIS burned area mapping algorithm and product. <em>Remote Sensing of Environment</em>, 217, 72-85.</p>
+</blockquote>
+</section>
+<section id="world-database-on-protected-areas-wdpa" class="level3">
+<h3 class="anchored" data-anchor-id="world-database-on-protected-areas-wdpa">World Database on Protected Areas (WDPA)</h3>
+<p>Protected area boundaries from UNEP-WCMC and IUCN:</p>
+<ul>
+<li><strong>Polygons</strong>: Official protected area boundaries</li>
+<li><strong>Attributes</strong>: Governance, management, IUCN category</li>
+<li><strong>Updates</strong>: Monthly data releases</li>
+</ul>
+<blockquote class="blockquote">
+<p>UNEP-WCMC and IUCN (2024), Protected Planet: The World Database on Protected Areas (WDPA).</p>
+</blockquote>
+</section>
+</section>
+<section id="contact" class="level2">
+<h2 class="anchored" data-anchor-id="contact">Contact</h2>
+<p>For questions about these analyses or the MAPME Initiative:</p>
+<ul>
+<li><strong>GitHub</strong>: <a href="https://github.com/mapme-initiative/mapme.biodiversity.reports">mapme-initiative/mapme.biodiversity.reports</a></li>
+<li><strong>Package Issues</strong>: <a href="https://github.com/mapme-initiative/mapme.biodiversity/issues">mapme-initiative/mapme.biodiversity</a></li>
+</ul>
+</section>
+<section id="license" class="level2">
+<h2 class="anchored" data-anchor-id="license">License</h2>
+<p>This project is open source. Code is available under the MIT License. Data sources have their own licensing terms - please refer to the original data providers for details.</p>
 </section>
 
 </main> <!-- /main -->
@@ -761,7 +878,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="in">&lt;div class="hero-section"&gt;</span></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="in">  &lt;div class="hero-content"&gt;</span></span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="in">    &lt;h1 class="hero-title"&gt;MAPME Biodiversity Reports&lt;/h1&gt;</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="in">    &lt;p class="hero-subtitle"&gt;Open-source geospatial analysis for conservation monitoring&lt;/p&gt;</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="in">    &lt;p class="hero-subtitle"&gt;Open-source geospatial analysis for conservation impact management&lt;/p&gt;</span></span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="in">  &lt;/div&gt;</span></span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="in">&lt;/div&gt;</span></span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
@@ -791,52 +908,62 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>::: {.g-col-12 .g-col-md-6}</span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="fu">### 📊 Coming Soon</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="fu">### 🇱🇦 Laos Forest Cover Evaluation</span></span>
 <span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>Additional reports for other regions are in development:</span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Central America portfolio analysis</span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Ecuador mangrove assessment</span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Selva Maya cross-border analysis</span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="fu">## Data Sources</span></span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>Our analyses rely on globally consistent, openly available datasets:</span>
-<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Dataset <span class="pp">|</span> Source <span class="pp">|</span> Resolution <span class="pp">|</span></span>
-<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a><span class="pp">|---------|--------|------------|</span></span>
-<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Forest Cover <span class="pp">|</span> Global Forest Watch (Hansen et al., 2013) <span class="pp">|</span> 30m <span class="pp">|</span></span>
-<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Burned Areas <span class="pp">|</span> MODIS MCD64A1 <span class="pp">|</span> 500m <span class="pp">|</span></span>
-<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Protected Areas <span class="pp">|</span> WDPA/IUCN <span class="pp">|</span> Vector <span class="pp">|</span></span>
-<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a><span class="fu">## Methodology</span></span>
-<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>The reports in this repository use the **mapme.biodiversity** R package, which provides:</span>
-<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Standardized access to global environmental datasets</span>
-<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Efficient zonal statistics computation</span>
-<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Reproducible indicator calculations</span>
-<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Support for parallel processing</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>**Period:** 2000-2024  </span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>**Focus:** Forest Cover Loss &amp; Conservation Outcomes</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>Evaluation of forest cover development in Lao protected areas, examining:</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Forest cover loss trends (2000-2024)</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Comparative analysis between project and non-project areas</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Temporal dynamics during project phases</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">View Report →</span><span class="co">](reports/evaluation_laos_forest_cover.qmd)</span></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a><span class="fu">## Data Sources</span></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>Our analyses rely on globally consistent, openly available datasets:</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Dataset <span class="pp">|</span> Source <span class="pp">|</span> Resolution <span class="pp">|</span></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a><span class="pp">|---------|--------|------------|</span></span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Forest Cover <span class="pp">|</span> Global Forest Watch (Hansen et al., 2013) <span class="pp">|</span> 30m <span class="pp">|</span></span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Burned Areas <span class="pp">|</span> MODIS MCD64A1 <span class="pp">|</span> 500m <span class="pp">|</span></span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Protected Areas <span class="pp">|</span> WDPA/IUCN <span class="pp">|</span> Vector <span class="pp">|</span></span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a><span class="fu">## Methodology</span></span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>The reports in this repository use the **mapme.biodiversity** R package, which provides:</span>
 <span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>Learn more about the package at: <span class="co">[</span><span class="ot">mapme-initiative.github.io/mapme.biodiversity</span><span class="co">](https://mapme-initiative.github.io/mapme.biodiversity/)</span></span>
-<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a><span class="fu">## About This Project</span></span>
-<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>This project is part of the **MAPME Initiative** (Measuring and Advancing the Protection of Ecosystems), supporting KfW and partners in monitoring and evaluating conservation projects worldwide.</span>
-<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
-<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reproducibility</span></span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Standardized access to global environmental datasets</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Efficient zonal statistics computation</span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Reproducible indicator calculations</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Support for parallel processing</span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>Learn more about the package at: <span class="co">[</span><span class="ot">mapme-initiative.github.io/mapme.biodiversity</span><span class="co">](https://mapme-initiative.github.io/mapme.biodiversity/)</span></span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a><span class="fu">## About This Project</span></span>
 <span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>All code and data processing scripts are available in this repository. The analyses can be reproduced using the provided R scripts and openly available data sources.</span>
-<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>This project is part of the **MAPME Initiative** (Maps for Planning, Monitoring and Evaluation in Development Cooperation), supporting KfW and partners with data based products to improve impact management of their projects. For more information see <span class="co">[</span><span class="ot">https://www.mapme-initiative.org/</span><span class="co">](https://www.mapme-initiative.org/)</span>.</span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reproducibility</span></span>
 <span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>*Last updated: January 2026*</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>All code and data processing scripts are available in this repository. The analyses can be reproduced using the provided R scripts and openly available data sources.</span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a>*Last updated: January 2026*</span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 <footer class="footer">
@@ -848,7 +975,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Built with <a href="https://quarto.org/">Quarto</a></p>
 </div>
     <div class="nav-footer-right">
-<p><a href="https://github.com/openkfw/mapme.protectedareas">GitHub</a></p>
+<p><a href="https://github.com/mapme-initiative/mapme.biodiversity.reports">GitHub</a></p>
 </div>
   </div>
 </footer>

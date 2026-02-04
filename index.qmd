@@ -8,7 +8,7 @@ page-layout: full
 <div class="hero-section">
   <div class="hero-content">
     <h1 class="hero-title">MAPME Biodiversity Reports</h1>
-    <p class="hero-subtitle">Open-source geospatial analysis for conservation monitoring</p>
+    <p class="hero-subtitle">Open-source geospatial analysis for conservation impact management</p>
   </div>
 </div>
 ```
@@ -38,13 +38,18 @@ Analysis of threat levels in Bolivian protected areas, examining:
 :::
 
 ::: {.g-col-12 .g-col-md-6}
-### 📊 Coming Soon
+### 🇱🇦 Laos Forest Cover Evaluation
 
-Additional reports for other regions are in development:
+**Period:** 2000-2024  
+**Focus:** Forest Cover Loss & Conservation Outcomes
 
-- Central America portfolio analysis
-- Ecuador mangrove assessment
-- Selva Maya cross-border analysis
+Evaluation of forest cover development in Lao protected areas, examining:
+
+- Forest cover loss trends (2000-2024)
+- Comparative analysis between project and non-project areas
+- Temporal dynamics during project phases
+
+[View Report →](reports/evaluation_laos_forest_cover.qmd)
 
 :::
 
@@ -73,7 +78,7 @@ Learn more about the package at: [mapme-initiative.github.io/mapme.biodiversity]
 
 ## About This Project
 
-This project is part of the **MAPME Initiative** (Measuring and Advancing the Protection of Ecosystems), supporting KfW and partners in monitoring and evaluating conservation projects worldwide.
+This project is part of the **MAPME Initiative** (Maps for Planning, Monitoring and Evaluation in Development Cooperation), supporting KfW and partners with data based products to improve impact management of their projects. For more information see [https://www.mapme-initiative.org/](https://www.mapme-initiative.org/).
 
 ::: {.callout-note}
 ## Reproducibility
@@ -84,6 +89,7 @@ All code and data processing scripts are available in this repository. The analy
 ---
 
 *Last updated: January 2026*
+
 
 
 

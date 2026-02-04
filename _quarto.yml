@@ -17,11 +17,13 @@ website:
         menu:
           - text: "Bolivia Threat Assessment"
             href: reports/threat_assessment_bolivia.qmd
+          - text: "Laos Forest Cover Evaluation"
+            href: reports/evaluation_laos_forest_cover.qmd
       - text: "About"
         href: about.qmd
     right:
       - icon: github
-        href: https://github.com/openkfw/mapme.protectedareas
+        href: https://github.com/mapme-initiative/mapme.biodiversity.reports
   
   sidebar:
     - title: "Reports"
@@ -29,6 +31,7 @@ website:
       background: light
       contents:
         - reports/threat_assessment_bolivia.qmd
+        - reports/evaluation_laos_forest_cover.qmd
   
   page-footer:
     left: |
@@ -36,7 +39,7 @@ website:
     center: |
       Built with [Quarto](https://quarto.org/)
     right: |
-      [GitHub](https://github.com/openkfw/mapme.protectedareas)
+      [GitHub](https://github.com/mapme-initiative/mapme.biodiversity.reports)
 
 format:
   html:
@@ -64,6 +67,7 @@ knitr:
   opts_chunk:
     fig.retina: 2
     out.width: "100%"
+
 
 
 
