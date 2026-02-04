@@ -8,7 +8,7 @@ page-layout: full
 <div class="hero-section">
   <div class="hero-content">
     <h1 class="hero-title">MAPME Biodiversity Reports</h1>
-    <p class="hero-subtitle">Open-source geospatial analysis for conservation monitoring</p>
+    <p class="hero-subtitle">Open-source geospatial analysis for conservation impact management</p>
   </div>
 </div>
 ```
@@ -78,7 +78,7 @@ Learn more about the package at: [mapme-initiative.github.io/mapme.biodiversity]
 
 ## About This Project
 
-This project is part of the **MAPME Initiative** (Measuring and Advancing the Protection of Ecosystems), supporting KfW and partners in monitoring and evaluating conservation projects worldwide.
+This project is part of the **MAPME Initiative** (Maps for Planning, Monitoring and Evaluation in Development Cooperation), supporting KfW and partners with data based products to improve impact management of their projects. For more information see [https://www.mapme-initiative.org/](https://www.mapme-initiative.org/).
 
 ::: {.callout-note}
 ## Reproducibility

@@ -4,7 +4,7 @@ title: "About"
 
 ## The MAPME Initiative
 
-**MAPME** (Measuring and Advancing the Protection of Ecosystems) is an initiative that develops open-source tools and methodologies for conservation monitoring and impact evaluation.
+**MAPME** (Maps for Planning, Monitoring and Evaluation in Development Cooperation) is an initiative that develops open-source tools and methodologies for conservation monitoring and impact evaluation.
 
 ### Goals
 
@@ -74,7 +74,7 @@ Protected area boundaries from UNEP-WCMC and IUCN:
 
 For questions about these analyses or the MAPME Initiative:
 
-- **GitHub**: [openkfw/mapme.protectedareas](https://github.com/openkfw/mapme.protectedareas)
+- **GitHub**: [mapme-initiative/mapme.biodiversity.reports](https://github.com/mapme-initiative/mapme.biodiversity.reports)
 - **Package Issues**: [mapme-initiative/mapme.biodiversity](https://github.com/mapme-initiative/mapme.biodiversity/issues)
 
 ## License

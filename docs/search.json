@@ -1,15 +1,5 @@
 [
   {
-    "objectID": "reports/threat_assessment_bolivia.html",
-    "href": "reports/threat_assessment_bolivia.html",
-    "title": "Threat Assessment for Protected Areas in Bolivia",
-    "section": "",
-    "text": "This analysis supports peer-discussion on the threat level of protected areas (PAs) in the Bolivian Amazon Basin. The goal is to assist KfW and its partners in the project preparation phase and to derive information about the current portfolio’s relevance for protecting the most threatened areas.\nThe analysis examines a set of predefined PAs, ranks them according to their threat level, and compares them to past KfW support. We utilize publicly available data from:\n\nWorld Database of Protected Areas (WDPA/IUCN) - For protected area boundaries and metadata\nGlobal Forest Watch (Hansen et al., 2013) - For forest cover loss detection\nMODIS MCD64A1 - For burned area mapping\n\n\n\n\n\n\n\nNoteAnalysis Period Update\n\n\n\nThis report has been updated to cover the period 2000-2024, extending the original analysis by 4 years. Additionally, fire analysis now uses burned area in hectares instead of active fire counts, providing a more accurate measure of fire impact.",
-    "crumbs": [
-      "Threat Assessment for Protected Areas in Bolivia"
-    ]
-  },
-  {
     "objectID": "reports/threat_assessment_bolivia.html#introduction",
     "href": "reports/threat_assessment_bolivia.html#introduction",
     "title": "Threat Assessment for Protected Areas in Bolivia",
@@ -40,11 +30,11 @@
     ]
   },
   {
-    "objectID": "reports/threat_assessment_bolivia.html#burned-area-analysis-2000-2022",
-    "href": "reports/threat_assessment_bolivia.html#burned-area-analysis-2000-2022",
+    "objectID": "reports/threat_assessment_bolivia.html#burned-area-analysis-2015-2023",
+    "href": "reports/threat_assessment_bolivia.html#burned-area-analysis-2015-2023",
     "title": "Threat Assessment for Protected Areas in Bolivia",
-    "section": "Burned Area Analysis (2000-2022)",
-    "text": "Burned Area Analysis (2000-2022)\n\n\n\n\n\n\nImportantMethodology Update\n\n\n\nThis analysis uses burned area in hectares from the MODIS MCD64A1 product (Giglio et al., 2018). This provides a more accurate measure of actual fire impact on ecosystems compared to active fire counts, as it quantifies the spatial extent of burned areas rather than just the number of fire detections.\nNote: MCD64A1 burned area data is available through 2022. Forest cover loss analysis covers 2000-2024, while burned area analysis covers 2000-2022.\n\n\nFire is a significant threat to protected areas, whether from natural causes (e.g., El Niño-related droughts) or human activities (land clearing, agricultural burning). The MODIS MCD64A1 burned area product provides monthly burned area detection at 500m resolution, allowing us to quantify the total hectares affected by fire within each protected area over the analysis period (2000-2022).\n\nInteractive Map\nThe map shows burned area totals for analyzed protected areas. Larger circles indicate greater cumulative burned area.\n\n\n\n\n\n\n\n\nTotal Burned Area by Protected Area\n\n\n\n\n\n\n\n\nAnnual Burned Area Trends",
+    "section": "Burned Area Analysis (2015-2023)",
+    "text": "Burned Area Analysis (2015-2023)\n\n\n\n\n\n\nCautionMethodology Notes: Burned Areas and Forest Cover Loss Detection (click to expand)\n\n\n\n\n\n\nComparing Burned Area and Forest Cover Loss Data\nThis analysis uses burned area in hectares from the MODIS MCD64A1 product (Giglio et al., 2018). It is important to understand the methodological differences between burned area and forest cover loss data:\n\nBurned Area (MCD64A1): Cumulative sum of all fire-affected areas. If the same area burns multiple times over the analysis period, each burn event is counted separately. This means burned area totals can exceed the total land area of a protected area.\nForest Cover Loss (Global Forest Watch): Each forest pixel is only counted once when it transitions from forest to non-forest. Even if an area burns multiple times or experiences repeated disturbances, the loss is recorded only at the initial deforestation event.\n\nImplication for interpretation: Burned area values are typically higher than forest cover loss values because they represent cumulative fire exposure, not permanent land cover change. High burned area with low forest loss may indicate recurrent fires in grasslands or savannas, while matching high values in both metrics suggest fire-driven deforestation.\n\n\nGFW Detection Limitations in Dry Forest Ecosystems\nA critical limitation of the Global Forest Watch data concerns its reduced detection accuracy in dry forest ecosystems, such as those found in Kaa-Iya del Gran Chaco National Park and other Chaco-type environments. This limitation stems from several technical factors:\n\nSpectral Confusion: The “brown” signature of deciduous trees during the dry season is often indistinguishable from bare soil in global satellite baselines, leading to underdetection of forest cover.\nDeciduous Phenology: Dry forests naturally lose their leaves seasonally, which can be misinterpreted as permanent forest loss or, conversely, cause actual losses to be missed when trees are leafless.\nAlgorithm Bias: Research indicates that GFW algorithms are fundamentally optimized for humid tropical biomes and frequently misclassify the sparse, clumped canopies characteristic of the Gran Chaco as shrubland or non-forest.\nMasking Practices: GFW often masks out non-humid regions from its primary forest datasets entirely, resulting in systematic underrepresentation of dry forest dynamics.\n\nInterpretation Guidance: Low or zero forest cover loss values for dry forest protected areas (such as Kaa-Iya del Gran Chaco) should be interpreted as a technical artifact rather than evidence of low threat. Nevertheless, the relatively low burned area values observed in Kaa-Iya del Gran Chaco suggest that this area may indeed have been spared from the major fire events that affected other regions in the last decade.\n\n\n\n\nFire is a significant threat to protected areas, whether from natural causes (e.g., El Niño-related droughts) or human activities (land clearing, agricultural burning). The MODIS MCD64A1 burned area product provides monthly burned area detection at 500m resolution, allowing us to quantify the total hectares affected by fire within each protected area over the analysis period (2015-2023).\n\nInteractive Map\nThe map shows burned area totals for analyzed protected areas. Larger circles indicate greater cumulative burned area.\n\n\n\n\n\n\n\n\nTotal Burned Area by Protected Area\n\n\n\n\n\n\n\n\nAnnual Burned Area Trends",
     "crumbs": [
       "Threat Assessment for Protected Areas in Bolivia"
     ]
@@ -55,127 +45,6 @@
     "title": "Threat Assessment for Protected Areas in Bolivia",
     "section": "Interpretation & Discussion",
     "text": "Interpretation & Discussion\n\nMost Threatened Protected Areas\nBased on the combined analysis of forest cover loss and burned area data, the following protected areas emerge as the most threatened and should be prioritized for conservation intervention.\n\n\n\n\n\n\nNoteThreat Index Methodology\n\n\n\nThe Composite Threat Index used in this analysis follows established approaches in conservation prioritization (Margules and Pressey 2000; Wilson et al. 2005). The index combines three normalized indicators:\n\nAbsolute Forest Loss (ha): Total hectares of forest lost since 2001, capturing the magnitude of habitat destruction.\nRelative Forest Loss (%): Percentage of original forest cover lost, indicating the intensity of pressure relative to the area’s forest resources.\nTotal Burned Area (ha): Cumulative fire exposure since 2015, reflecting fire-related threats.\n\nCalculation Method: Each indicator is normalized to a 0-1 scale using min-max normalization: ( = ). The final threat score is the arithmetic mean of all three normalized indicators, giving equal weight to each threat dimension.\nInterpretation:\n\nScores close to 1.0 indicate areas with the highest combined threats across all dimensions\nScores close to 0.0 indicate areas with relatively lower threat levels\nThe index is relative to the analyzed portfolio and should not be compared across different study areas\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nWarningCritical Findings: Most Threatened Areas\n\n\n\nBased on the composite threat index and supporting evidence from documented fire events:\n1. Otuquis National Park - Ranks among the highest-threat areas due to catastrophic fire events during the 2019-2020 Bolivian fire crisis. According to reports from the Fundación Amigos de la Naturaleza (Fundación Amigos de la Naturaleza (FAN) 2019), this Pantanal-Chaco transition zone experienced unprecedented fire activity that burned over 5 million hectares across eastern Bolivia in 2019 alone.\n2. San Matías Integrated Management Natural Area - High burned area and forest loss values. This area, located near the Brazilian border in the Chiquitano dry forest region, was severely affected by the 2019 fires, which were linked to agricultural expansion and land clearing practices.\n3. Areas in the Chiquitano Dry Forest Region - The Chiquitano forest, the world’s largest and best-preserved tropical dry forest, experienced devastating fires in 2019 that destroyed approximately 1.4 million hectares according to satellite analysis. Several protected areas in this region show elevated threat scores.\n4. Kaa-Iya del Gran Chaco National Park - While showing high absolute values due to its large size (3.4 million ha), this area appears to have been relatively spared from the worst fire events. Note that GFW detection limitations in dry forest ecosystems (see methodology note above) may underestimate actual forest dynamics in this area.\nNote on Data Interpretation: The rankings are based on available satellite data and should be interpreted alongside ground-truth information and local ecological knowledge. Some areas may show low threat scores due to detection limitations rather than actual low threat levels.\n\n\n\n\nDoes Forest Cover Loss Coincide with High Burned Areas?\n\n\n\n\n\n\nThe analysis reveals a moderate positive correlation (r = 0.67) between absolute forest cover loss and burned area. This relationship suggests that fire and deforestation are interconnected threats in many protected areas. Key observations:\n\nHigh fire, high loss areas (upper right quadrant): These areas experience fire-driven deforestation, where fire is likely a direct cause or facilitator of forest loss. They should be prioritized for integrated fire management and deforestation control.\nHigh fire, low loss areas (upper left quadrant): These may represent ecosystems where fire occurs but does not lead to permanent forest loss—either because fires occur in non-forest vegetation (savannas, grasslands) or because forests regenerate after fire events.\nLow fire, high loss areas (lower right quadrant): Deforestation in these areas is driven by factors other than fire, such as agricultural conversion or logging. Different intervention strategies focused on land-use planning and enforcement may be more effective.\nAreas near the origin: Protected areas with low values for both metrics may either be well-protected or, in the case of dry forest ecosystems, may be affected by the detection limitations discussed above.\n\n\n\nIs KfW Already Present in the Most Threatened Areas?\n\n\n\n\n\n\nNoteKfW Portfolio Coverage Analysis\n\n\n\nCurrent KfW presence in threatened areas:\n\nOf the top 10 most threatened protected areas, 1 are currently supported by KfW projects.\nThis indicates that KfW is underrepresented in the most critical areas requiring conservation investment.\n\nCoverage by threat level:\n\n\n\n\n\n\n\n\n\n\nTemporal Patterns and Emerging Threats\nThe heatmaps reveal important temporal patterns that align with documented events in the region:\n\n2019-2020 Fire Crisis: Multiple protected areas show dramatic spikes in both burned area and forest loss during 2019-2020. This corresponds to the well-documented Bolivian fire crisis of 2019, during which fires—many linked to agricultural clearing—burned an estimated 5.3 million hectares across Bolivia (Fundación Amigos de la Naturaleza (FAN) 2019). The Chiquitano dry forest, the world’s largest and best-preserved tropical dry forest (Pennington, Prado, and Pendry 2000), was particularly affected, with approximately 1.4 million hectares burned. International media and conservation organizations extensively documented this event, which triggered national emergency declarations.\nPost-Crisis Patterns (2020-2023): Following the 2019 peak, some areas show reduced fire activity. This may reflect:\n\nReduced fuel availability after extensive burning\nIncreased monitoring and enforcement following international attention\nNatural variation in fire occurrence\nHowever, 2020 also saw significant fire activity in the Pantanal region, affecting areas like Otuquis National Park\n\nPersistent Deforestation Patterns: Areas showing continuous, steady loss patterns (rather than fire-related spikes) suggest ongoing land conversion pressures, likely related to agricultural expansion—a pattern consistent with Bolivia’s agricultural frontier dynamics in the lowlands.",
-    "crumbs": [
-      "Threat Assessment for Protected Areas in Bolivia"
-    ]
-  },
-  {
-    "objectID": "reports/threat_assessment_bolivia.html#data-sources-references",
-    "href": "reports/threat_assessment_bolivia.html#data-sources-references",
-    "title": "Threat Assessment for Protected Areas in Bolivia",
-    "section": "Data Sources & References",
-    "text": "Data Sources & References\n\n\nFundación Amigos de la Naturaleza (FAN). 2019. “Reporte de Incendios Forestales En Bolivia 2019.” https://www.fan-bo.org.\n\n\nMargules, Christopher R, and Robert L Pressey. 2000. “Systematic Conservation Planning.” Nature 405 (6783): 243–53.\n\n\nPennington, R Toby, Darién E Prado, and Colin A Pendry. 2000. “Neotropical Seasonally Dry Forests and Quaternary Vegetation Changes.” Journal of Biogeography 27 (2): 261–73.\n\n\nWilson, Kerrie A, Michael I Westphal, Hugh P Possingham, and Jane Elith. 2005. “Measuring and Incorporating Vulnerability into Conservation Planning.” Environmental Management 35 (5): 527–43.\n\n\n\nWDPA: UNEP-WCMC and IUCN (2024), Protected Planet: The World Database on Protected Areas (WDPA)\nGFW: Hansen, M. C., et al. (2013). High-Resolution Global Maps of 21st-Century Forest Cover Change. Science, 342(15 November): 850–53. Data version: GFC-2024-v1.12.\nMODIS MCD64A1: Giglio, L., Boschetti, L., Roy, D. P., Humber, M. L., & Justice, C. O. (2018). The Collection 6 MODIS burned area mapping algorithm and product. Remote Sensing of Environment, 217, 72-85. Available at: https://modis-fire.umd.edu/ba.html\n\n\nReport generated: 2026-02-04",
-    "crumbs": [
-      "Threat Assessment for Protected Areas in Bolivia"
-    ]
-  },
-  {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
-    "section": "",
-    "text": "MAPME (Measuring and Advancing the Protection of Ecosystems) is an initiative that develops open-source tools and methodologies for conservation monitoring and impact evaluation.\n\n\n\nReproducible Analysis: Create transparent, reproducible workflows for processing global biodiversity and environmental data\nOpen Tools: Develop open-source R packages that enable anyone to analyze conservation effectiveness\nEvidence-Based Conservation: Support data-driven decision making in protected area management\n\n\n\n\n\nKfW Development Bank: Financial cooperation projects for protected areas worldwide\nGIZ: Technical cooperation and capacity building\nAcademic Partners: Collaboration on methodology development and validation"
-  },
-  {
-    "objectID": "about.html#the-mapme-initiative",
-    "href": "about.html#the-mapme-initiative",
-    "title": "About",
-    "section": "",
-    "text": "MAPME (Measuring and Advancing the Protection of Ecosystems) is an initiative that develops open-source tools and methodologies for conservation monitoring and impact evaluation.\n\n\n\nReproducible Analysis: Create transparent, reproducible workflows for processing global biodiversity and environmental data\nOpen Tools: Develop open-source R packages that enable anyone to analyze conservation effectiveness\nEvidence-Based Conservation: Support data-driven decision making in protected area management\n\n\n\n\n\nKfW Development Bank: Financial cooperation projects for protected areas worldwide\nGIZ: Technical cooperation and capacity building\nAcademic Partners: Collaboration on methodology development and validation"
-  },
-  {
-    "objectID": "about.html#the-mapme.biodiversity-package",
-    "href": "about.html#the-mapme.biodiversity-package",
-    "title": "About",
-    "section": "The mapme.biodiversity Package",
-    "text": "The mapme.biodiversity Package\nThe mapme.biodiversity R package is the technical foundation for these analyses. It provides:\n\nResource Functions: Download and manage global environmental datasets\nIndicator Functions: Calculate standardized indicators for any polygon geometry\nEfficient Processing: Parallel computation support for large portfolios\nStandardized Output: Consistent data formats across all indicators\n\n\nSupported Indicators\nThe package supports numerous indicators including:\n\nForest cover and forest loss (Global Forest Watch)\nBurned areas (MODIS MCD64A1)\nLandcover classification (ESA WorldCover)\nPopulation density (WorldPop)\nClimate variables (CHELSA, WorldClim)\nAnd many more…"
-  },
-  {
-    "objectID": "about.html#data-sources",
-    "href": "about.html#data-sources",
-    "title": "About",
-    "section": "Data Sources",
-    "text": "Data Sources\n\nGlobal Forest Watch\nForest cover data from Hansen et al. (2013) provides:\n\nTree Cover 2000: Baseline forest extent\nYear of Loss: Annual forest loss detection (2001-present)\nResolution: 30m Landsat-derived\n\n\nHansen, M. C., et al. (2013). High-Resolution Global Maps of 21st-Century Forest Cover Change. Science, 342(6160), 850-853.\n\n\n\nMODIS Burned Area (MCD64A1)\nThe MCD64A1 product provides:\n\nBurned Area: Monthly burned area detection\nBurn Date: Julian day of burning\nResolution: 500m MODIS-derived\n\n\nGiglio, L., et al. (2018). The Collection 6 MODIS burned area mapping algorithm and product. Remote Sensing of Environment, 217, 72-85.\n\n\n\nWorld Database on Protected Areas (WDPA)\nProtected area boundaries from UNEP-WCMC and IUCN:\n\nPolygons: Official protected area boundaries\nAttributes: Governance, management, IUCN category\nUpdates: Monthly data releases\n\n\nUNEP-WCMC and IUCN (2024), Protected Planet: The World Database on Protected Areas (WDPA)."
-  },
-  {
-    "objectID": "about.html#contact",
-    "href": "about.html#contact",
-    "title": "About",
-    "section": "Contact",
-    "text": "Contact\nFor questions about these analyses or the MAPME Initiative:\n\nGitHub: openkfw/mapme.protectedareas\nPackage Issues: mapme-initiative/mapme.biodiversity"
-  },
-  {
-    "objectID": "about.html#license",
-    "href": "about.html#license",
-    "title": "About",
-    "section": "License",
-    "text": "License\nThis project is open source. Code is available under the MIT License. Data sources have their own licensing terms - please refer to the original data providers for details."
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "MAPME Biodiversity Reports",
-    "section": "",
-    "text": "Open-source geospatial analysis for conservation monitoring"
-  },
-  {
-    "objectID": "index.html#welcome",
-    "href": "index.html#welcome",
-    "title": "MAPME Biodiversity Reports",
-    "section": "Welcome",
-    "text": "Welcome\nThis website hosts threat assessment reports and conservation analyses for protected areas worldwide. The analyses leverage open geospatial data and the mapme.biodiversity R package to generate reproducible insights on ecosystem health and conservation pressures."
-  },
-  {
-    "objectID": "index.html#available-reports",
-    "href": "index.html#available-reports",
-    "title": "MAPME Biodiversity Reports",
-    "section": "Available Reports",
-    "text": "Available Reports\n\n\n🇧🇴 Bolivia Threat Assessment\nPeriod: 2000-2024\nFocus: Forest Cover Loss & Burned Areas\nAnalysis of threat levels in Bolivian protected areas, examining:\n\nPrimary forest cover loss trends\nBurned area dynamics (MODIS MCD64A1)\nComparison between supported and non-supported areas\n\nView Report →\n\n\n🇱🇦 Laos Forest Cover Evaluation\nPeriod: 2000-2024\nFocus: Forest Cover Loss & Conservation Outcomes\nEvaluation of forest cover development in Lao protected areas, examining:\n\nForest cover loss trends (2000-2024)\nComparative analysis between project and non-project areas\nTemporal dynamics during project phases\n\nView Report →"
-  },
-  {
-    "objectID": "index.html#data-sources",
-    "href": "index.html#data-sources",
-    "title": "MAPME Biodiversity Reports",
-    "section": "Data Sources",
-    "text": "Data Sources\nOur analyses rely on globally consistent, openly available datasets:\n\n\n\nDataset\nSource\nResolution\n\n\n\n\nForest Cover\nGlobal Forest Watch (Hansen et al., 2013)\n30m\n\n\nBurned Areas\nMODIS MCD64A1\n500m\n\n\nProtected Areas\nWDPA/IUCN\nVector"
-  },
-  {
-    "objectID": "index.html#methodology",
-    "href": "index.html#methodology",
-    "title": "MAPME Biodiversity Reports",
-    "section": "Methodology",
-    "text": "Methodology\nThe reports in this repository use the mapme.biodiversity R package, which provides:\n\nStandardized access to global environmental datasets\nEfficient zonal statistics computation\nReproducible indicator calculations\nSupport for parallel processing\n\nLearn more about the package at: mapme-initiative.github.io/mapme.biodiversity"
-  },
-  {
-    "objectID": "index.html#about-this-project",
-    "href": "index.html#about-this-project",
-    "title": "MAPME Biodiversity Reports",
-    "section": "About This Project",
-    "text": "About This Project\nThis project is part of the MAPME Initiative (Measuring and Advancing the Protection of Ecosystems), supporting KfW and partners in monitoring and evaluating conservation projects worldwide.\n\n\n\n\n\n\nNoteReproducibility\n\n\n\nAll code and data processing scripts are available in this repository. The analyses can be reproduced using the provided R scripts and openly available data sources.\n\n\n\nLast updated: January 2026"
-  },
-  {
-    "objectID": "taskdescription.html",
-    "href": "taskdescription.html",
-    "title": "",
-    "section": "",
-    "text": "Code\n\n\n\n\nThe purpose of this new project is to update a data-analysis that was done with R. The data-analysis was done about 2 years ago and I downloaded the repo for you that contains the relevant code. You can find and scan the code in this folder: “~/Documents/cursor/mapme.protectedareas/”. You may not need to scan everything because it will crowd your context window but you should start with\n-       “~/Documents/cursor/mapme.protectedareas/README.md” -       “~/Documents/cursor/mapme.protectedareas/contributing.md”\nTo get a first impression how the repo is structured and about its multiple purposes. You will see that it has mulitple purposes of which only a couple is relevant here.\nYou can then check the file “~/Documents/cursor/mapme.protectedareas/analysis/threat_assessment_bolivia.Rmd”.\nIt contains the relevant reporting code that I need to update. You will notice that in this script, several datasets are loaded for the analysis. I will provide you with newly updated data here or tell you how to generate it.\nThe R object that is called “wdpa_kfw” is now located under “data/portfolio.gpkg”. It contains all protected areas that are still or where formerly financed by KfW or GIZ.\nNext there is an R object created called “gfw_lossstats” loaded from a CSV. this file contains forest cover loss statistics from the global forest watch. It was generated with another script using the mapme.biodiversity package. You can find more information about this package here and about its basic usage here https://github.com/mapme-initiative/mapme.biodiversity. Read the readme.md from the repository to understand how it works. You should then create a separate R script from scratch called “processing.R” that generates the relevant input statistics. We do this outside of the Rmd script, because it can take a longer time to process.\nHere the update already starts. You should add data up until 2024 i.e. process forest cover loss data between 2000 and 2024.\nA more detailed documentation of the package is also available online under: https://mapme-initiative.github.io/mapme.biodiversity/\nThe same is true for fire data. later in the script there is an object loaded called bolivia_fire_data. This data was also generated with the afformentioned package which also allows to calculate fire indicators. Now there is one important change in the package. Formerly the package allowed to generated statistics on active fire counts using NASA FIRMS data. Now the package only allows to generate burned areas in ha based on MODIS data. So you would also need to update the analysis code in the markdown file to account for this and measure area instead of incidences.\n You will also need another geospatial datafile that contains all protected areas. It is used in the script to create an object called wdpa_allPAs. You can find the relevant data in “data/wdpa.gdb”. Its a file geodatabase, that you can load as a spatial layer in R as well.\nNow here are your main tasks for the project - regenerate and update the relevant input data for the period 2000-2024. Do this in a sepearte R script. process the data and eventually fix errors. - regenerate the rmd file for reporting purposes. Note that you should adapt the text in the markdown according to the new study period, utilized methods and data and also according to the results you detected. - You should check before, whether we still want to use the old RMD system or whether it is possible to change to the more modern Quarto format from RStudio. - check whether it still makes sense to use workflowR to generate the website or whether it is easier to use Quarto for this purpose. Remember that I use Github pages the free version. I want to make this a scalable project i.e. to put new analysis scripts and reports into the website. - generate the html websites for from the RMD or Quarto files so I can check the results.\n Make sure to install and or update also all relevant R packages. Also make sure to generate sufficient documentation in a Readme file of this repo."
-  },
-  {
-    "objectID": "reports/threat_assessment_bolivia.html#burned-area-analysis-2015-2022",
-    "href": "reports/threat_assessment_bolivia.html#burned-area-analysis-2015-2022",
-    "title": "Threat Assessment for Protected Areas in Bolivia",
-    "section": "Burned Area Analysis (2015-2022)",
-    "text": "Burned Area Analysis (2015-2022)\n\n\n\n\n\n\nImportantMethodology Note: Comparing Burned Area and Forest Cover Loss\n\n\n\nThis analysis uses burned area in hectares from the MODIS MCD64A1 product (Giglio et al., 2018). It is important to understand the methodological differences between burned area and forest cover loss data:\n\nBurned Area (MCD64A1): Cumulative sum of all fire-affected areas. If the same area burns multiple times over the analysis period, each burn event is counted separately. This means burned area totals can exceed the total land area of a protected area.\nForest Cover Loss (Global Forest Watch): Each forest pixel is only counted once when it transitions from forest to non-forest. Even if an area burns multiple times or experiences repeated disturbances, the loss is recorded only at the initial deforestation event.\n\nImplication for interpretation: Burned area values are typically higher than forest cover loss values because they represent cumulative fire exposure, not permanent land cover change. High burned area with low forest loss may indicate recurrent fires in grasslands or savannas, while matching high values in both metrics suggest fire-driven deforestation.\n\n\nFire is a significant threat to protected areas, whether from natural causes (e.g., El Niño-related droughts) or human activities (land clearing, agricultural burning). The MODIS MCD64A1 burned area product provides monthly burned area detection at 500m resolution, allowing us to quantify the total hectares affected by fire within each protected area over the analysis period (2015-2022).\n\nInteractive Map\nThe map shows burned area totals for analyzed protected areas. Larger circles indicate greater cumulative burned area.\n\n\n\n\n\n\n\n\nTotal Burned Area by Protected Area\n\n\n\n\n\n\n\n\nAnnual Burned Area Trends",
-    "crumbs": [
-      "Threat Assessment for Protected Areas in Bolivia"
-    ]
-  },
-  {
-    "objectID": "reports/threat_assessment_bolivia.html#burned-area-analysis-2015-2023",
-    "href": "reports/threat_assessment_bolivia.html#burned-area-analysis-2015-2023",
-    "title": "Threat Assessment for Protected Areas in Bolivia",
-    "section": "Burned Area Analysis (2015-2023)",
-    "text": "Burned Area Analysis (2015-2023)\n\n\n\n\n\n\nCautionMethodology Notes: Burned Areas and Forest Cover Loss Detection (click to expand)\n\n\n\n\n\n\nComparing Burned Area and Forest Cover Loss Data\nThis analysis uses burned area in hectares from the MODIS MCD64A1 product (Giglio et al., 2018). It is important to understand the methodological differences between burned area and forest cover loss data:\n\nBurned Area (MCD64A1): Cumulative sum of all fire-affected areas. If the same area burns multiple times over the analysis period, each burn event is counted separately. This means burned area totals can exceed the total land area of a protected area.\nForest Cover Loss (Global Forest Watch): Each forest pixel is only counted once when it transitions from forest to non-forest. Even if an area burns multiple times or experiences repeated disturbances, the loss is recorded only at the initial deforestation event.\n\nImplication for interpretation: Burned area values are typically higher than forest cover loss values because they represent cumulative fire exposure, not permanent land cover change. High burned area with low forest loss may indicate recurrent fires in grasslands or savannas, while matching high values in both metrics suggest fire-driven deforestation.\n\n\nGFW Detection Limitations in Dry Forest Ecosystems\nA critical limitation of the Global Forest Watch data concerns its reduced detection accuracy in dry forest ecosystems, such as those found in Kaa-Iya del Gran Chaco National Park and other Chaco-type environments. This limitation stems from several technical factors:\n\nSpectral Confusion: The “brown” signature of deciduous trees during the dry season is often indistinguishable from bare soil in global satellite baselines, leading to underdetection of forest cover.\nDeciduous Phenology: Dry forests naturally lose their leaves seasonally, which can be misinterpreted as permanent forest loss or, conversely, cause actual losses to be missed when trees are leafless.\nAlgorithm Bias: Research indicates that GFW algorithms are fundamentally optimized for humid tropical biomes and frequently misclassify the sparse, clumped canopies characteristic of the Gran Chaco as shrubland or non-forest.\nMasking Practices: GFW often masks out non-humid regions from its primary forest datasets entirely, resulting in systematic underrepresentation of dry forest dynamics.\n\nInterpretation Guidance: Low or zero forest cover loss values for dry forest protected areas (such as Kaa-Iya del Gran Chaco) should be interpreted as a technical artifact rather than evidence of low threat. Nevertheless, the relatively low burned area values observed in Kaa-Iya del Gran Chaco suggest that this area may indeed have been spared from the major fire events that affected other regions in the last decade.\n\n\n\n\nFire is a significant threat to protected areas, whether from natural causes (e.g., El Niño-related droughts) or human activities (land clearing, agricultural burning). The MODIS MCD64A1 burned area product provides monthly burned area detection at 500m resolution, allowing us to quantify the total hectares affected by fire within each protected area over the analysis period (2015-2023).\n\nInteractive Map\nThe map shows burned area totals for analyzed protected areas. Larger circles indicate greater cumulative burned area.\n\n\n\n\n\n\n\n\nTotal Burned Area by Protected Area\n\n\n\n\n\n\n\n\nAnnual Burned Area Trends",
     "crumbs": [
       "Threat Assessment for Protected Areas in Bolivia"
     ]
@@ -201,6 +70,240 @@
     ]
   },
   {
+    "objectID": "reports/threat_assessment_bolivia.html#data-sources-references",
+    "href": "reports/threat_assessment_bolivia.html#data-sources-references",
+    "title": "Threat Assessment for Protected Areas in Bolivia",
+    "section": "Data Sources & References",
+    "text": "Data Sources & References\n\n\nFundación Amigos de la Naturaleza (FAN). 2019. “Reporte de Incendios Forestales En Bolivia 2019.” https://www.fan-bo.org.\n\n\nMargules, Christopher R, and Robert L Pressey. 2000. “Systematic Conservation Planning.” Nature 405 (6783): 243–53.\n\n\nPennington, R Toby, Darién E Prado, and Colin A Pendry. 2000. “Neotropical Seasonally Dry Forests and Quaternary Vegetation Changes.” Journal of Biogeography 27 (2): 261–73.\n\n\nWilson, Kerrie A, Michael I Westphal, Hugh P Possingham, and Jane Elith. 2005. “Measuring and Incorporating Vulnerability into Conservation Planning.” Environmental Management 35 (5): 527–43.\n\n\n\nWDPA: UNEP-WCMC and IUCN (2024), Protected Planet: The World Database on Protected Areas (WDPA)\nGFW: Hansen, M. C., et al. (2013). High-Resolution Global Maps of 21st-Century Forest Cover Change. Science, 342(15 November): 850–53. Data version: GFC-2024-v1.12.\nMODIS MCD64A1: Giglio, L., Boschetti, L., Roy, D. P., Humber, M. L., & Justice, C. O. (2018). The Collection 6 MODIS burned area mapping algorithm and product. Remote Sensing of Environment, 217, 72-85. Available at: https://modis-fire.umd.edu/ba.html\n\n\nReport generated: 2026-02-04",
+    "crumbs": [
+      "Threat Assessment for Protected Areas in Bolivia"
+    ]
+  },
+  {
+    "objectID": "data/admin1_subset.html",
+    "href": "data/admin1_subset.html",
+    "title": "",
+    "section": "",
+    "text": "Code\n\n\n\n\n&lt;!DOCTYPE qgis PUBLIC ‘http://mrcc.com/qgis.dtd’ ‘SYSTEM’&gt;     dataset\n\n\n       GEOGCRS[“WGS 84”,ENSEMBLE[“World Geodetic System 1984 ensemble”,MEMBER[“World Geodetic System 1984 (Transit)”],MEMBER[“World Geodetic System 1984 (G730)”],MEMBER[“World Geodetic System 1984 (G873)”],MEMBER[“World Geodetic System 1984 (G1150)”],MEMBER[“World Geodetic System 1984 (G1674)”],MEMBER[“World Geodetic System 1984 (G1762)”],ELLIPSOID[“WGS 84”,6378137,298.257223563,LENGTHUNIT[“metre”,1]],ENSEMBLEACCURACY[2.0]],PRIMEM[“Greenwich”,0,ANGLEUNIT[“degree”,0.0174532925199433]],CS[ellipsoidal,2],AXIS[“geodetic latitude (Lat)”,north,ORDER[1],ANGLEUNIT[“degree”,0.0174532925199433]],AXIS[“geodetic longitude (Lon)”,east,ORDER[2],ANGLEUNIT[“degree”,0.0174532925199433]],USAGE[SCOPE[“Horizontal component of 3D system.”],AREA[“World.”],BBOX[-90,-180,90,180]],ID[“EPSG”,4326]] +proj=longlat +datum=WGS84 +no_defs 3452 4326 EPSG:4326 WGS 84 longlat EPSG:7030 true"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "MAPME (Maps for Planning, Monitoring and Evaluation in Development Cooperation) is an initiative that develops open-source tools and methodologies for conservation monitoring and impact evaluation.\n\n\n\nReproducible Analysis: Create transparent, reproducible workflows for processing global biodiversity and environmental data\nOpen Tools: Develop open-source R packages that enable anyone to analyze conservation effectiveness\nEvidence-Based Conservation: Support data-driven decision making in protected area management\n\n\n\n\n\nKfW Development Bank: Financial cooperation projects for protected areas worldwide\nGIZ: Technical cooperation and capacity building\nAcademic Partners: Collaboration on methodology development and validation"
+  },
+  {
+    "objectID": "about.html#the-mapme-initiative",
+    "href": "about.html#the-mapme-initiative",
+    "title": "About",
+    "section": "",
+    "text": "MAPME (Maps for Planning, Monitoring and Evaluation in Development Cooperation) is an initiative that develops open-source tools and methodologies for conservation monitoring and impact evaluation.\n\n\n\nReproducible Analysis: Create transparent, reproducible workflows for processing global biodiversity and environmental data\nOpen Tools: Develop open-source R packages that enable anyone to analyze conservation effectiveness\nEvidence-Based Conservation: Support data-driven decision making in protected area management\n\n\n\n\n\nKfW Development Bank: Financial cooperation projects for protected areas worldwide\nGIZ: Technical cooperation and capacity building\nAcademic Partners: Collaboration on methodology development and validation"
+  },
+  {
+    "objectID": "about.html#the-mapme.biodiversity-package",
+    "href": "about.html#the-mapme.biodiversity-package",
+    "title": "About",
+    "section": "The mapme.biodiversity Package",
+    "text": "The mapme.biodiversity Package\nThe mapme.biodiversity R package is the technical foundation for these analyses. It provides:\n\nResource Functions: Download and manage global environmental datasets\nIndicator Functions: Calculate standardized indicators for any polygon geometry\nEfficient Processing: Parallel computation support for large portfolios\nStandardized Output: Consistent data formats across all indicators\n\n\nSupported Indicators\nThe package supports numerous indicators including:\n\nForest cover and forest loss (Global Forest Watch)\nBurned areas (MODIS MCD64A1)\nLandcover classification (ESA WorldCover)\nPopulation density (WorldPop)\nClimate variables (CHELSA, WorldClim)\nAnd many more…"
+  },
+  {
+    "objectID": "about.html#data-sources",
+    "href": "about.html#data-sources",
+    "title": "About",
+    "section": "Data Sources",
+    "text": "Data Sources\n\nGlobal Forest Watch\nForest cover data from Hansen et al. (2013) provides:\n\nTree Cover 2000: Baseline forest extent\nYear of Loss: Annual forest loss detection (2001-present)\nResolution: 30m Landsat-derived\n\n\nHansen, M. C., et al. (2013). High-Resolution Global Maps of 21st-Century Forest Cover Change. Science, 342(6160), 850-853.\n\n\n\nMODIS Burned Area (MCD64A1)\nThe MCD64A1 product provides:\n\nBurned Area: Monthly burned area detection\nBurn Date: Julian day of burning\nResolution: 500m MODIS-derived\n\n\nGiglio, L., et al. (2018). The Collection 6 MODIS burned area mapping algorithm and product. Remote Sensing of Environment, 217, 72-85.\n\n\n\nWorld Database on Protected Areas (WDPA)\nProtected area boundaries from UNEP-WCMC and IUCN:\n\nPolygons: Official protected area boundaries\nAttributes: Governance, management, IUCN category\nUpdates: Monthly data releases\n\n\nUNEP-WCMC and IUCN (2024), Protected Planet: The World Database on Protected Areas (WDPA)."
+  },
+  {
+    "objectID": "about.html#contact",
+    "href": "about.html#contact",
+    "title": "About",
+    "section": "Contact",
+    "text": "Contact\nFor questions about these analyses or the MAPME Initiative:\n\nGitHub: mapme-initiative/mapme.biodiversity.reports\nPackage Issues: mapme-initiative/mapme.biodiversity"
+  },
+  {
+    "objectID": "about.html#license",
+    "href": "about.html#license",
+    "title": "About",
+    "section": "License",
+    "text": "License\nThis project is open source. Code is available under the MIT License. Data sources have their own licensing terms - please refer to the original data providers for details."
+  },
+  {
+    "objectID": "taskdescriptions/lao/taskdescription_lao_step2.html",
+    "href": "taskdescriptions/lao/taskdescription_lao_step2.html",
+    "title": "",
+    "section": "",
+    "text": "Code\nI had a first look at the evaluation report. Here is my feedback. Please implement the proposed changes which are given for each individual section below."
+  },
+  {
+    "objectID": "taskdescriptions/lao/taskdescription_lao_step2.html#overall-trends",
+    "href": "taskdescriptions/lao/taskdescription_lao_step2.html#overall-trends",
+    "title": "",
+    "section": "Overall Trends",
+    "text": "Overall Trends\n\nconvert linechart forest-cover overview to a stacked barplot. the individual staks should be all protected areas in Laos that were analyzed in the report. make sure to use an appealing well distinguishable color scheme for the different areas.\nconvert bar chart with total lossees to a stacked bar chart with total losses, again the individual areas comprising the stacks. make sure to use the same color scheme as before."
+  },
+  {
+    "objectID": "taskdescriptions/lao/taskdescription_lao_step4.html",
+    "href": "taskdescriptions/lao/taskdescription_lao_step4.html",
+    "title": "",
+    "section": "",
+    "text": "Code\n\n\n\n\n\nplots in Section overall Trends: Areas appear twice in the legend. Verify why that is. Did you add the data twice to the plot or did you add only legend items twice. Fix it. Protected areas should appear only once.\nplots ins ## Temporal Analysis of Deforestation for the Project Period: Comparison is good but the legend gets very large because of some very large names taking up around 60% of the plot. Limit the legend width and truncate the labels where necessary to around 20% of the total plot size.\nextend all plot sizes again to take 100% of the panel width.\nmap: it seems that the layer “Forest Loss Statistics” only contains data from the four selected PAs. change this. Add the data from all analyzed areas to this layer.\nthe Nam Ha protected area appear twice in the data with two distinct WDPA IDs. It once refers to an area where the DESIGNATION is “ASEAN Heritage Park” and once to an area where the Designation is “National Protected Area”. Only use the area “National Protected Area” throughout the whole report. Make this fact explicit in the section about analzed areas and remove it from the table."
+  },
+  {
+    "objectID": "taskdescriptions/bolivia/taskdescription.html",
+    "href": "taskdescriptions/bolivia/taskdescription.html",
+    "title": "",
+    "section": "",
+    "text": "Code\n\n\n\n\nThe purpose of this new project is to update a data-analysis that was done with R. The data-analysis was done about 2 years ago and I downloaded the repo for you that contains the relevant code. You can find and scan the code in this folder: “~/Documents/cursor/mapme.protectedareas/”. You may not need to scan everything because it will crowd your context window but you should start with\n-       “~/Documents/cursor/mapme.protectedareas/README.md” -       “~/Documents/cursor/mapme.protectedareas/contributing.md”\nTo get a first impression how the repo is structured and about its multiple purposes. You will see that it has mulitple purposes of which only a couple is relevant here.\nYou can then check the file “~/Documents/cursor/mapme.protectedareas/analysis/threat_assessment_bolivia.Rmd”.\nIt contains the relevant reporting code that I need to update. You will notice that in this script, several datasets are loaded for the analysis. I will provide you with newly updated data here or tell you how to generate it.\nThe R object that is called “wdpa_kfw” is now located under “data/portfolio.gpkg”. It contains all protected areas that are still or where formerly financed by KfW or GIZ.\nNext there is an R object created called “gfw_lossstats” loaded from a CSV. this file contains forest cover loss statistics from the global forest watch. It was generated with another script using the mapme.biodiversity package. You can find more information about this package here and about its basic usage here https://github.com/mapme-initiative/mapme.biodiversity. Read the readme.md from the repository to understand how it works. You should then create a separate R script from scratch called “processing.R” that generates the relevant input statistics. We do this outside of the Rmd script, because it can take a longer time to process.\nHere the update already starts. You should add data up until 2024 i.e. process forest cover loss data between 2000 and 2024.\nA more detailed documentation of the package is also available online under: https://mapme-initiative.github.io/mapme.biodiversity/\nThe same is true for fire data. later in the script there is an object loaded called bolivia_fire_data. This data was also generated with the afformentioned package which also allows to calculate fire indicators. Now there is one important change in the package. Formerly the package allowed to generated statistics on active fire counts using NASA FIRMS data. Now the package only allows to generate burned areas in ha based on MODIS data. So you would also need to update the analysis code in the markdown file to account for this and measure area instead of incidences.\n You will also need another geospatial datafile that contains all protected areas. It is used in the script to create an object called wdpa_allPAs. You can find the relevant data in “data/wdpa.gdb”. Its a file geodatabase, that you can load as a spatial layer in R as well.\nNow here are your main tasks for the project - regenerate and update the relevant input data for the period 2000-2024. Do this in a sepearte R script. process the data and eventually fix errors. - regenerate the rmd file for reporting purposes. Note that you should adapt the text in the markdown according to the new study period, utilized methods and data and also according to the results you detected. - You should check before, whether we still want to use the old RMD system or whether it is possible to change to the more modern Quarto format from RStudio. - check whether it still makes sense to use workflowR to generate the website or whether it is easier to use Quarto for this purpose. Remember that I use Github pages the free version. I want to make this a scalable project i.e. to put new analysis scripts and reports into the website. - generate the html websites for from the RMD or Quarto files so I can check the results.\n Make sure to install and or update also all relevant R packages. Also make sure to generate sufficient documentation in a Readme file of this repo."
+  },
+  {
+    "objectID": "taskdescriptions/bolivia/taskdescription_step2.html",
+    "href": "taskdescriptions/bolivia/taskdescription_step2.html",
+    "title": "",
+    "section": "",
+    "text": "Code\n\n\n\n\nThe routines in this repository for calculating forest cover loss and fires based on MODIS are now working and the data is processed. Now I would like you to focus on the analysis part. I want you to\n\nupdate t threat_assessment_bolivia and make all plots pretty\ncheck the results and your text interpretation in the report against the actual data.\n\nThere might be different ways to do check for consistency. You could either - check the results from the raw data generated and stored in the csvs and analyse this data yourself to draw conclusions or - render the report and analyse either the html or a screenshot of the rendered html report, or - approach this in any other way that seems effective to you. Reflect on how to best approach this. You are the data analyst in this cases and your interpretations should be in line with the empirical data.\nWhat I need you to do specifically is: - confirm, that the text interpretation in the report is in line with your observations from the data patterns - draw further conclusions from the data that do not appear in the text yet. These can be general trends, highlighting examples with a larger explanatory power for general patterns, pointing to outliers or other observations that deviate from general trends. -\nFeedback on current report\nMaps:\nIn both maps, the PAs (Others) layer should have a dark-green outline and be 20% transparent. In addition it would be nice if you could see if it is possible to add the names as labels of both PA layers in the map. If so, add labels in very dark green color. offset them a bit from the centroid because currently we have the point data at the centroid location.\nInterpretation: It seems to me that we could extend much more the intepretation of the results. The goal of the analysis is to analyse the threat level of different areas. So interpretation could cover: - which are the most affected / threatened areas - does forest cover loss coincide with those areas with high losses? - is KfW already present in the most threatened areas?\nthink of further interpretation lines that could be relevant. Then analysis the results yourself in detail and add the interpretations."
+  },
+  {
+    "objectID": "taskdescriptions/bolivia/taskdescription_step3.html",
+    "href": "taskdescriptions/bolivia/taskdescription_step3.html",
+    "title": "",
+    "section": "",
+    "text": "Code\n\n\n\n\nI want you to reflect and then adjust the analysis part of this project. First read threat_assessment_bolivia.qmd … it contains all of the relevant analysis parts including your previous adjustments. - section “Analyzed Protected Areas”: Make sure to discuss that we analyzed a set of protected aras within the Bolivian Amazon of which 5 areas where supported by KfW in current or past projectsfinancially. Make sure to include all of those areas in the table, but limit the display to 8 on the first tab. make sure to list those firest, that had been KfW supported. Rename the column “agency” to “Supported” and then instead of “KfW” mark entries with “yes” and “no”. Second. We do not need the columns “country”, “region” and “subregion” because they do not show any meaningfull variance. Intead add “Forest cover in 2001”, “Forest Cover in 2024,”Total Burned Area”. Make sure to retrieve the respective entries from the actual data. If possible also add the option to download the data as csv (only if there is a built-in option in the package, do not create entensive workarounds).\nSection “Burned Area Analysis”. - It is important for this analysis to discuss more the implications of using data from the Global Forest watch for the interpreation of the data. There is a lack of detection for dry forest ecosystems which are found e.g. in the Kaa Iya del Gran Chaco. This lack of detections stems from spectral confusion and deciduous phenology; the “brown” signature of dry-season trees is often indistinguishable from bare soil in global baselines. Research indicates GFW algorithms are fundamentally biased toward humid tropical biomes, frequently misclassifying the sparse, clumped canopies of the Gran Chaco as shrubland. Furthermore, GFW often masks out non-humid regions from its primary forest datasets entirely. For this study, GFW’s zero-values as a technical artifact; you can add to the improvements section to use datasets like MapBiomas Chaco to accurately capture dry forest dynamics and loss. Nevertheless Kaa Iya del Gran Chaco was somehow saved from major fire events in the last decade which indicates that this area indeed is less threatened.\nHeatmap Plots: - Please make the border of KfW supported area observations less prominent. make it grey and less thick. Currently it is too large.\nSection Most Threatened Protected Areas: - you created a threat score which is a composed indicator. You did not explain how you created it. From my point of view it would make sense to take into account total forest cover loss, burned area and relative loss. Make sure to make this methodologically very sound potentially drawing from others expiriences from literature to create such indicators. Make sure to explain detail but easy words how it is created and how to interpret it. - For the Discussion of Top 5 Most Threatened Protected Areas: Make sure to align your interpretation with an internet research. Avoid any halluzination on the interpretation part. This needs to be well funded. It would even help to report sources for your conclusions. - You then created a plot called: Does Forest Cover Loss Coincide with High Burned Areas? It does not really make sense from my point of view to correlate total burned area with relative loss. It would be more sensefull to correlate it with absolute loss. Try to recraete the statistics and adapt your interpretation.\nSection: Temporal Patterns and Emerging Threats - this is a qualitative interpretation. Recheck again with literature or internet research to confirm your interpretations.\nPleases summarize Forest Cover Loss Interpretation and Burned Area Analysis Context in one section called “Discussion of methods and data”. Include also there the section about possible improvements. make this the last section of the report. The section with Recommendations should come before.\nFor the recommendations I would like you to focus purely on the findings that emerge from the project i.e. priority 1 and 2 are good, priority 3 and 4 cannot be really deduced from the data. you can add other priorities if they are related to the findings of the report. make also sure for this section, that you make your interpretation a bit more cautious given that we look at the problem very one-dimensional. You should say something that reflects that fact that we are looking at conservation priorities from the angle of threats in this report, we do not consider biodiversity, the local economy, the social or cultural dimension or the fact were institutional structures are strong enough to support a good project."
+  },
+  {
+    "objectID": "taskdescriptions/lao/taskdescription_lao_step1.html",
+    "href": "taskdescriptions/lao/taskdescription_lao_step1.html",
+    "title": "",
+    "section": "",
+    "text": "Code"
+  },
+  {
+    "objectID": "taskdescriptions/lao/taskdescription_lao_step1.html#repository-context",
+    "href": "taskdescriptions/lao/taskdescription_lao_step1.html#repository-context",
+    "title": "",
+    "section": "Repository Context",
+    "text": "Repository Context\nThis repository (mapme.biodiversity.reports) contains Quarto-based reports for analyzing environmental threats and forest dynamics in protected areas. The project uses:\n\nQuarto for dynamic report generation (HTML output for GitHub Pages)\nR programming language for data processing and analysis\nmapme.biodiversity R package for geospatial data acquisition (GFW forest cover loss, MODIS burned area)\nsf for spatial data handling\nleaflet for interactive maps\nggplot2/plotly for visualizations\nDT for interactive tables\n\n\nKey Files to Understand\nBefore starting, read these files to understand the structure and approach:\n\nreports/threat_assessment_bolivia.qmd:\n\nReference implementation of a threat assessment report\nShows how to structure sections, load data, create maps, generate plots\nNote: This Laos report should be framed as an evaluation report, not a threat assessment\nUse similar structure but adapt language and framing for evaluation context\n\nprocessing.R:\n\nShows how to process forest cover loss data using mapme.biodiversity\nUses get_gfw_treecover() and get_gfw_lossyear() to download GFW data\nUses calc_treecover_area() to calculate annual forest cover statistics\nProcesses data for 2000-2024 period\n\nREADME.md:\n\nRepository structure, setup instructions, technical requirements\nImportant: GDAL version requirements, macOS setup notes. Everything is alreay installed so it might be less relevant.\n\n_quarto.yml:\n\nQuarto project configuration\nOutput directory set to docs/ for GitHub Pages\n\n\n\n\nData Structure\n\nProtected Areas Data: data/wdpa_lao.gdb (File Geodatabase)\n\nLayer: WDPA_WDOECM_poly_Feb2026_LAO (30 polygon features)\nContains all protected areas in Laos\nFilter for the 4 target areas using WDPA IDs (see below)"
+  },
+  {
+    "objectID": "taskdescriptions/lao/taskdescription_lao_step1.html#task-overview",
+    "href": "taskdescriptions/lao/taskdescription_lao_step1.html#task-overview",
+    "title": "",
+    "section": "Task Overview",
+    "text": "Task Overview\nGenerate an evaluation report for the evaluation department analyzing forest cover development in 4 protected areas in Laos. The report should focus on forest cover loss only (no burned area analysis). The comparative analysis with all Lao PAs vs KfW-supported areas should be placed in the last section of the report.\n\nTarget Protected Areas\n\n\n\nProtected Area Name\nArea (km²)\nWDPA ID (Protected Planet)\n\n\n\n\nNam Kan\n1,360\n71253\n\n\nNam Ha\n2,224\n555756396 / 71252\n\n\nHin Nam No\n941\n555703744\n\n\nKounxe Nongma\n538\n555703750\n\n\n\nNote: Nam Ha has two WDPA IDs. Check which one is correct in the GDB or use both if they represent different designations but make this very clear in the report."
+  },
+  {
+    "objectID": "taskdescriptions/lao/taskdescription_lao_step1.html#specific-requirements",
+    "href": "taskdescriptions/lao/taskdescription_lao_step1.html#specific-requirements",
+    "title": "",
+    "section": "Specific Requirements",
+    "text": "Specific Requirements\n\n1. Data Processing\n\nDownload shapefiles of 4 protected areas\n\nLoad from data/wdpa_lao.gdb layer WDPA_WDOECM_poly_Feb2026_LAO\nFilter by WDPA IDs: 71253, 555756396, 71252, 555703744, 555703750\nVerify geometry validity and transform to WGS84 (EPSG:4326) if needed\n\nProcess forest cover data\n\nUse mapme.biodiversity package to download GFW data:\n\nget_gfw_treecover(version = \"GFC-2024-v1.12\")\nget_gfw_lossyear(version = \"GFC-2024-v1.12\")\n\nCalculate annual forest cover area using calc_treecover_area() for years 2000-present\nSave processed data to CSV: data/laos_forest_cover_2000_2024.csv\nFormat: columns should include WDPAID, ORIG_NAME, year, area_ha (forest cover), loss_ha (annual loss)\n\n\n\n\n2. Excel Summary Table\n\nCreate summary table: Forest cover per year per protected area (2000-present)\n\nColumns: Protected Area Name, Year, Forest Cover (ha), Annual Loss (ha), Cumulative Loss (ha) for the years 2009-2013, 2014-2018 and 2019-2023\nInclude all 4 areas\nExport as CSV (can be opened in Excel)\nAlso include as interactive DT table in the Quarto report\n\n\n\n\n3. Required Graphs\n\nGraph 1: Cumulative deforestation (2009-2013) for each of the 4 PAs\n\nX-axis: Year (2009, 2010, 2011, 2012, 2013)\nY-axis: Cumulative forest loss (ha)\nOne line per PA, clearly labeled\nUse ggplot2 with plotly for interactivity if possible\n\nGraph 2: Cumulative deforestation (2014-2018) for each of the 4 PAs\n\nSame format as Graph 1\nYears: 2014, 2015, 2016, 2017, 2018\n\nGraph 3: Cumulative deforestation (2019-2023) for each of the 4 PAs\n\nSame format as Graph 1\nYears: 2019, 2020, 2021, 2022, 2023\n\n\nNote: “Cumulative deforestation” means the total loss accumulated from the start of each period (e.g., for 2009-2013, show cumulative loss starting from 2009 baseline).\n\n\n4. Descriptive Statements\n\nPrepare descriptive statements about deforestation development:\n\nCompare deforestation rates before and after project start. Before is likely 2009-2013, during is 2014-2018, after is 2019-2023… make this assumption explicit.\nIdentify which areas show increasing/decreasing trends\nHighlight any notable patterns or outliers\nBase statements on empirical data from the analyses\nFrame in evaluation context (supporting evaluation of forest stock development)\n\n\n\n\n5. Comparative Analysis (Last Section)\n\nCompare 4 target areas with all Lao PAs\n\nLoad all protected areas from data/wdpa_lao.gdb\nProcess forest cover loss for all Lao PAs (or use summary statistics if processing all is too time-consuming)\nCreate comparative visualizations (boxplots, bar charts, etc.)\nHighlight how the 4 target areas compare to the national average\n\nCompare with KfW-supported areas (if data available)\n\nLoad KfW portfolio from data/portfolio.gpkg\nFilter for Laos entries\nCompare forest cover loss trends between KfW-supported areas and the 4 target areas\nDiscuss implications for evaluation"
+  },
+  {
+    "objectID": "taskdescriptions/lao/taskdescription_lao_step1.html#report-structure-and-formatting",
+    "href": "taskdescriptions/lao/taskdescription_lao_step1.html#report-structure-and-formatting",
+    "title": "",
+    "section": "Report Structure and Formatting",
+    "text": "Report Structure and Formatting\n\nReport Title and Framing\n\nTitle: Should reflect evaluation purpose, e.g., “Evaluation of Forest Cover Development in Protected Areas in Laos” or similar\nFraming: Use evaluation language throughout:\n\n“Evaluation of forest cover development”\n“Assessment of conservation outcomes”\n“Analysis of forest cover trends”\nAvoid “threat assessment” terminology\n\n\n\n\nSuggested Report Sections\n\nIntroduction\n\nBackground on the 4 protected areas\nPurpose of the evaluation\nData sources and methodology\n\nAnalyzed Protected Areas\n\nTable with key information about the 4 areas\nInclude: Name, WDPA ID, Area (ha), Designation, Status, etc.\n\nForest Cover Development (2000-Present)\n\nSummary table (Excel-compatible CSV)\nOverall trends description\n\nTemporal Analysis of Deforestation for the project period\n\nGraph 1: Cumulative deforestation (2009-2013)\nGraph 2: Cumulative deforestation (2014-2018)\nGraph 3: Cumulative deforestation (2019-2023)\nInterpretation of trends before/after project start\n\nDescriptive Analysis\n\nDetailed statements about deforestation development\nComparison of periods\nIdentification of most/least affected areas\n\nComparative Context (Last Section)\n\nComparison with all Lao protected areas\nComparison with KfW-supported areas (if available)\nDiscussion of relative performance\n\nConclusions and Recommendations\n\nSummary of findings\nEvaluation conclusions\nRecommendations for future monitoring\n\n\n\n\nVisual Style\n\nFollow the style from threat_assessment_bolivia.qmd:\n\nInteractive maps using leaflet\nInteractive plots using plotly\nClean, professional formatting\nConsistent color schemes\nMap width: 80% with light grey border (if maps are included)\n\n\n\n\nTechnical Implementation Notes\n\nData Processing Script\n\nCreate process_laos_forest_cover.R similar to processing.R\nUse mapme.biodiversity workflow:\nlibrary(mapme.biodiversity)\nlibrary(sf)\nlibrary(dplyr)\n\n# Load PAs\nwdpa_lao &lt;- st_read(\"data/wdpa_lao.gdb\", layer = \"WDPA_WDOECM_poly_Feb2026_LAO\")\n\n# Filter for target areas\ntarget_ids &lt;- c(71253, 555756396, 71252, 555703744, 555703750)\nportfolio &lt;- wdpa_lao %&gt;% filter(WDPAID %in% target_ids)\n\n# Get resources\nportfolio &lt;- get_resources(\n  portfolio,\n  get_gfw_treecover(version = \"GFC-2024-v1.12\"),\n  get_gfw_lossyear(version = \"GFC-2024-v1.12\")\n)\n\n# Calculate indicators\nportfolio &lt;- calc_indicators(\n  portfolio,\n  calc_treecover_area(years = 2000:2024, min_cover = 10, min_size = 1)\n)\n\n# Extract and save results\n# ... (see processing.R for details)\n\nQuarto Report File\n\nCreate reports/evaluation_laos_forest_cover.qmd\nFollow structure of threat_assessment_bolivia.qmd but adapt for evaluation context\nUse similar chunk structure and code organization\n\nData Files\n\nSave processed data to data/laos_forest_cover_2000_2024.csv\nFormat: WDPAID, ORIG_NAME, year, area_ha, loss_ha, cumulative_loss_ha"
+  },
+  {
+    "objectID": "taskdescriptions/lao/taskdescription_lao_step1.html#important-considerations",
+    "href": "taskdescriptions/lao/taskdescription_lao_step1.html#important-considerations",
+    "title": "",
+    "section": "Important Considerations",
+    "text": "Important Considerations\n\nProject Start Date: The requester mentions “before and after the start of the project” but doesn’t specify the exact project start date. You may need to:\n\nCheck if there’s documentation about project start dates\nUse a reasonable assumption (e.g., 2014 as a common project start year)\nOr analyze multiple potential breakpoints\n\nCumulative Deforestation Calculation:\n\nFor each period (2009-2013, 2014-2018, 2019-2023), calculate cumulative loss from the start of that period\nExample: For 2009-2013, show cumulative loss from 2009 baseline (not from 2000)\n\nNam Ha WDPA ID Issue:\n\nTwo IDs listed: 555756396 and 71252\nCheck which one exists in the GDB\nIf both exist, determine which is the correct one or include both if they represent different designations\n\nData Availability:\n\nGFW data is available through 2024 (GFC-2024-v1.12)\nEnsure all calculations use consistent data version\n\nEvaluation Context:\n\nFrame all findings in terms of evaluation of forest stock development\nFocus on outcomes and trends rather than threats\nUse language appropriate for evaluation reports"
+  },
+  {
+    "objectID": "taskdescriptions/lao/taskdescription_lao_step1.html#output-files-expected",
+    "href": "taskdescriptions/lao/taskdescription_lao_step1.html#output-files-expected",
+    "title": "",
+    "section": "Output Files Expected",
+    "text": "Output Files Expected\n\nProcessing Script: process_laos_forest_cover.R\nProcessed Data: data/laos_forest_cover_2000_2024.csv\nSummary Table: data/laos_forest_cover_summary.csv (Excel-compatible)\nQuarto Report: reports/evaluation_laos_forest_cover.qmd\nRendered HTML: docs/reports/evaluation_laos_forest_cover.html (after rendering)"
+  },
+  {
+    "objectID": "taskdescriptions/lao/taskdescription_lao_step1.html#next-steps-after-implementation",
+    "href": "taskdescriptions/lao/taskdescription_lao_step1.html#next-steps-after-implementation",
+    "title": "",
+    "section": "Next Steps After Implementation",
+    "text": "Next Steps After Implementation\n\nRender the report: quarto render reports/evaluation_laos_forest_cover.qmd\nReview the HTML output locally\nVerify all requirements are met\nCheck that graphs show cumulative deforestation correctly\nEnsure descriptive statements are data-driven and accurate\nCommit changes to Git repository\n\n\nNote: This task description should be comprehensive enough to allow implementation in a fresh context window. All necessary context, file locations, technical details, and requirements are included above."
+  },
+  {
+    "objectID": "taskdescriptions/lao/taskdescription_lao_step3.html",
+    "href": "taskdescriptions/lao/taskdescription_lao_step3.html",
+    "title": "",
+    "section": "",
+    "text": "Code"
+  },
+  {
+    "objectID": "taskdescriptions/lao/taskdescription_lao_step3.html#map",
+    "href": "taskdescriptions/lao/taskdescription_lao_step3.html#map",
+    "title": "",
+    "section": "Map",
+    "text": "Map\n\nmake the map only have of the vertical size. make it horizontally 100%. It seems to be currently only 70% or 80%.\nCheck if you can add a transparency slider for the maplayers from the leaflet library or leaflet.extras library or any leaflet related library. research wheather layer transparency sliders are possible.\nChange the two embedded layers “Forest Cover Loss (2001-2014)” and “Forest Cover Loss (2014-2024)”. I want them to show the periods that we also use below for the analysis. Those are 2009-2013, 2014-2018, 2019-2023. Look at the pattterns in the URLs. They contain startyear and stopyear or similar tags. Adjust those with the years and create three layers for those periods. In addition create another layer that shows the period 2001-2024.\nAdd another layer called “Project PAs (Outlines)”. It should contain the same data as “Project PAs” but it should be styled differently. Use only the polygon outline in Red and make the fill completly transparent."
+  },
+  {
+    "objectID": "taskdescriptions/lao/taskdescription_lao_step3.html#line-charts-and-barcharts",
+    "href": "taskdescriptions/lao/taskdescription_lao_step3.html#line-charts-and-barcharts",
+    "title": "",
+    "section": "Line Charts and Barcharts",
+    "text": "Line Charts and Barcharts\n\nnot all charts currently contain the vertical lines with the project periods. Add them to all plots.\nonly two vertical lines are shown for the years 2014 and 2019. make sure to add also lines for 2009 and 2023 for all plots.\nmake the lines slightly thinner and more elegant.\nMake all plots but the overall Trends plot only have of the verical size."
+  },
+  {
+    "objectID": "taskdescriptions/lao/taskdescription_lao_step3.html#interpretations",
+    "href": "taskdescriptions/lao/taskdescription_lao_step3.html#interpretations",
+    "title": "",
+    "section": "Interpretations",
+    "text": "Interpretations\n\nOnce the data is processed for the whole country rework your interpretations and take into account the comparative perspective."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "About",
+    "section": "",
+    "text": "Open-source geospatial analysis for conservation impact management"
+  },
+  {
+    "objectID": "index.html#welcome",
+    "href": "index.html#welcome",
+    "title": "About",
+    "section": "Welcome",
+    "text": "Welcome\nThis website hosts threat assessment reports and conservation analyses for protected areas worldwide. The analyses leverage open geospatial data and the mapme.biodiversity R package to generate reproducible insights on ecosystem health and conservation pressures."
+  },
+  {
+    "objectID": "index.html#available-reports",
+    "href": "index.html#available-reports",
+    "title": "About",
+    "section": "Available Reports",
+    "text": "Available Reports\n\n\n🇧🇴 Bolivia Threat Assessment\nPeriod: 2000-2024\nFocus: Forest Cover Loss & Burned Areas\nAnalysis of threat levels in Bolivian protected areas, examining:\n\nPrimary forest cover loss trends\nBurned area dynamics (MODIS MCD64A1)\nComparison between supported and non-supported areas\n\nView Report →\n\n\n🇱🇦 Laos Forest Cover Evaluation\nPeriod: 2000-2024\nFocus: Forest Cover Loss & Conservation Outcomes\nEvaluation of forest cover development in Lao protected areas, examining:\n\nForest cover loss trends (2000-2024)\nComparative analysis between project and non-project areas\nTemporal dynamics during project phases\n\nView Report →"
+  },
+  {
+    "objectID": "index.html#data-sources",
+    "href": "index.html#data-sources",
+    "title": "About",
+    "section": "Data Sources",
+    "text": "Data Sources\nOur analyses rely on globally consistent, openly available datasets:\n\n\n\nDataset\nSource\nResolution\n\n\n\n\nForest Cover\nGlobal Forest Watch (Hansen et al., 2013)\n30m\n\n\nBurned Areas\nMODIS MCD64A1\n500m\n\n\nProtected Areas\nWDPA/IUCN\nVector"
+  },
+  {
+    "objectID": "index.html#methodology",
+    "href": "index.html#methodology",
+    "title": "About",
+    "section": "Methodology",
+    "text": "Methodology\nThe reports in this repository use the mapme.biodiversity R package, which provides:\n\nStandardized access to global environmental datasets\nEfficient zonal statistics computation\nReproducible indicator calculations\nSupport for parallel processing\n\nLearn more about the package at: mapme-initiative.github.io/mapme.biodiversity"
+  },
+  {
+    "objectID": "index.html#about-this-project",
+    "href": "index.html#about-this-project",
+    "title": "About",
+    "section": "About This Project",
+    "text": "About This Project\nThis project is part of the MAPME Initiative (Maps for Planning, Monitoring and Evaluation in Development Cooperation), supporting KfW and partners with data based products to improve impact management of their projects. For more information see https://www.mapme-initiative.org/.\n\n\n\n\n\n\nNoteReproducibility\n\n\n\nAll code and data processing scripts are available in this repository. The analyses can be reproduced using the provided R scripts and openly available data sources.\n\n\n\nLast updated: January 2026"
+  },
+  {
+    "objectID": "data/municipalities.html",
+    "href": "data/municipalities.html",
+    "title": "",
+    "section": "",
+    "text": "Code\n\n\n\n\n&lt;!DOCTYPE qgis PUBLIC ‘http://mrcc.com/qgis.dtd’ ‘SYSTEM’&gt;     dataset\n\n\n       GEOGCRS[“WGS 84”,ENSEMBLE[“World Geodetic System 1984 ensemble”,MEMBER[“World Geodetic System 1984 (Transit)”],MEMBER[“World Geodetic System 1984 (G730)”],MEMBER[“World Geodetic System 1984 (G873)”],MEMBER[“World Geodetic System 1984 (G1150)”],MEMBER[“World Geodetic System 1984 (G1674)”],MEMBER[“World Geodetic System 1984 (G1762)”],ELLIPSOID[“WGS 84”,6378137,298.257223563,LENGTHUNIT[“metre”,1]],ENSEMBLEACCURACY[2.0]],PRIMEM[“Greenwich”,0,ANGLEUNIT[“degree”,0.0174532925199433]],CS[ellipsoidal,2],AXIS[“geodetic latitude (Lat)”,north,ORDER[1],ANGLEUNIT[“degree”,0.0174532925199433]],AXIS[“geodetic longitude (Lon)”,east,ORDER[2],ANGLEUNIT[“degree”,0.0174532925199433]],USAGE[SCOPE[“Horizontal component of 3D system.”],AREA[“World.”],BBOX[-90,-180,90,180]],ID[“EPSG”,4326]] +proj=longlat +datum=WGS84 +no_defs 3452 4326 EPSG:4326 WGS 84 longlat EPSG:7030 true"
+  },
+  {
     "objectID": "reports/evaluation_laos_forest_cover.html#introduction",
     "href": "reports/evaluation_laos_forest_cover.html#introduction",
     "title": "Evaluation of Forest Cover Development in Protected Areas in Laos",
@@ -216,6 +319,16 @@
     "title": "Evaluation of Forest Cover Development in Protected Areas in Laos",
     "section": "Analyzed Protected Areas",
     "text": "Analyzed Protected Areas\nThe evaluation focuses on four protected areas in Laos that are part of the evaluation portfolio:\n\n\n\n\n\n\nNoteNote on Nam Ha Protected Area\n\n\n\nNam Ha appears in the WDPA database with two distinct WDPA IDs representing different designations: - WDPA ID 71252: Nam Ha National Protected Area (used in this analysis) - WDPA ID 555756396: Nam Ha ASEAN Heritage Park (excluded from this analysis)\nThis report uses only the National Protected Area designation (WDPA ID 71252) throughout all analyses and visualizations.",
+    "crumbs": [
+      "Evaluation of Forest Cover Development in Protected Areas in Laos"
+    ]
+  },
+  {
+    "objectID": "reports/evaluation_laos_forest_cover.html#map",
+    "href": "reports/evaluation_laos_forest_cover.html#map",
+    "title": "Evaluation of Forest Cover Development in Protected Areas in Laos",
+    "section": "Map",
+    "text": "Map",
     "crumbs": [
       "Evaluation of Forest Cover Development in Protected Areas in Laos"
     ]
@@ -241,31 +354,11 @@
     ]
   },
   {
-    "objectID": "reports/evaluation_laos_forest_cover.html#descriptive-analysis",
-    "href": "reports/evaluation_laos_forest_cover.html#descriptive-analysis",
+    "objectID": "reports/evaluation_laos_forest_cover.html#key-findings",
+    "href": "reports/evaluation_laos_forest_cover.html#key-findings",
     "title": "Evaluation of Forest Cover Development in Protected Areas in Laos",
-    "section": "Descriptive Analysis",
-    "text": "Descriptive Analysis\nThis section provides detailed empirical statements about deforestation development based on the data analysis.\n\nDeforestation Development by Period\n\n\n\n\n\n\n\n\nKey Findings\nBased on the empirical analysis of forest cover data:\n\nPeriod Comparison: The analysis compares deforestation rates across three periods:\n\nBefore project (2009-2013): Baseline period before project implementation\nDuring project (2014-2018): Project implementation period\nAfter project (2019-2023): Post-project period\n\nTrend Identification: The data reveals:\n\nAreas showing increasing trends: Protected areas where deforestation rates increased over time\nAreas showing decreasing trends: Protected areas where deforestation rates decreased over time\nAreas with stable patterns: Protected areas with relatively consistent deforestation rates\n\nNotable Patterns:\n\nIdentification of outliers or unusual patterns in deforestation\nComparison of relative performance across the four protected areas\nAssessment of whether project implementation coincided with changes in deforestation rates\n\n\n\n\n\n\n\n\nNoteData-Driven Statements\n\n\n\nThe descriptive statements above are based on empirical calculations from the forest cover data. Specific numerical findings will be automatically generated once the data processing script has been executed. The analysis framework is designed to support evidence-based evaluation of conservation outcomes.",
-    "crumbs": [
-      "Evaluation of Forest Cover Development in Protected Areas in Laos"
-    ]
-  },
-  {
-    "objectID": "reports/evaluation_laos_forest_cover.html#comparative-context",
-    "href": "reports/evaluation_laos_forest_cover.html#comparative-context",
-    "title": "Evaluation of Forest Cover Development in Protected Areas in Laos",
-    "section": "Comparative Context",
-    "text": "Comparative Context\nThis section compares the four target protected areas with all Lao protected areas and, where available, with KfW-supported areas to provide context for the evaluation findings.\n\nComparison with All Lao Protected Areas\n\n\n**Framework for Comparative Analysis**\n\nTo complete the comparison with all Lao protected areas, the forest cover data\nprocessing would need to be extended to include all 30 protected areas.\nThis would allow calculation of:\n- National average deforestation rates\n- Percentile rankings of target areas\n- Boxplots showing target areas relative to national distribution\n\n**Current Analysis**: The four target areas represent 16.7 % of all protected areas in Laos.\n\n\n\n\nComparison with KfW-Supported Areas\n\n\n**KfW Portfolio in Laos**\n\nFound 7 KfW-supported protected areas in Laos.\n\n**Overlap Analysis**: 2 of 5 target areas are in the KfW portfolio.\n\n**Note**: To complete the comparison, forest cover data would need to be\nprocessed for all KfW-supported areas in Laos. This would allow:\n- Comparison of deforestation rates between KfW-supported and target areas\n- Assessment of relative performance\n- Evaluation of portfolio effectiveness\n\n\n\n\nDiscussion of Relative Performance\nThe comparative analysis framework is designed to:\n\nContextualize Findings: Place the four target areas in the broader context of all Lao protected areas\nBenchmark Performance: Compare deforestation rates against national averages and KfW portfolio performance\nSupport Evaluation: Provide evidence for evaluating whether target areas perform better, worse, or similar to other protected areas\n\nImplementation Note: Full comparative analysis requires processing forest cover data for all Lao protected areas and KfW-supported areas. The current report provides the framework and can be extended once additional data processing is completed.",
-    "crumbs": [
-      "Evaluation of Forest Cover Development in Protected Areas in Laos"
-    ]
-  },
-  {
-    "objectID": "reports/evaluation_laos_forest_cover.html#conclusions-and-recommendations",
-    "href": "reports/evaluation_laos_forest_cover.html#conclusions-and-recommendations",
-    "title": "Evaluation of Forest Cover Development in Protected Areas in Laos",
-    "section": "Conclusions and Recommendations",
-    "text": "Conclusions and Recommendations\n\nSummary of Findings\nThis evaluation report provides a comprehensive analysis of forest cover development in four protected areas in Laos from 2000 to 2024. Key findings include:\n\nTemporal Trends: Analysis of deforestation patterns across three distinct periods (before, during, and after project implementation)\nArea-Specific Patterns: Identification of trends and patterns for each of the four protected areas\nComparative Context: Framework for comparing target areas with national averages and KfW portfolio\n\n\n\nEvaluation Conclusions\nThe analysis supports evaluation of forest stock development by:\n\nProviding empirical, data-driven evidence of forest cover trends\nEnabling comparison of deforestation rates across different time periods\nSupporting assessment of conservation outcomes and management effectiveness\n\n\n\nRecommendations for Future Monitoring\n\nRegular Updates: Continue monitoring forest cover development on an annual basis to track trends\nExtended Analysis: Process forest cover data for all Lao protected areas to enable comprehensive comparative analysis\nIntegration: Combine forest cover analysis with other indicators (biodiversity, management effectiveness, socioeconomic factors) for holistic evaluation\nGround Truthing: Validate satellite-based findings with field observations where possible\nCausal Analysis: Investigate drivers of deforestation patterns identified in the analysis",
+    "section": "Key Findings",
+    "text": "Key Findings\n\n\n\n\n\n\nBased on the empirical analysis of forest cover data from 2000 to 2024 for all 29 protected areas in Laos, the following key findings emerge:\n\nOverall Forest Cover Development\nThe analysis reveals that all protected areas in Laos have experienced forest cover loss over the analysis period. The total forest cover loss across all 29 protected areas from 2000 to 2024 amounts to 493,745 hectares.\nProject Areas Performance: - The four project areas account for 11.1% of total forest loss across all Lao protected areas - Average relative loss in project areas: 9.08% - Average relative loss in other areas: 12.46% - National average relative loss: 11.99%\n\n\nPeriod-Specific Trends\nBefore Project Period (2009-2013): - During the baseline period, project areas experienced an average annual loss of 537 ha/year - This compares to a national average of 459 ha/year across all Lao protected areas - Project areas showed higher deforestation rates than the national average during this period\nDuring Project Period (2014-2018): - Project areas experienced an average annual loss of 801 ha/year during project implementation - National average during this period: 893 ha/year - Change from baseline: Project areas showed a increase of 49.3% in annual deforestation rates compared to the baseline period - Project areas performed better than the national average during the project period\nAfter Project Period (2019-2023): - Project areas experienced an average annual loss of 800 ha/year in the post-project period - National average during this period: 1310 ha/year - Change from project period: Project areas showed a reduction of 0.2% in annual deforestation rates compared to the project implementation period - This period allows assessment of whether project effects were sustained after project completion\n\n\nArea-Specific Patterns\nThe detailed statistics table above shows that:\n\nMost Affected Areas: Among all Lao protected areas, the areas with the highest total forest cover loss are Phou Sabot Phoungchong, Dong Phou Vieng, Nam Et-Phouloey. None of these are project areas\nRelative Loss Comparison: When considering relative loss (percentage of original forest cover):\n\nProject areas show lower relative loss (9.08% vs 11.99% national average)\nThis suggests that project areas have been relatively more effective in maintaining forest cover\n\nTrend Changes: The comparison of average annual loss rates across periods reveals:\n\nProject areas: Before→During: increase of 49.3%; During→After: decrease of 0.2%\nNational trends: Before→During: increase of 94.7%; During→After: increase of 46.6%\n\n\n\n\nComparative Analysis with National Trends\nThe comprehensive analysis of all 29 Lao protected areas provides important context for evaluating project area performance:\n\nRelative Performance: Project areas demonstrate better forest conservation outcomes compared to all Lao protected areas\nTemporal Patterns: The comparison of period-specific trends reveals whether project areas follow similar patterns to the national average or show distinct trajectories that may be attributed to project interventions\nEffectiveness Assessment: By comparing project area trends with national trends, we can assess whether the project areas experienced different deforestation dynamics during and after the project period compared to the broader protected area network in Laos",
     "crumbs": [
       "Evaluation of Forest Cover Development in Protected Areas in Laos"
     ]
@@ -281,23 +374,38 @@
     ]
   },
   {
-    "objectID": "reports/evaluation_laos_forest_cover.html#map",
-    "href": "reports/evaluation_laos_forest_cover.html#map",
-    "title": "Evaluation of Forest Cover Development in Protected Areas in Laos",
-    "section": "Map",
-    "text": "Map",
-    "crumbs": [
-      "Evaluation of Forest Cover Development in Protected Areas in Laos"
-    ]
+    "objectID": "index.html#the-mapme-initiative",
+    "href": "index.html#the-mapme-initiative",
+    "title": "About",
+    "section": "The MAPME Initiative",
+    "text": "The MAPME Initiative\nMAPME (Maps for Planning, Monitoring and Evaluation in Development Cooperation) is an initiative that develops open-source tools and methodologies for conservation monitoring and impact evaluation.\n\nGoals\n\nReproducible Analysis: Create transparent, reproducible workflows for processing global biodiversity and environmental data\nOpen Tools: Develop open-source R packages that enable anyone to analyze conservation effectiveness\nEvidence-Based Conservation: Support data-driven decision making in protected area management\n\n\n\nPartners\n\nKfW Development Bank: Financial cooperation projects for protected areas worldwide\nGIZ: Technical cooperation and capacity building\nAcademic Partners: Collaboration on methodology development and validation"
   },
   {
-    "objectID": "reports/evaluation_laos_forest_cover.html#key-findings",
-    "href": "reports/evaluation_laos_forest_cover.html#key-findings",
-    "title": "Evaluation of Forest Cover Development in Protected Areas in Laos",
-    "section": "Key Findings",
-    "text": "Key Findings\n\n\n\n\n\n\nBased on the empirical analysis of forest cover data from 2000 to 2024 for all 29 protected areas in Laos, the following key findings emerge:\n\nOverall Forest Cover Development\nThe analysis reveals that all protected areas in Laos have experienced forest cover loss over the analysis period. The total forest cover loss across all 29 protected areas from 2000 to 2024 amounts to 493,745 hectares.\nProject Areas Performance: - The four project areas account for 11.1% of total forest loss across all Lao protected areas - Average relative loss in project areas: 9.08% - Average relative loss in other areas: 12.46% - National average relative loss: 11.99%\n\n\nPeriod-Specific Trends\nBefore Project Period (2009-2013): - During the baseline period, project areas experienced an average annual loss of 537 ha/year - This compares to a national average of 459 ha/year across all Lao protected areas - Project areas showed higher deforestation rates than the national average during this period\nDuring Project Period (2014-2018): - Project areas experienced an average annual loss of 801 ha/year during project implementation - National average during this period: 893 ha/year - Change from baseline: Project areas showed a increase of 49.3% in annual deforestation rates compared to the baseline period - Project areas performed better than the national average during the project period\nAfter Project Period (2019-2023): - Project areas experienced an average annual loss of 800 ha/year in the post-project period - National average during this period: 1310 ha/year - Change from project period: Project areas showed a reduction of 0.2% in annual deforestation rates compared to the project implementation period - This period allows assessment of whether project effects were sustained after project completion\n\n\nArea-Specific Patterns\nThe detailed statistics table above shows that:\n\nMost Affected Areas: Among all Lao protected areas, the areas with the highest total forest cover loss are Phou Sabot Phoungchong, Dong Phou Vieng, Nam Et-Phouloey. None of these are project areas\nRelative Loss Comparison: When considering relative loss (percentage of original forest cover):\n\nProject areas show lower relative loss (9.08% vs 11.99% national average)\nThis suggests that project areas have been relatively more effective in maintaining forest cover\n\nTrend Changes: The comparison of average annual loss rates across periods reveals:\n\nProject areas: Before→During: increase of 49.3%; During→After: decrease of 0.2%\nNational trends: Before→During: increase of 94.7%; During→After: increase of 46.6%\n\n\n\n\nComparative Analysis with National Trends\nThe comprehensive analysis of all 29 Lao protected areas provides important context for evaluating project area performance:\n\nRelative Performance: Project areas demonstrate better forest conservation outcomes compared to all Lao protected areas\nTemporal Patterns: The comparison of period-specific trends reveals whether project areas follow similar patterns to the national average or show distinct trajectories that may be attributed to project interventions\nEffectiveness Assessment: By comparing project area trends with national trends, we can assess whether the project areas experienced different deforestation dynamics during and after the project period compared to the broader protected area network in Laos",
-    "crumbs": [
-      "Evaluation of Forest Cover Development in Protected Areas in Laos"
-    ]
+    "objectID": "index.html#the-mapme.biodiversity-package",
+    "href": "index.html#the-mapme.biodiversity-package",
+    "title": "About",
+    "section": "The mapme.biodiversity Package",
+    "text": "The mapme.biodiversity Package\nThe mapme.biodiversity R package is the technical foundation for these analyses. It provides:\n\nResource Functions: Download and manage global environmental datasets\nIndicator Functions: Calculate standardized indicators for any polygon geometry\nEfficient Processing: Parallel computation support for large portfolios\nStandardized Output: Consistent data formats across all indicators\n\n\nSupported Indicators\nThe package supports numerous indicators including:\n\nForest cover and forest loss (Global Forest Watch)\nBurned areas (MODIS MCD64A1)\nLandcover classification (ESA WorldCover)\nPopulation density (WorldPop)\nClimate variables (CHELSA, WorldClim)\nAnd many more…"
+  },
+  {
+    "objectID": "index.html#data-sources-1",
+    "href": "index.html#data-sources-1",
+    "title": "About",
+    "section": "Data Sources",
+    "text": "Data Sources\n\nGlobal Forest Watch\nForest cover data from Hansen et al. (2013) provides:\n\nTree Cover 2000: Baseline forest extent\nYear of Loss: Annual forest loss detection (2001-present)\nResolution: 30m Landsat-derived\n\n\nHansen, M. C., et al. (2013). High-Resolution Global Maps of 21st-Century Forest Cover Change. Science, 342(6160), 850-853.\n\n\n\nMODIS Burned Area (MCD64A1)\nThe MCD64A1 product provides:\n\nBurned Area: Monthly burned area detection\nBurn Date: Julian day of burning\nResolution: 500m MODIS-derived\n\n\nGiglio, L., et al. (2018). The Collection 6 MODIS burned area mapping algorithm and product. Remote Sensing of Environment, 217, 72-85.\n\n\n\nWorld Database on Protected Areas (WDPA)\nProtected area boundaries from UNEP-WCMC and IUCN:\n\nPolygons: Official protected area boundaries\nAttributes: Governance, management, IUCN category\nUpdates: Monthly data releases\n\n\nUNEP-WCMC and IUCN (2024), Protected Planet: The World Database on Protected Areas (WDPA)."
+  },
+  {
+    "objectID": "index.html#contact",
+    "href": "index.html#contact",
+    "title": "About",
+    "section": "Contact",
+    "text": "Contact\nFor questions about these analyses or the MAPME Initiative:\n\nGitHub: mapme-initiative/mapme.biodiversity.reports\nPackage Issues: mapme-initiative/mapme.biodiversity"
+  },
+  {
+    "objectID": "index.html#license",
+    "href": "index.html#license",
+    "title": "About",
+    "section": "License",
+    "text": "License\nThis project is open source. Code is available under the MIT License. Data sources have their own licensing terms - please refer to the original data providers for details."
   }
 ]

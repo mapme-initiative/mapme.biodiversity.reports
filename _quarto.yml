@@ -23,7 +23,7 @@ website:
         href: about.qmd
     right:
       - icon: github
-        href: https://github.com/openkfw/mapme.protectedareas
+        href: https://github.com/mapme-initiative/mapme.biodiversity.reports
   
   sidebar:
     - title: "Reports"
@@ -39,7 +39,7 @@ website:
     center: |
       Built with [Quarto](https://quarto.org/)
     right: |
-      [GitHub](https://github.com/openkfw/mapme.protectedareas)
+      [GitHub](https://github.com/mapme-initiative/mapme.biodiversity.reports)
 
 format:
   html:
