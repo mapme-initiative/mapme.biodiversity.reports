@@ -156,9 +156,12 @@ if (st_crs(wdpa_all_lao)$epsg != 4326) {
 
 # Filter for non-project areas (exclude all project areas)
 # Also explicitly exclude the duplicate Nam Ha ASEAN Heritage Park
+# Exclude Hin Nam Ho/Hin Nam No related areas (user request)
 non_project_areas <- wdpa_all_lao %>%
   filter(!WDPAID %in% target_wdpa_ids) %>%
-  filter(WDPAID != 555756396)  # Explicitly exclude Nam Ha ASEAN Heritage Park
+  filter(WDPAID != 555756396) %>%  # Explicitly exclude Nam Ha ASEAN Heritage Park
+  filter(!grepl("Hin Nam Ho", ORIG_NAME, ignore.case = TRUE)) %>%  # Exclude Hin Nam Ho from Other PAs
+  filter(!grepl("Hin Nam No", ORIG_NAME, ignore.case = TRUE))  # Also exclude Hin Nam No variants
 
 cat("✓ Loaded all Lao PAs:", nrow(wdpa_all_lao), "total\n")
 cat("✓ Non-project areas:", nrow(non_project_areas), "\n")
@@ -502,7 +505,7 @@ map <- map %>%
   ) %>%
   addLayersControl(
     baseGroups = c("CartoDB", "OpenStreetMap", "Satellite", "Topography"),
-    overlayGroups = c("Project PAs", "Project PAs (Outlines)", "Other PAs", "PA Labels",
+    overlayGroups = c("Project PAs", "Other PAs", "PA Labels",
                      "Forest Loss Statistics",
                      "Forest Cover Loss (2009-2013)",
                      "Forest Cover Loss (2014-2018)",
@@ -513,7 +516,7 @@ map <- map %>%
   ) %>%
   hideGroup(c("Forest Cover Loss (2009-2013)", "Forest Cover Loss (2014-2018)",
               "Forest Cover Loss (2019-2023)", "Forest Cover Loss (2001-2024)",
-              "Regional Primary Forests (2001)", "Project PAs"))
+              "Regional Primary Forests (2001)"))
   
 # Note: Layer opacity control in Leaflet requires custom JavaScript implementation
 # The layer control allows toggling layers on/off. For dynamic opacity sliders,
