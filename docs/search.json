@@ -199,5 +199,85 @@
     "crumbs": [
       "Threat Assessment for Protected Areas in Bolivia"
     ]
+  },
+  {
+    "objectID": "reports/evaluation_laos_forest_cover.html#introduction",
+    "href": "reports/evaluation_laos_forest_cover.html#introduction",
+    "title": "Evaluation of Forest Cover Development in Protected Areas in Laos",
+    "section": "Introduction",
+    "text": "Introduction\nThis evaluation report analyzes forest cover development in four protected areas in Laos to support the evaluation of conservation outcomes and forest stock development. The analysis focuses on forest cover loss dynamics from 2000 to 2024, utilizing publicly available satellite data to assess trends and patterns in forest conservation.\n\nPurpose of the Evaluation\nThe evaluation aims to:\n\nAssess forest cover development trends in four target protected areas\nCompare deforestation rates before, during, and after project implementation periods\nProvide empirical evidence for evaluating conservation outcomes\nSupport decision-making for future conservation investments\n\n\n\nData Sources and Methodology\nThis analysis utilizes:\n\nWorld Database of Protected Areas (WDPA/IUCN) - For protected area boundaries and metadata\nGlobal Forest Watch (Hansen et al., 2013) - For forest cover loss detection using GFC-2024-v1.12\nmapme.biodiversity R package - For automated data acquisition and processing\n\nMethodology Notes:\n\nForest cover loss is defined as “a stand-replacement disturbance, or a change from a forest to non-forest state”\nForest cover is defined as tree cover ≥10% with minimum patch size of 1 hectare\nAnalysis period: 2000-2024 (25 years)\nCumulative deforestation is calculated from the start of each analysis period (2009, 2014, 2019)\n\n\n\n\n\n\n\nNoteProject Period Assumptions\n\n\n\nFor this evaluation, we assume the following project periods: - Before project: 2009-2013 (baseline period) - During project: 2014-2018 (project implementation period) - After project: 2019-2023 (post-project period)\nThese assumptions are made explicit throughout the report. If actual project start dates differ, the analysis can be adjusted accordingly.",
+    "crumbs": [
+      "Evaluation of Forest Cover Development in Protected Areas in Laos"
+    ]
+  },
+  {
+    "objectID": "reports/evaluation_laos_forest_cover.html#analyzed-protected-areas",
+    "href": "reports/evaluation_laos_forest_cover.html#analyzed-protected-areas",
+    "title": "Evaluation of Forest Cover Development in Protected Areas in Laos",
+    "section": "Analyzed Protected Areas",
+    "text": "Analyzed Protected Areas\nThe evaluation focuses on four protected areas in Laos that are part of the evaluation portfolio:",
+    "crumbs": [
+      "Evaluation of Forest Cover Development in Protected Areas in Laos"
+    ]
+  },
+  {
+    "objectID": "reports/evaluation_laos_forest_cover.html#forest-cover-development-2000-present",
+    "href": "reports/evaluation_laos_forest_cover.html#forest-cover-development-2000-present",
+    "title": "Evaluation of Forest Cover Development in Protected Areas in Laos",
+    "section": "Forest Cover Development (2000-Present)",
+    "text": "Forest Cover Development (2000-Present)\nForest cover development is quantified using Global Forest Watch data (Hansen et al., 2013). This section presents overall trends in forest cover and loss across the analysis period.\n\nSummary Statistics\n\n\n\n\n\n\n\n\nOverall Trends",
+    "crumbs": [
+      "Evaluation of Forest Cover Development in Protected Areas in Laos"
+    ]
+  },
+  {
+    "objectID": "reports/evaluation_laos_forest_cover.html#temporal-analysis-of-deforestation-for-the-project-period",
+    "href": "reports/evaluation_laos_forest_cover.html#temporal-analysis-of-deforestation-for-the-project-period",
+    "title": "Evaluation of Forest Cover Development in Protected Areas in Laos",
+    "section": "Temporal Analysis of Deforestation for the Project Period",
+    "text": "Temporal Analysis of Deforestation for the Project Period\nThis section presents cumulative deforestation trends for three distinct periods, allowing comparison of deforestation rates before, during, and after project implementation.\n\nGraph 1: Cumulative Deforestation (2009-2013)\nThis graph shows cumulative forest loss from 2009 baseline for the period before project implementation.\n\n\n\n\n\n\n\n\nGraph 2: Cumulative Deforestation (2014-2018)\nThis graph shows cumulative forest loss from 2014 baseline for the project implementation period.\n\n\n\n\n\n\n\n\nGraph 3: Cumulative Deforestation (2019-2023)\nThis graph shows cumulative forest loss from 2019 baseline for the post-project period.\n\n\n\n\n\n\n\n\nInterpretation of Trends",
+    "crumbs": [
+      "Evaluation of Forest Cover Development in Protected Areas in Laos"
+    ]
+  },
+  {
+    "objectID": "reports/evaluation_laos_forest_cover.html#descriptive-analysis",
+    "href": "reports/evaluation_laos_forest_cover.html#descriptive-analysis",
+    "title": "Evaluation of Forest Cover Development in Protected Areas in Laos",
+    "section": "Descriptive Analysis",
+    "text": "Descriptive Analysis\nThis section provides detailed empirical statements about deforestation development based on the data analysis.\n\nDeforestation Development by Period\n\n\n\n\n\n\n\n\nKey Findings\nBased on the empirical analysis of forest cover data:\n\nPeriod Comparison: The analysis compares deforestation rates across three periods:\n\nBefore project (2009-2013): Baseline period before project implementation\nDuring project (2014-2018): Project implementation period\nAfter project (2019-2023): Post-project period\n\nTrend Identification: The data reveals:\n\nAreas showing increasing trends: Protected areas where deforestation rates increased over time\nAreas showing decreasing trends: Protected areas where deforestation rates decreased over time\nAreas with stable patterns: Protected areas with relatively consistent deforestation rates\n\nNotable Patterns:\n\nIdentification of outliers or unusual patterns in deforestation\nComparison of relative performance across the four protected areas\nAssessment of whether project implementation coincided with changes in deforestation rates\n\n\n\n\n\n\n\n\nNoteData-Driven Statements\n\n\n\nThe descriptive statements above are based on empirical calculations from the forest cover data. Specific numerical findings will be automatically generated once the data processing script has been executed. The analysis framework is designed to support evidence-based evaluation of conservation outcomes.",
+    "crumbs": [
+      "Evaluation of Forest Cover Development in Protected Areas in Laos"
+    ]
+  },
+  {
+    "objectID": "reports/evaluation_laos_forest_cover.html#comparative-context",
+    "href": "reports/evaluation_laos_forest_cover.html#comparative-context",
+    "title": "Evaluation of Forest Cover Development in Protected Areas in Laos",
+    "section": "Comparative Context",
+    "text": "Comparative Context\nThis section compares the four target protected areas with all Lao protected areas and, where available, with KfW-supported areas to provide context for the evaluation findings.\n\nComparison with All Lao Protected Areas\n\n\n**Framework for Comparative Analysis**\n\nTo complete the comparison with all Lao protected areas, the forest cover data\nprocessing would need to be extended to include all 30 protected areas.\nThis would allow calculation of:\n- National average deforestation rates\n- Percentile rankings of target areas\n- Boxplots showing target areas relative to national distribution\n\n**Current Analysis**: The four target areas represent 16.7 % of all protected areas in Laos.\n\n\n\n\nComparison with KfW-Supported Areas\n\n\n**KfW Portfolio in Laos**\n\nFound 7 KfW-supported protected areas in Laos.\n\n**Overlap Analysis**: 2 of 5 target areas are in the KfW portfolio.\n\n**Note**: To complete the comparison, forest cover data would need to be\nprocessed for all KfW-supported areas in Laos. This would allow:\n- Comparison of deforestation rates between KfW-supported and target areas\n- Assessment of relative performance\n- Evaluation of portfolio effectiveness\n\n\n\n\nDiscussion of Relative Performance\nThe comparative analysis framework is designed to:\n\nContextualize Findings: Place the four target areas in the broader context of all Lao protected areas\nBenchmark Performance: Compare deforestation rates against national averages and KfW portfolio performance\nSupport Evaluation: Provide evidence for evaluating whether target areas perform better, worse, or similar to other protected areas\n\nImplementation Note: Full comparative analysis requires processing forest cover data for all Lao protected areas and KfW-supported areas. The current report provides the framework and can be extended once additional data processing is completed.",
+    "crumbs": [
+      "Evaluation of Forest Cover Development in Protected Areas in Laos"
+    ]
+  },
+  {
+    "objectID": "reports/evaluation_laos_forest_cover.html#conclusions-and-recommendations",
+    "href": "reports/evaluation_laos_forest_cover.html#conclusions-and-recommendations",
+    "title": "Evaluation of Forest Cover Development in Protected Areas in Laos",
+    "section": "Conclusions and Recommendations",
+    "text": "Conclusions and Recommendations\n\nSummary of Findings\nThis evaluation report provides a comprehensive analysis of forest cover development in four protected areas in Laos from 2000 to 2024. Key findings include:\n\nTemporal Trends: Analysis of deforestation patterns across three distinct periods (before, during, and after project implementation)\nArea-Specific Patterns: Identification of trends and patterns for each of the four protected areas\nComparative Context: Framework for comparing target areas with national averages and KfW portfolio\n\n\n\nEvaluation Conclusions\nThe analysis supports evaluation of forest stock development by:\n\nProviding empirical, data-driven evidence of forest cover trends\nEnabling comparison of deforestation rates across different time periods\nSupporting assessment of conservation outcomes and management effectiveness\n\n\n\nRecommendations for Future Monitoring\n\nRegular Updates: Continue monitoring forest cover development on an annual basis to track trends\nExtended Analysis: Process forest cover data for all Lao protected areas to enable comprehensive comparative analysis\nIntegration: Combine forest cover analysis with other indicators (biodiversity, management effectiveness, socioeconomic factors) for holistic evaluation\nGround Truthing: Validate satellite-based findings with field observations where possible\nCausal Analysis: Investigate drivers of deforestation patterns identified in the analysis",
+    "crumbs": [
+      "Evaluation of Forest Cover Development in Protected Areas in Laos"
+    ]
+  },
+  {
+    "objectID": "reports/evaluation_laos_forest_cover.html#data-sources-references",
+    "href": "reports/evaluation_laos_forest_cover.html#data-sources-references",
+    "title": "Evaluation of Forest Cover Development in Protected Areas in Laos",
+    "section": "Data Sources & References",
+    "text": "Data Sources & References\n\nWDPA: UNEP-WCMC and IUCN (2024), Protected Planet: The World Database on Protected Areas (WDPA)\nGFW: Hansen, M. C., et al. (2013). High-Resolution Global Maps of 21st-Century Forest Cover Change. Science, 342(15 November): 850–53. Data version: GFC-2024-v1.12.\nmapme.biodiversity: R package for automated biodiversity indicator calculation\n\n\nReport generated: 2026-02-03",
+    "crumbs": [
+      "Evaluation of Forest Cover Development in Protected Areas in Laos"
+    ]
   }
 ]
