@@ -99,19 +99,25 @@ if ("NAME" %in% names(wdpa_lao) && !"ORIG_NAME" %in% names(wdpa_lao)) {
     rename(ORIG_NAME = NAME)
 }
 
-# Filter for our target WDPA IDs
-portfolio <- wdpa_lao %>%
+# Process ALL Lao PAs for comparative analysis
+# Filter for our target WDPA IDs (project areas)
+target_portfolio <- wdpa_lao %>%
   filter(WDPAID %in% target_wdpa_ids)
 
-cat("      ✓ Filtered to target areas:", nrow(portfolio), "features\n")
+cat("      ✓ Target project areas:", nrow(target_portfolio), "features\n")
 
-# Display which areas were found
-if (nrow(portfolio) > 0) {
-  cat("      Found protected areas:\n")
-  for (i in 1:nrow(portfolio)) {
-    cat("        -", portfolio$ORIG_NAME[i], "(WDPAID:", portfolio$WDPAID[i], ")\n")
+# Display which target areas were found
+if (nrow(target_portfolio) > 0) {
+  cat("      Found project protected areas:\n")
+  for (i in 1:nrow(target_portfolio)) {
+    cat("        -", target_portfolio$ORIG_NAME[i], "(WDPAID:", target_portfolio$WDPAID[i], ")\n")
   }
 }
+
+# Use ALL Lao PAs for processing (for comparative analysis)
+portfolio <- wdpa_lao
+
+cat("      ✓ Processing ALL Lao PAs for comparative analysis:", nrow(portfolio), "features\n")
 
 # Make geometries valid
 portfolio <- st_make_valid(portfolio)
@@ -195,14 +201,23 @@ gfw_stats <- gfw_stats %>%
   ) %>%
   ungroup()
 
-# Save full dataset
+# Mark project areas
+gfw_stats <- gfw_stats %>%
+  mutate(
+    is_project_area = WDPAID %in% target_wdpa_ids
+  )
+
+# Save full dataset (all Lao PAs)
 write.csv(
   gfw_stats,
   "data/laos_forest_cover_2000_2024.csv",
   row.names = FALSE
 )
 
-cat("      ✓ Saved: data/laos_forest_cover_2000_2024.csv\n\n")
+cat("      ✓ Saved: data/laos_forest_cover_2000_2024.csv\n")
+cat("      Total records:", nrow(gfw_stats), "\n")
+cat("      Project areas:", sum(gfw_stats$is_project_area, na.rm = TRUE), "unique PAs\n")
+cat("      Other areas:", length(unique(gfw_stats$WDPAID[!gfw_stats$is_project_area])), "unique PAs\n\n")
 
 # =============================================================================
 # PART 4: Create Summary Table for Excel

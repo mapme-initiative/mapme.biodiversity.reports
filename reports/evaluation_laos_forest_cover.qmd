@@ -2,8 +2,8 @@
 title: "Evaluation of Forest Cover Development in Protected Areas in Laos"
 subtitle: "Analysis of Forest Cover Loss in Four Protected Areas (2000-2024)"
 author: 
-  - name: "MAPME Initiative"
-    affiliations: "Evaluation Department"
+  - name: "Johannes Schielein"
+    affiliations: "KfW Development Bank"
 date: "2026-01-12"
 date-modified: last-modified
 abstract: |
@@ -43,8 +43,19 @@ library(DT)
 
 options(scipen = 10000)
 
-# Define Laos WDPA IDs for analysis
-target_wdpa_ids <- c(71253, 555756396, 71252, 555703744, 555703750)
+# Define Laos WDPA IDs for analysis (project areas)
+# Note: Nam Ha has two WDPA IDs (71252 = National Protected Area, 555756396 = ASEAN Heritage Park)
+# We use only the National Protected Area designation (71252)
+target_wdpa_ids <- c(71253, 71252, 555703744, 555703750)
+
+# Define consistent color scheme for project areas
+# Using a distinct, appealing color palette
+project_colors <- c(
+  "Nam Kan" = "#1f77b4",           # Blue
+  "Nam Ha" = "#ff7f0e",            # Orange
+  "Hin Nam No" = "#2ca02c",       # Green
+  "Kounxe Nongma" = "#d62728"     # Red
+)
 ```
 
 ```{r data-loading}
@@ -63,6 +74,15 @@ wdpa_lao <- st_read(
 if ("SITE_ID" %in% names(wdpa_lao)) {
   wdpa_lao <- wdpa_lao %>%
     rename(WDPAID = SITE_ID)
+} else if ("WDPAID" %in% names(wdpa_lao)) {
+  # Already has WDPAID
+} else {
+  # Try to find the ID column
+  id_col <- grep("ID|id", names(wdpa_lao), value = TRUE)[1]
+  if (!is.na(id_col)) {
+    wdpa_lao <- wdpa_lao %>%
+      rename(WDPAID = !!sym(id_col))
+  }
 }
 
 if ("NAME" %in% names(wdpa_lao) && !"ORIG_NAME" %in% names(wdpa_lao)) {
@@ -70,9 +90,11 @@ if ("NAME" %in% names(wdpa_lao) && !"ORIG_NAME" %in% names(wdpa_lao)) {
     rename(ORIG_NAME = NAME)
 }
 
-# Filter for target areas
+# Filter for target areas (project areas)
+# Note: Exclude Nam Ha ASEAN Heritage Park (555756396), keep only National Protected Area (71252)
 target_areas <- wdpa_lao %>%
   filter(WDPAID %in% target_wdpa_ids) %>%
+  filter(!(WDPAID == 555756396)) %>%  # Explicitly exclude ASEAN Heritage Park
   st_make_valid()
 
 # Transform to WGS84 if needed
@@ -80,8 +102,10 @@ if (st_crs(target_areas)$epsg != 4326) {
   target_areas <- st_transform(target_areas, 4326)
 }
 
-# Calculate area in hectares
-if ("GIS_AREA" %in% names(target_areas)) {
+# Get total area from GIS_M_AREA or GIS_AREA (convert from sqkm to ha)
+if ("GIS_M_AREA" %in% names(target_areas)) {
+  target_areas$total_area_ha <- target_areas$GIS_M_AREA * 100
+} else if ("GIS_AREA" %in% names(target_areas)) {
   target_areas$total_area_ha <- target_areas$GIS_AREA * 100
 } else if ("REP_AREA" %in% names(target_areas)) {
   target_areas$total_area_ha <- target_areas$REP_AREA * 100
@@ -98,7 +122,18 @@ if (file.exists("../data/laos_forest_cover_2000_2024.csv")) {
     show_col_types = FALSE
   )
   
+  # Remove duplicate Nam Ha entries - keep only National Protected Area (71252), remove ASEAN Heritage Park (555756396)
+  forest_data <- forest_data %>%
+    filter(!(WDPAID == 555756396 & ORIG_NAME == "Nam Ha")) %>%
+    mutate(WDPAID = as.numeric(WDPAID))
+  
+  # Separate project and non-project areas
+  project_data <- forest_data %>% filter(is_project_area == TRUE)
+  other_data <- forest_data %>% filter(is_project_area == FALSE)
+  
   cat("✓ Loaded forest cover data:", nrow(forest_data), "records\n")
+  cat("✓ Project areas:", length(unique(project_data$WDPAID)), "PAs\n")
+  cat("✓ Other areas:", length(unique(other_data$WDPAID)), "PAs\n")
 } else {
   warning("Forest cover data not found. Run process_laos_forest_cover.R first!")
   forest_data <- tibble(
@@ -111,18 +146,7 @@ if (file.exists("../data/laos_forest_cover_2000_2024.csv")) {
   )
 }
 
-# ----- Load Summary Table -----
-if (file.exists("../data/laos_forest_cover_summary.csv")) {
-  summary_table <- read_csv(
-    "../data/laos_forest_cover_summary.csv",
-    show_col_types = FALSE
-  )
-  cat("✓ Loaded summary table\n")
-} else {
-  summary_table <- NULL
-}
-
-# ----- Load All Lao PAs for Comparative Analysis -----
+# ----- Load All Lao PAs for Map and Comparison -----
 wdpa_all_lao <- wdpa_lao %>%
   st_make_valid()
 
@@ -130,25 +154,14 @@ if (st_crs(wdpa_all_lao)$epsg != 4326) {
   wdpa_all_lao <- st_transform(wdpa_all_lao, 4326)
 }
 
-cat("✓ Loaded all Lao PAs:", nrow(wdpa_all_lao), "total\n")
+# Filter for non-project areas (exclude all project areas)
+# Also explicitly exclude the duplicate Nam Ha ASEAN Heritage Park
+non_project_areas <- wdpa_all_lao %>%
+  filter(!WDPAID %in% target_wdpa_ids) %>%
+  filter(WDPAID != 555756396)  # Explicitly exclude Nam Ha ASEAN Heritage Park
 
-# ----- Load KfW Portfolio (if available) -----
-if (file.exists("../data/portfolio.gpkg")) {
-  portfolio_kfw <- read_sf("../data/portfolio.gpkg")
-  
-  # Filter for Laos
-  portfolio_kfw_lao <- portfolio_kfw %>%
-    filter(
-      country == "Laos" | 
-      country == "Lao PDR" | 
-      grepl("LAO", country, ignore.case = TRUE)
-    )
-  
-  cat("✓ Loaded KfW portfolio for Laos:", nrow(portfolio_kfw_lao), "entries\n")
-} else {
-  portfolio_kfw_lao <- NULL
-  cat("⚠ KfW portfolio not found\n")
-}
+cat("✓ Loaded all Lao PAs:", nrow(wdpa_all_lao), "total\n")
+cat("✓ Non-project areas:", nrow(non_project_areas), "\n")
 ```
 
 ## Introduction
@@ -193,6 +206,16 @@ These assumptions are made explicit throughout the report. If actual project sta
 ## Analyzed Protected Areas
 
 The evaluation focuses on four protected areas in Laos that are part of the evaluation portfolio:
+
+::: {.callout-note}
+## Note on Nam Ha Protected Area
+
+Nam Ha appears in the WDPA database with two distinct WDPA IDs representing different designations:
+- **WDPA ID 71252**: Nam Ha National Protected Area (used in this analysis)
+- **WDPA ID 555756396**: Nam Ha ASEAN Heritage Park (excluded from this analysis)
+
+This report uses only the **National Protected Area** designation (WDPA ID 71252) throughout all analyses and visualizations.
+:::
 
 ```{r table-pas}
 #| echo: false
@@ -271,6 +294,283 @@ table_data %>%
   formatRound(c('Area (ha)', 'Forest 2000 (ha)', paste0('Forest ', latest_year, ' (ha)')), 0)
 ```
 
+## Map
+
+```{r map-laos}
+#| echo: false
+#| fig-height: 3.5
+#| out-width: "100%"
+#| classes: map-container
+
+# Prepare data for mapping - calculate forest loss statistics for ALL areas
+if (nrow(forest_data) > 0) {
+  # Calculate absolute and relative loss for ALL areas
+  forest_stats <- forest_data %>%
+    group_by(WDPAID, ORIG_NAME) %>%
+    summarise(
+      forest_2000 = area_ha[year == 2000],
+      forest_latest = area_ha[year == max(year, na.rm = TRUE)],
+      absolute_loss = forest_2000 - forest_latest,
+      relative_loss = (absolute_loss / forest_2000) * 100,
+      is_project_area = first(is_project_area),
+      .groups = "drop"
+    )
+  
+  # Join with all areas from WDPA
+  all_areas_stats <- wdpa_all_lao %>%
+    st_drop_geometry() %>%
+    mutate(WDPAID = as.numeric(WDPAID)) %>%
+    left_join(forest_stats, by = "WDPAID")
+  
+  # Get total area
+  if ("GIS_M_AREA" %in% names(all_areas_stats)) {
+    all_areas_stats$total_area_ha <- all_areas_stats$GIS_M_AREA * 100
+  } else if ("GIS_AREA" %in% names(all_areas_stats)) {
+    all_areas_stats$total_area_ha <- all_areas_stats$GIS_AREA * 100
+  } else if ("REP_AREA" %in% names(all_areas_stats)) {
+    all_areas_stats$total_area_ha <- all_areas_stats$REP_AREA * 100
+  } else {
+    # Calculate from geometry
+    all_areas_with_geom <- wdpa_all_lao %>%
+      mutate(WDPAID = as.numeric(WDPAID)) %>%
+      left_join(forest_stats, by = "WDPAID")
+    all_areas_stats$total_area_ha <- as.numeric(st_area(all_areas_with_geom)) / 10000
+  }
+  
+  # Categorize losses for all areas
+  all_areas_stats$relative_loss_categorized <- cut(
+    all_areas_stats$relative_loss,
+    breaks = c(-1, 2, 5, 10, 20, 100),
+    labels = c("0-2%", "2-5%", "5-10%", "10-20%", ">20%")
+  )
+  
+  max_abs_loss <- max(all_areas_stats$absolute_loss, na.rm = TRUE)
+  all_areas_stats$absolute_loss_categorized <- cut(
+    all_areas_stats$absolute_loss,
+    breaks = c(-1, 100, 1000, 5000, 10000, max_abs_loss),
+    labels = c("0-100 ha", "100-1,000 ha", "1,000-5,000 ha", "5,000-10,000 ha", ">10,000 ha")
+  )
+  
+  # Get centroids for markers for all areas
+  all_areas_with_geom <- wdpa_all_lao %>%
+    mutate(WDPAID = as.numeric(WDPAID)) %>%
+    left_join(forest_stats, by = "WDPAID")
+  
+  all_centroids <- st_centroid(all_areas_with_geom)
+  all_coords <- st_coordinates(all_centroids)
+  all_areas_stats$X <- all_coords[, "X"]
+  all_areas_stats$Y <- all_coords[, "Y"]
+  
+  # Create HTML labels for all areas
+  all_areas_stats$label <- paste(
+    "<p><b>", all_areas_stats$ORIG_NAME, "</b></br>",
+    "Total Area:", format(round(all_areas_stats$total_area_ha, 0), big.mark = ","), "ha</br>",
+    "Forest Cover (2000):", format(round(all_areas_stats$forest_2000, 0), big.mark = ","), "ha</br>",
+    "Absolute Loss (2000-2024):", format(round(all_areas_stats$absolute_loss, 0), big.mark = ","), "ha</br>",
+    "Relative Loss (2000-2024):", round(all_areas_stats$relative_loss, 2), "%",
+    "</p>"
+  )
+  
+  # Filter out areas without data
+  all_areas_stats <- all_areas_stats %>%
+    filter(!is.na(forest_2000))
+} else {
+  all_areas_stats <- wdpa_all_lao %>%
+    st_drop_geometry() %>%
+    mutate(
+      X = NA, Y = NA,
+      label = paste0("<p><b>", ORIG_NAME, "</b></p>"),
+      relative_loss_categorized = "0-2%",
+      absolute_loss_categorized = "0-100 ha"
+    )
+}
+
+# Prepare label data for all PAs (offset from centroid)
+all_pas_for_labels <- bind_rows(
+  target_areas %>% mutate(pa_type = "Project"),
+  non_project_areas %>% mutate(pa_type = "Other")
+) %>%
+  filter(!is.na(ORIG_NAME))
+
+# Calculate centroids for labels
+if (nrow(all_pas_for_labels) > 0) {
+  label_centroids <- st_centroid(all_pas_for_labels)
+  label_coords <- st_coordinates(label_centroids)
+  all_pas_for_labels$label_lng <- label_coords[, "X"] + 0.15  # Offset east
+  all_pas_for_labels$label_lat <- label_coords[, "Y"] + 0.08  # Offset north
+}
+
+# Color palettes
+pal_relative_loss <- colorFactor(
+  palette = rev(brewer.pal(5, "RdYlGn")),
+  domain = all_areas_stats$relative_loss_categorized
+)
+
+# Create map - build conditionally
+map_attribution <- paste(
+  "Forest Loss: Hansen et al. (2013) |",
+  "Protected Areas: WDPA/IUCN (2024)"
+)
+
+map <- leaflet() %>%
+  addTiles(group = "OpenStreetMap") %>%
+  addProviderTiles(providers$CartoDB.Positron, group = "CartoDB") %>%
+  addProviderTiles(providers$Esri.WorldImagery, group = "Satellite") %>%
+  addProviderTiles(providers$Esri.WorldShadedRelief, group = "Topography") %>%
+  addTiles(
+    "https://tiles.globalforestwatch.org/umd_tree_cover_loss/latest/dynamic/{z}/{x}/{y}.png?&start_year=2009&end_year=2013&render_type=true_color",
+    group = "Forest Cover Loss (2009-2013)",
+    attribution = map_attribution
+  ) %>%
+  addTiles(
+    "https://tiles.globalforestwatch.org/umd_tree_cover_loss/latest/dynamic/{z}/{x}/{y}.png?&start_year=2014&end_year=2018&render_type=true_color",
+    group = "Forest Cover Loss (2014-2018)",
+    attribution = map_attribution
+  ) %>%
+  addTiles(
+    "https://tiles.globalforestwatch.org/umd_tree_cover_loss/latest/dynamic/{z}/{x}/{y}.png?&start_year=2019&end_year=2023&render_type=true_color",
+    group = "Forest Cover Loss (2019-2023)",
+    attribution = map_attribution
+  ) %>%
+  addTiles(
+    "https://tiles.globalforestwatch.org/umd_tree_cover_loss/latest/dynamic/{z}/{x}/{y}.png?&start_year=2001&end_year=2024&render_type=true_color",
+    group = "Forest Cover Loss (2001-2024)",
+    attribution = map_attribution
+  ) %>%
+  addTiles(
+    "https://tiles.globalforestwatch.org/umd_regional_primary_forest_2001/latest/dynamic/{z}/{x}/{y}.png",
+    group = "Regional Primary Forests (2001)",
+    attribution = map_attribution
+  )
+
+# Add polygon layers
+if (nrow(target_areas) > 0 && inherits(target_areas, "sf")) {
+  # Project PAs outlines only (red outline, transparent fill)
+  map <- map %>% addPolygons(
+    data = target_areas,
+    fillColor = "transparent",
+    fillOpacity = 0,
+    color = "red",
+    weight = 2,
+    opacity = 1,
+    group = "Project PAs",
+    label = ~ORIG_NAME
+  )
+}
+
+if (nrow(non_project_areas) > 0 && inherits(non_project_areas, "sf")) {
+  map <- map %>% addPolygons(
+    data = non_project_areas,
+    fillColor = "#90EE90",
+    fillOpacity = 0.2,
+    color = "#006400",
+    weight = 2,
+    opacity = 0.9,
+    group = "Other PAs",
+    label = ~ORIG_NAME
+  )
+}
+
+# Add circle markers for forest loss statistics (ALL areas)
+if (nrow(all_areas_stats) > 0 && !all(is.na(all_areas_stats$X))) {
+  map <- map %>%
+    addCircleMarkers(
+      data = all_areas_stats,
+      lng = ~X,
+      lat = ~Y,
+      color = ~pal_relative_loss(relative_loss_categorized),
+      group = "Forest Loss Statistics",
+      radius = ~ifelse(absolute_loss_categorized == ">10,000 ha", 12,
+                ifelse(absolute_loss_categorized == "5,000-10,000 ha", 8,
+                ifelse(absolute_loss_categorized == "1,000-5,000 ha", 6,
+                ifelse(absolute_loss_categorized == "100-1,000 ha", 4, 2)))),
+      popup = ~label,
+      stroke = FALSE,
+      fillOpacity = 0.7
+    )
+}
+
+map <- map %>%
+  addFullscreenControl() %>%
+  addLegend(
+    "bottomright",
+    data = all_areas_stats,
+    pal = pal_relative_loss,
+    values = ~relative_loss_categorized,
+    title = "Relative Forest Cover Loss<br>(2000-2024)",
+    opacity = 1
+  ) %>%
+  addLayersControl(
+    baseGroups = c("CartoDB", "OpenStreetMap", "Satellite", "Topography"),
+    overlayGroups = c("Project PAs", "Project PAs (Outlines)", "Other PAs", "PA Labels",
+                     "Forest Loss Statistics",
+                     "Forest Cover Loss (2009-2013)",
+                     "Forest Cover Loss (2014-2018)",
+                     "Forest Cover Loss (2019-2023)",
+                     "Forest Cover Loss (2001-2024)",
+                     "Regional Primary Forests (2001)"),
+    options = layersControlOptions(collapsed = FALSE)
+  ) %>%
+  hideGroup(c("Forest Cover Loss (2009-2013)", "Forest Cover Loss (2014-2018)",
+              "Forest Cover Loss (2019-2023)", "Forest Cover Loss (2001-2024)",
+              "Regional Primary Forests (2001)", "Project PAs"))
+  
+# Note: Layer opacity control in Leaflet requires custom JavaScript implementation
+# The layer control allows toggling layers on/off. For dynamic opacity sliders,
+# additional JavaScript would need to be added to manipulate layer opacity.
+
+# Add PA name labels (offset from centroid)
+if (nrow(all_pas_for_labels) > 0) {
+  # Project PA labels (dark green, bold)
+  project_labels <- all_pas_for_labels %>% filter(pa_type == "Project")
+  if (nrow(project_labels) > 0) {
+    map <- map %>% addLabelOnlyMarkers(
+      data = project_labels,
+      lng = ~label_lng,
+      lat = ~label_lat,
+      label = ~ORIG_NAME,
+      labelOptions = labelOptions(
+        noHide = TRUE,
+        direction = "right",
+        textOnly = TRUE,
+        style = list(
+          "color" = "#006400",
+          "font-weight" = "bold",
+          "font-size" = "11px",
+          "text-shadow" = "1px 1px 2px white, -1px -1px 2px white"
+        )
+      ),
+      group = "PA Labels"
+    )
+  }
+  
+  # Other PA labels (dark green, normal)
+  other_labels <- all_pas_for_labels %>% filter(pa_type == "Other")
+  if (nrow(other_labels) > 0) {
+    map <- map %>% addLabelOnlyMarkers(
+      data = other_labels,
+      lng = ~label_lng,
+      lat = ~label_lat,
+      label = ~ORIG_NAME,
+      labelOptions = labelOptions(
+        noHide = TRUE,
+        direction = "right",
+        textOnly = TRUE,
+        style = list(
+          "color" = "#006400",
+          "font-weight" = "normal",
+          "font-size" = "10px",
+          "text-shadow" = "1px 1px 2px white, -1px -1px 2px white"
+        )
+      ),
+      group = "PA Labels"
+    )
+  }
+}
+
+map
+```
+
 ## Forest Cover Development (2000-Present)
 
 Forest cover development is quantified using Global Forest Watch data (Hansen et al., 2013). This section presents overall trends in forest cover and loss across the analysis period.
@@ -280,8 +580,96 @@ Forest cover development is quantified using Global Forest Watch data (Hansen et
 ```{r summary-stats}
 #| echo: false
 
-if (!is.null(summary_table) && nrow(summary_table) > 0) {
-  summary_table %>%
+if (nrow(forest_data) > 0 && nrow(wdpa_all_lao) > 0) {
+  # Get total area from WDPA data for ALL areas
+  # First calculate area from geometry if needed
+  if (!"GIS_M_AREA" %in% names(wdpa_all_lao) && !"GIS_AREA" %in% names(wdpa_all_lao) && !"REP_AREA" %in% names(wdpa_all_lao)) {
+    wdpa_all_lao$total_area_ha <- as.numeric(st_area(wdpa_all_lao)) / 10000
+  }
+  
+  all_areas_df <- wdpa_all_lao %>%
+    st_drop_geometry() %>%
+    mutate(WDPAID = as.numeric(WDPAID))
+  
+  # Get GIS_M_AREA or GIS_AREA for total area
+  if ("GIS_M_AREA" %in% names(all_areas_df)) {
+    all_areas_df$total_area_ha <- all_areas_df$GIS_M_AREA * 100
+  } else if ("GIS_AREA" %in% names(all_areas_df)) {
+    all_areas_df$total_area_ha <- all_areas_df$GIS_AREA * 100
+  } else if ("REP_AREA" %in% names(all_areas_df)) {
+    all_areas_df$total_area_ha <- all_areas_df$REP_AREA * 100
+  } else if (!"total_area_ha" %in% names(all_areas_df)) {
+    # Fallback: use a default or calculate from geometry before dropping
+    all_areas_df$total_area_ha <- NA_real_
+  }
+  
+  # Get forest cover in 2000
+  forest_2000 <- forest_data %>%
+    filter(year == 2000) %>%
+    select(WDPAID, forest_2000 = area_ha) %>%
+    mutate(WDPAID = as.numeric(WDPAID))
+  
+  # Calculate cumulative losses for periods
+  period_losses <- forest_data %>%
+    mutate(WDPAID = as.numeric(WDPAID)) %>%
+    group_by(WDPAID, ORIG_NAME) %>%
+    summarise(
+      cum_loss_2009_2013 = sum(loss_ha[year >= 2009 & year <= 2013], na.rm = TRUE),
+      cum_loss_2014_2018 = sum(loss_ha[year >= 2014 & year <= 2018], na.rm = TRUE),
+      cum_loss_2019_2023 = sum(loss_ha[year >= 2019 & year <= 2023], na.rm = TRUE),
+      is_project_area = first(is_project_area),
+      .groups = "drop"
+    )
+  
+  # Pivot annual losses to wide format
+  annual_losses <- forest_data %>%
+    mutate(WDPAID = as.numeric(WDPAID)) %>%
+    filter(year >= 2001 & year <= 2024) %>%
+    select(WDPAID, ORIG_NAME, year, loss_ha) %>%
+    pivot_wider(
+      names_from = year,
+      values_from = loss_ha,
+      names_prefix = "Loss "
+    )
+  
+  # Combine all data
+  summary_wide <- all_areas_df %>%
+    select(WDPAID, ORIG_NAME, total_area_ha) %>%
+    left_join(forest_2000, by = "WDPAID") %>%
+    left_join(period_losses, by = "WDPAID") %>%
+    left_join(annual_losses, by = "WDPAID") %>%
+    mutate(
+      `Project Area` = ifelse(is_project_area, "Yes", "No"),
+      `Protected Area Name` = ORIG_NAME,
+      `WDPA ID` = WDPAID,
+      `Total Protected Area` = total_area_ha,
+      `Forest Cover in 2000` = forest_2000,
+      `Cumulative Loss 2009-2013 (ha)` = cum_loss_2009_2013,
+      `Cumulative Loss 2014-2018 (ha)` = cum_loss_2014_2018,
+      `Cumulative Loss 2019-2023 (ha)` = cum_loss_2019_2023
+    ) %>%
+    select(
+      `Protected Area Name`,
+      `WDPA ID`,
+      `Project Area`,
+      `Total Protected Area`,
+      `Forest Cover in 2000`,
+      `Cumulative Loss 2009-2013 (ha)`,
+      `Cumulative Loss 2014-2018 (ha)`,
+      `Cumulative Loss 2019-2023 (ha)`,
+      starts_with("Loss ")
+    ) %>%
+    arrange(`Project Area`, `Protected Area Name`)
+  
+  # Get column names for formatting
+  loss_cols <- names(summary_wide)[grepl("^Loss ", names(summary_wide))]
+  format_cols <- c('Total Protected Area', 'Forest Cover in 2000',
+                   'Cumulative Loss 2009-2013 (ha)', 
+                   'Cumulative Loss 2014-2018 (ha)', 
+                   'Cumulative Loss 2019-2023 (ha)',
+                   loss_cols)
+  
+  summary_wide %>%
     datatable(
       filter = 'top',
       extensions = 'Buttons',
@@ -289,18 +677,15 @@ if (!is.null(summary_table) && nrow(summary_table) > 0) {
         dom = 'Bfrtip',
         scrollX = TRUE,
         scrollY = "400px",
-        pageLength = 15,
+        pageLength = 10,
         buttons = list(
           list(extend = 'csv', text = 'Download CSV'),
           list(extend = 'excel', text = 'Download Excel')
         )
       ),
-      caption = "Forest Cover Development Summary (2000-Present) - Excel-compatible format"
+      caption = "Forest Cover Development Summary (2000-Present) - Wide Format"
     ) %>%
-    formatRound(c('Forest Cover (ha)', 'Annual Loss (ha)', 
-                  'Cumulative Loss 2009-2013 (ha)', 
-                  'Cumulative Loss 2014-2018 (ha)', 
-                  'Cumulative Loss 2019-2023 (ha)'), 0)
+    formatRound(format_cols, 0)
 } else {
   cat("**Note:** Summary table not yet generated. Run `process_laos_forest_cover.R` to create this data.")
 }
@@ -311,59 +696,86 @@ if (!is.null(summary_table) && nrow(summary_table) > 0) {
 ```{r overall-trends}
 #| echo: false
 #| fig-height: 8
-#| fig-width: 12
+#| fig-width: 10
+#| out-width: "100%"
+#| fig-align: center
 
 if (nrow(forest_data) > 0) {
-  # Calculate total forest cover and loss by year
-  annual_totals <- forest_data %>%
-    group_by(year) %>%
-    summarise(
-      total_forest_ha = sum(area_ha, na.rm = TRUE),
-      total_loss_ha = sum(loss_ha, na.rm = TRUE),
-      .groups = "drop"
-    )
+  # Prepare data for stacked bar charts
+  # Forest cover by area and year (project areas only for stacking)
+  forest_by_area <- project_data %>%
+    mutate(WDPAID = as.numeric(WDPAID)) %>%
+    select(WDPAID, ORIG_NAME, year, area_ha) %>%
+    arrange(ORIG_NAME, year)
   
-  # Plot overall forest cover trend
-  p1 <- ggplot(annual_totals, aes(x = year, y = total_forest_ha)) +
-    geom_line(color = "#2E7D32", linewidth = 1.2) +
-    geom_point(color = "#2E7D32", size = 2) +
+  # Annual losses by area and year (project areas only for stacking)
+  loss_by_area <- project_data %>%
+    mutate(WDPAID = as.numeric(WDPAID)) %>%
+    filter(year >= 2001) %>%
+    select(WDPAID, ORIG_NAME, year, loss_ha) %>%
+    arrange(ORIG_NAME, year)
+  
+  # Plot 1: Stacked bar chart for forest cover
+  p1 <- ggplot(forest_by_area, aes(x = year, y = area_ha, fill = ORIG_NAME)) +
+    geom_bar(stat = "identity", position = "stack") +
+    geom_vline(xintercept = c(2009, 2014, 2019, 2023), linetype = "dashed", color = "darkgrey", linewidth = 0.5) +
+    scale_fill_manual(values = project_colors) +
     labs(
       x = "Year",
       y = "Total Forest Cover (ha)",
       title = "Total Forest Cover Development (2000-2024)",
-      subtitle = "Sum of all four protected areas"
+      subtitle = "Stacked by protected area",
+      fill = "Protected Area"
     ) +
     scale_y_continuous(labels = comma) +
+    scale_x_continuous(breaks = seq(2000, 2024, by = 2)) +
     theme_minimal() +
     theme(
       plot.title = element_text(size = 14, face = "bold"),
-      plot.subtitle = element_text(size = 12, color = "gray50")
+      plot.subtitle = element_text(size = 12, color = "gray50"),
+      legend.position = "bottom"
     )
   
-  # Plot annual loss
-  p2 <- ggplot(annual_totals, aes(x = year, y = total_loss_ha)) +
-    geom_col(fill = "#C62828", alpha = 0.7) +
+  # Plot 2: Stacked bar chart for annual losses
+  p2 <- ggplot(loss_by_area, aes(x = year, y = loss_ha, fill = ORIG_NAME)) +
+    geom_bar(stat = "identity", position = "stack") +
+    geom_vline(xintercept = c(2009, 2014, 2019, 2023), linetype = "dashed", color = "darkgrey", linewidth = 0.5) +
+    scale_fill_manual(values = project_colors) +
     labs(
       x = "Year",
       y = "Annual Forest Loss (ha)",
-      title = "Annual Forest Cover Loss (2000-2024)",
-      subtitle = "Sum of all four protected areas"
+      title = "Annual Forest Cover Loss (2001-2024)",
+      subtitle = "Stacked by protected area",
+      fill = "Protected Area"
     ) +
     scale_y_continuous(labels = comma) +
+    scale_x_continuous(breaks = seq(2001, 2024, by = 2)) +
     theme_minimal() +
     theme(
       plot.title = element_text(size = 14, face = "bold"),
-      plot.subtitle = element_text(size = 12, color = "gray50")
+      plot.subtitle = element_text(size = 12, color = "gray50"),
+      legend.position = "bottom"
     )
   
-  # Combine plots
+  # Make interactive - use separate plots to avoid legend duplication
+  p1_plotly <- ggplotly(p1, tooltip = c("year", "area_ha", "ORIG_NAME"))
+  p2_plotly <- ggplotly(p2, tooltip = c("year", "loss_ha", "ORIG_NAME"))
+  
+  # Remove legend from second plot to avoid duplication
+  p2_plotly <- p2_plotly %>% layout(showlegend = FALSE)
+  
+  # Combine with subplot
   subplot(
-    ggplotly(p1, tooltip = c("year", "total_forest_ha")),
-    ggplotly(p2, tooltip = c("year", "total_loss_ha")),
+    p1_plotly,
+    p2_plotly,
     nrows = 2,
-    shareX = TRUE
+    shareX = TRUE,
+    shareY = FALSE,
+    margin = 0.05
   ) %>%
-    layout(title = "Forest Cover Development Overview")
+    layout(
+      title = "Forest Cover Development Overview"
+    )
 } else {
   cat("**Note:** Forest cover data not yet available. Run `process_laos_forest_cover.R` to generate this data.")
 }
@@ -371,31 +783,32 @@ if (nrow(forest_data) > 0) {
 
 ## Temporal Analysis of Deforestation for the Project Period
 
-This section presents cumulative deforestation trends for three distinct periods, allowing comparison of deforestation rates before, during, and after project implementation.
+This section presents cumulative deforestation trends and forest cover development for project areas and all analyzed protected areas.
 
-### Graph 1: Cumulative Deforestation (2009-2013)
+### Cumulative Forest Cover Loss (2001-2024) for Project PAs
 
-This graph shows cumulative forest loss from 2009 baseline for the period before project implementation.
-
-```{r graph-2009-2013}
+```{r graph-cumulative-project}
 #| echo: false
-#| fig-height: 7
+#| fig-height: 3.5
 #| fig-width: 10
+#| out-width: "100%"
+#| fig-align: center
 
 if (nrow(forest_data) > 0) {
-  # Calculate cumulative loss from 2009 baseline
-  period_2009_2013 <- forest_data %>%
-    filter(year >= 2009 & year <= 2013) %>%
+  # Calculate cumulative loss from 2001 baseline for project areas only
+  cumulative_data <- project_data %>%
+    mutate(WDPAID = as.numeric(WDPAID)) %>%
+    filter(year >= 2001) %>%
     group_by(WDPAID, ORIG_NAME) %>%
     arrange(year) %>%
     mutate(
-      baseline_2009 = area_ha[year == 2009],
-      cumulative_loss = baseline_2009 - area_ha
+      baseline_2001 = area_ha[year == 2001],
+      cumulative_loss = baseline_2001 - area_ha
     ) %>%
     ungroup()
   
-  if (nrow(period_2009_2013) > 0) {
-    p <- ggplot(period_2009_2013, aes(
+  if (nrow(cumulative_data) > 0) {
+    p <- ggplot(cumulative_data, aes(
       x = year,
       y = cumulative_loss,
       color = ORIG_NAME,
@@ -407,414 +820,529 @@ if (nrow(forest_data) > 0) {
       )
     )) +
       geom_line(linewidth = 1.2) +
-      geom_point(size = 2.5) +
+      geom_point(size = 2) +
+      # Add vertical lines for project phases (thinner, more elegant)
+      geom_vline(xintercept = c(2009, 2014, 2019, 2023), linetype = "dashed", color = "darkgrey", linewidth = 0.5) +
+      # Add phase labels
+      annotate("text", x = 2011, y = max(cumulative_data$cumulative_loss, na.rm = TRUE) * 0.95, 
+               label = "Before\n(2009-2013)", color = "darkgrey", size = 3, fontface = "bold") +
+      annotate("text", x = 2016, y = max(cumulative_data$cumulative_loss, na.rm = TRUE) * 0.95, 
+               label = "During\n(2014-2018)", color = "darkgrey", size = 3, fontface = "bold") +
+      annotate("text", x = 2021, y = max(cumulative_data$cumulative_loss, na.rm = TRUE) * 0.95, 
+               label = "After\n(2019-2023)", color = "darkgrey", size = 3, fontface = "bold") +
+      scale_color_manual(values = project_colors) +
       labs(
         x = "Year",
         y = "Cumulative Forest Loss (ha)",
-        title = "Cumulative Deforestation (2009-2013)",
-        subtitle = "Cumulative loss from 2009 baseline",
+        title = "Cumulative Forest Cover Loss (2001-2024) for Project PAs",
+        subtitle = "Cumulative loss from 2001 baseline",
         color = "Protected Area"
       ) +
       scale_y_continuous(labels = comma) +
-      scale_x_continuous(breaks = 2009:2013) +
+      scale_x_continuous(breaks = seq(2001, 2024, by = 2)) +
       theme_minimal() +
       theme(
         plot.title = element_text(size = 14, face = "bold"),
         plot.subtitle = element_text(size = 12, color = "gray50"),
-        legend.position = "bottom"
-      )
+        legend.position = "bottom",
+        legend.key.width = unit(0.5, "cm"),
+        legend.text = element_text(size = 8),
+        legend.title = element_text(size = 9)
+      ) +
+      guides(color = guide_legend(
+        nrow = 2,
+        override.aes = list(size = 1.5),
+        title.position = "top"
+      ))
     
-    ggplotly(p, tooltip = "text")
+    # Truncate long names in legend and limit legend width
+    p_plotly <- ggplotly(p, tooltip = "text")
+    
+    # Truncate labels
+    for (i in 1:length(p_plotly$x$data)) {
+      if (!is.null(p_plotly$x$data[[i]]$name)) {
+        if (nchar(p_plotly$x$data[[i]]$name) > 25) {
+          p_plotly$x$data[[i]]$name <- paste0(substr(p_plotly$x$data[[i]]$name, 1, 22), "...")
+        }
+      }
+    }
+    
+    p_plotly %>% layout(
+      legend = list(
+        orientation = "h",
+        x = 0.5,
+        xanchor = "center",
+        y = -0.15,
+        yanchor = "top",
+        font = list(size = 9),
+        xref = "paper",
+        yref = "paper"
+      ),
+      margin = list(b = 100)
+    )
   } else {
-    cat("**Note:** Data for 2009-2013 period not available.")
+    cat("**Note:** Data not available.")
   }
 } else {
   cat("**Note:** Forest cover data not yet available. Run `process_laos_forest_cover.R` to generate this data.")
 }
 ```
 
-### Graph 2: Cumulative Deforestation (2014-2018)
+### Cumulative Forest Cover Loss (2001-2024) for All PAs
 
-This graph shows cumulative forest loss from 2014 baseline for the project implementation period.
-
-```{r graph-2014-2018}
+```{r graph-cumulative-all}
 #| echo: false
-#| fig-height: 7
+#| fig-height: 3.5
 #| fig-width: 10
+#| out-width: "100%"
+#| fig-align: center
 
 if (nrow(forest_data) > 0) {
-  # Calculate cumulative loss from 2014 baseline
-  period_2014_2018 <- forest_data %>%
-    filter(year >= 2014 & year <= 2018) %>%
-    group_by(WDPAID, ORIG_NAME) %>%
+  # Combine project and other areas
+  cumulative_data <- forest_data %>%
+    mutate(WDPAID = as.numeric(WDPAID)) %>%
+    filter(year >= 2001) %>%
+    group_by(WDPAID, ORIG_NAME, is_project_area) %>%
     arrange(year) %>%
     mutate(
-      baseline_2014 = area_ha[year == 2014],
-      cumulative_loss = baseline_2014 - area_ha
+      baseline_2001 = area_ha[year == 2001],
+      cumulative_loss = baseline_2001 - area_ha
     ) %>%
     ungroup()
   
-  if (nrow(period_2014_2018) > 0) {
-    p <- ggplot(period_2014_2018, aes(
+  if (nrow(cumulative_data) > 0) {
+    # Create color mapping: project areas use project_colors, others use grey
+    all_areas <- unique(cumulative_data$ORIG_NAME)
+    color_mapping <- ifelse(all_areas %in% names(project_colors), 
+                           project_colors[all_areas], 
+                           "grey70")
+    names(color_mapping) <- all_areas
+    
+    p <- ggplot(cumulative_data, aes(
       x = year,
       y = cumulative_loss,
+      color = ORIG_NAME,
+      group = ORIG_NAME,
+      alpha = is_project_area,
+      text = paste(
+        "Protected Area:", ORIG_NAME,
+        "\nYear:", year,
+        "\nCumulative Loss:", format(round(cumulative_loss, 0), big.mark = ","), "ha",
+        "\nProject Area:", ifelse(is_project_area, "Yes", "No")
+      )
+    )) +
+      geom_line(linewidth = ifelse(cumulative_data$is_project_area, 1.2, 0.8)) +
+      geom_point(size = ifelse(cumulative_data$is_project_area, 2, 1.5)) +
+      # Add vertical lines for project phases (thinner, more elegant)
+      geom_vline(xintercept = c(2009, 2014, 2019, 2023), linetype = "dashed", color = "darkgrey", linewidth = 0.5) +
+      # Add phase labels
+      annotate("text", x = 2011, y = max(cumulative_data$cumulative_loss, na.rm = TRUE) * 0.95, 
+               label = "Before\n(2009-2013)", color = "darkgrey", size = 3, fontface = "bold") +
+      annotate("text", x = 2016, y = max(cumulative_data$cumulative_loss, na.rm = TRUE) * 0.95, 
+               label = "During\n(2014-2018)", color = "darkgrey", size = 3, fontface = "bold") +
+      annotate("text", x = 2021, y = max(cumulative_data$cumulative_loss, na.rm = TRUE) * 0.95, 
+               label = "After\n(2019-2023)", color = "darkgrey", size = 3, fontface = "bold") +
+      scale_color_manual(values = color_mapping) +
+      scale_alpha_manual(values = c("TRUE" = 1, "FALSE" = 0.6), guide = "none") +
+      labs(
+        x = "Year",
+        y = "Cumulative Forest Loss (ha)",
+        title = "Cumulative Forest Cover Loss (2001-2024) for All PAs",
+        subtitle = "Project PAs shown in colors, other PAs in grey",
+        color = "Protected Area"
+      ) +
+      scale_y_continuous(labels = comma) +
+      scale_x_continuous(breaks = seq(2001, 2024, by = 2)) +
+      theme_minimal() +
+      theme(
+        plot.title = element_text(size = 14, face = "bold"),
+        plot.subtitle = element_text(size = 12, color = "gray50"),
+        legend.position = "bottom",
+        legend.key.width = unit(0.5, "cm"),
+        legend.text = element_text(size = 8),
+        legend.title = element_text(size = 9)
+      ) +
+      guides(color = guide_legend(
+        nrow = 2,
+        override.aes = list(size = 1.5),
+        title.position = "top"
+      ))
+    
+    # Truncate long names in legend and limit legend width
+    p_plotly <- ggplotly(p, tooltip = "text")
+    
+    # Truncate labels and adjust legend
+    for (i in 1:length(p_plotly$x$data)) {
+      if (!is.null(p_plotly$x$data[[i]]$name)) {
+        if (nchar(p_plotly$x$data[[i]]$name) > 25) {
+          p_plotly$x$data[[i]]$name <- paste0(substr(p_plotly$x$data[[i]]$name, 1, 22), "...")
+        }
+      }
+    }
+    
+    p_plotly %>% layout(
+      legend = list(
+        orientation = "h",
+        x = 0.5,
+        xanchor = "center",
+        y = -0.15,
+        yanchor = "top",
+        font = list(size = 9),
+        xref = "paper",
+        yref = "paper"
+      ),
+      margin = list(b = 100)  # Add bottom margin for legend
+    )
+  } else {
+    cat("**Note:** Data not available.")
+  }
+} else {
+  cat("**Note:** Forest cover data not yet available. Run `process_laos_forest_cover.R` to generate this data.")
+}
+```
+
+### Forest Cover (2000-2024) for Project PAs
+
+```{r graph-cover-project}
+#| echo: false
+#| fig-height: 3.5
+#| fig-width: 10
+#| out-width: "100%"
+#| fig-align: center
+
+if (nrow(forest_data) > 0) {
+  cover_data <- project_data %>%
+    mutate(WDPAID = as.numeric(WDPAID)) %>%
+    filter(year >= 2000) %>%
+    select(WDPAID, ORIG_NAME, year, area_ha)
+  
+  if (nrow(cover_data) > 0) {
+    p <- ggplot(cover_data, aes(
+      x = year,
+      y = area_ha,
       color = ORIG_NAME,
       group = ORIG_NAME,
       text = paste(
         "Protected Area:", ORIG_NAME,
         "\nYear:", year,
-        "\nCumulative Loss:", format(round(cumulative_loss, 0), big.mark = ","), "ha"
+        "\nForest Cover:", format(round(area_ha, 0), big.mark = ","), "ha"
       )
     )) +
       geom_line(linewidth = 1.2) +
-      geom_point(size = 2.5) +
+      geom_point(size = 2) +
+      # Add vertical lines for project phases (thinner, more elegant)
+      geom_vline(xintercept = c(2009, 2014, 2019, 2023), linetype = "dashed", color = "darkgrey", linewidth = 0.5) +
+      # Add phase labels
+      annotate("text", x = 2011, y = max(cover_data$area_ha, na.rm = TRUE) * 0.98, 
+               label = "Before\n(2009-2013)", color = "darkgrey", size = 3, fontface = "bold") +
+      annotate("text", x = 2016, y = max(cover_data$area_ha, na.rm = TRUE) * 0.98, 
+               label = "During\n(2014-2018)", color = "darkgrey", size = 3, fontface = "bold") +
+      annotate("text", x = 2021, y = max(cover_data$area_ha, na.rm = TRUE) * 0.98, 
+               label = "After\n(2019-2023)", color = "darkgrey", size = 3, fontface = "bold") +
+      scale_color_manual(values = project_colors) +
       labs(
         x = "Year",
-        y = "Cumulative Forest Loss (ha)",
-        title = "Cumulative Deforestation (2014-2018)",
-        subtitle = "Cumulative loss from 2014 baseline (project implementation period)",
+        y = "Forest Cover (ha)",
+        title = "Forest Cover (2000-2024) for Project PAs",
+        subtitle = "Total forest cover by protected area",
         color = "Protected Area"
       ) +
       scale_y_continuous(labels = comma) +
-      scale_x_continuous(breaks = 2014:2018) +
+      scale_x_continuous(breaks = seq(2000, 2024, by = 2)) +
       theme_minimal() +
       theme(
         plot.title = element_text(size = 14, face = "bold"),
         plot.subtitle = element_text(size = 12, color = "gray50"),
-        legend.position = "bottom"
-      )
+        legend.position = "bottom",
+        legend.key.width = unit(0.5, "cm"),
+        legend.text = element_text(size = 8),
+        legend.title = element_text(size = 9)
+      ) +
+      guides(color = guide_legend(
+        nrow = 2,
+        override.aes = list(size = 1.5),
+        title.position = "top"
+      ))
     
-    ggplotly(p, tooltip = "text")
+    # Truncate long names in legend
+    p_plotly <- ggplotly(p, tooltip = "text")
+    
+    for (i in 1:length(p_plotly$x$data)) {
+      if (!is.null(p_plotly$x$data[[i]]$name)) {
+        if (nchar(p_plotly$x$data[[i]]$name) > 25) {
+          p_plotly$x$data[[i]]$name <- paste0(substr(p_plotly$x$data[[i]]$name, 1, 22), "...")
+        }
+      }
+    }
+    
+    p_plotly %>% layout(
+      legend = list(
+        orientation = "h",
+        x = 0.5,
+        xanchor = "center",
+        y = -0.15,
+        yanchor = "top",
+        font = list(size = 9)
+      ),
+      margin = list(b = 100)
+    )
   } else {
-    cat("**Note:** Data for 2014-2018 period not available.")
+    cat("**Note:** Data not available.")
   }
 } else {
   cat("**Note:** Forest cover data not yet available. Run `process_laos_forest_cover.R` to generate this data.")
 }
 ```
 
-### Graph 3: Cumulative Deforestation (2019-2023)
+### Forest Cover (2000-2024) for All PAs
 
-This graph shows cumulative forest loss from 2019 baseline for the post-project period.
-
-```{r graph-2019-2023}
+```{r graph-cover-all}
 #| echo: false
-#| fig-height: 7
+#| fig-height: 3.5
 #| fig-width: 10
+#| out-width: "100%"
+#| fig-align: center
 
 if (nrow(forest_data) > 0) {
-  # Calculate cumulative loss from 2019 baseline
-  period_2019_2023 <- forest_data %>%
-    filter(year >= 2019 & year <= 2023) %>%
-    group_by(WDPAID, ORIG_NAME) %>%
-    arrange(year) %>%
-    mutate(
-      baseline_2019 = area_ha[year == 2019],
-      cumulative_loss = baseline_2019 - area_ha
-    ) %>%
-    ungroup()
+  cover_data <- forest_data %>%
+    mutate(WDPAID = as.numeric(WDPAID)) %>%
+    filter(year >= 2000) %>%
+    select(WDPAID, ORIG_NAME, year, area_ha, is_project_area)
   
-  if (nrow(period_2019_2023) > 0) {
-    p <- ggplot(period_2019_2023, aes(
+  if (nrow(cover_data) > 0) {
+    # Create color mapping: project areas use project_colors, others use grey
+    all_areas <- unique(cover_data$ORIG_NAME)
+    color_mapping <- ifelse(all_areas %in% names(project_colors), 
+                           project_colors[all_areas], 
+                           "grey70")
+    names(color_mapping) <- all_areas
+    
+    p <- ggplot(cover_data, aes(
       x = year,
-      y = cumulative_loss,
+      y = area_ha,
       color = ORIG_NAME,
       group = ORIG_NAME,
+      alpha = is_project_area,
       text = paste(
         "Protected Area:", ORIG_NAME,
         "\nYear:", year,
-        "\nCumulative Loss:", format(round(cumulative_loss, 0), big.mark = ","), "ha"
+        "\nForest Cover:", format(round(area_ha, 0), big.mark = ","), "ha",
+        "\nProject Area:", ifelse(is_project_area, "Yes", "No")
       )
     )) +
-      geom_line(linewidth = 1.2) +
-      geom_point(size = 2.5) +
+      geom_line(linewidth = ifelse(cover_data$is_project_area, 1.2, 0.8)) +
+      geom_point(size = ifelse(cover_data$is_project_area, 2, 1.5)) +
+      # Add vertical lines for project phases (thinner, more elegant)
+      geom_vline(xintercept = c(2009, 2014, 2019, 2023), linetype = "dashed", color = "darkgrey", linewidth = 0.5) +
+      # Add phase labels
+      annotate("text", x = 2011, y = max(cover_data$area_ha, na.rm = TRUE) * 0.98, 
+               label = "Before\n(2009-2013)", color = "darkgrey", size = 3, fontface = "bold") +
+      annotate("text", x = 2016, y = max(cover_data$area_ha, na.rm = TRUE) * 0.98, 
+               label = "During\n(2014-2018)", color = "darkgrey", size = 3, fontface = "bold") +
+      annotate("text", x = 2021, y = max(cover_data$area_ha, na.rm = TRUE) * 0.98, 
+               label = "After\n(2019-2023)", color = "darkgrey", size = 3, fontface = "bold") +
+      scale_color_manual(values = color_mapping) +
+      scale_alpha_manual(values = c("TRUE" = 1, "FALSE" = 0.6), guide = "none") +
       labs(
         x = "Year",
-        y = "Cumulative Forest Loss (ha)",
-        title = "Cumulative Deforestation (2019-2023)",
-        subtitle = "Cumulative loss from 2019 baseline (post-project period)",
+        y = "Forest Cover (ha)",
+        title = "Forest Cover (2000-2024) for All PAs",
+        subtitle = "Project PAs shown in colors, other PAs in grey",
         color = "Protected Area"
       ) +
       scale_y_continuous(labels = comma) +
-      scale_x_continuous(breaks = 2019:2023) +
+      scale_x_continuous(breaks = seq(2000, 2024, by = 2)) +
       theme_minimal() +
       theme(
         plot.title = element_text(size = 14, face = "bold"),
         plot.subtitle = element_text(size = 12, color = "gray50"),
-        legend.position = "bottom"
-      )
+        legend.position = "bottom",
+        legend.key.width = unit(0.5, "cm"),
+        legend.text = element_text(size = 8),
+        legend.title = element_text(size = 9)
+      ) +
+      guides(color = guide_legend(
+        nrow = 2,
+        override.aes = list(size = 1.5),
+        title.position = "top"
+      ))
     
-    ggplotly(p, tooltip = "text")
+    # Truncate long names in legend and limit legend width
+    p_plotly <- ggplotly(p, tooltip = "text")
+    
+    for (i in 1:length(p_plotly$x$data)) {
+      if (!is.null(p_plotly$x$data[[i]]$name)) {
+        if (nchar(p_plotly$x$data[[i]]$name) > 25) {
+          p_plotly$x$data[[i]]$name <- paste0(substr(p_plotly$x$data[[i]]$name, 1, 22), "...")
+        }
+      }
+    }
+    
+    p_plotly %>% layout(
+      legend = list(
+        orientation = "h",
+        x = 0.5,
+        xanchor = "center",
+        y = -0.15,
+        yanchor = "top",
+        font = list(size = 9),
+        xref = "paper",
+        yref = "paper"
+      ),
+      margin = list(b = 100)
+    )
   } else {
-    cat("**Note:** Data for 2019-2023 period not available.")
+    cat("**Note:** Data not available.")
   }
 } else {
   cat("**Note:** Forest cover data not yet available. Run `process_laos_forest_cover.R` to generate this data.")
 }
 ```
 
-### Interpretation of Trends
+## Key Findings
 
-```{r period-comparison}
+```{r key-findings-analysis}
 #| echo: false
 #| fig-height: 8
-#| fig-width: 12
+#| fig-width: 10
+#| out-width: "100%"
+#| fig-align: center
 
 if (nrow(forest_data) > 0) {
-  # Calculate total loss for each period by protected area
-  period_comparison <- forest_data %>%
-    group_by(WDPAID, ORIG_NAME) %>%
+  # Calculate detailed statistics for interpretation (all areas)
+  findings_data <- forest_data %>%
+    mutate(WDPAID = as.numeric(WDPAID)) %>%
+    group_by(WDPAID, ORIG_NAME, is_project_area) %>%
     summarise(
-      loss_2009_2013 = sum(loss_ha[year >= 2009 & year <= 2013], na.rm = TRUE),
-      loss_2014_2018 = sum(loss_ha[year >= 2014 & year <= 2018], na.rm = TRUE),
-      loss_2019_2023 = sum(loss_ha[year >= 2019 & year <= 2023], na.rm = TRUE),
-      .groups = "drop"
-    ) %>%
-    pivot_longer(
-      cols = starts_with("loss_"),
-      names_to = "period",
-      values_to = "total_loss"
-    ) %>%
-    mutate(
-      period = case_when(
-        period == "loss_2009_2013" ~ "2009-2013\n(Before)",
-        period == "loss_2014_2018" ~ "2014-2018\n(During)",
-        period == "loss_2019_2023" ~ "2019-2023\n(After)"
-      )
-    )
-  
-  if (nrow(period_comparison) > 0) {
-    p <- ggplot(period_comparison, aes(
-      x = period,
-      y = total_loss,
-      fill = ORIG_NAME,
-      text = paste(
-        "Protected Area:", ORIG_NAME,
-        "\nPeriod:", period,
-        "\nTotal Loss:", format(round(total_loss, 0), big.mark = ","), "ha"
-      )
-    )) +
-      geom_col(position = "dodge", alpha = 0.8) +
-      labs(
-        x = "Period",
-        y = "Total Forest Loss (ha)",
-        title = "Comparison of Deforestation Rates Across Periods",
-        subtitle = "Total loss per period by protected area",
-        fill = "Protected Area"
-      ) +
-      scale_y_continuous(labels = comma) +
-      theme_minimal() +
-      theme(
-        plot.title = element_text(size = 14, face = "bold"),
-        plot.subtitle = element_text(size = 12, color = "gray50"),
-        legend.position = "bottom"
-      )
-    
-    ggplotly(p, tooltip = "text")
-  }
-}
-```
-
-## Descriptive Analysis
-
-This section provides detailed empirical statements about deforestation development based on the data analysis.
-
-### Deforestation Development by Period
-
-```{r descriptive-stats}
-#| echo: false
-
-if (nrow(forest_data) > 0) {
-  # Calculate statistics for each period
-  period_stats <- forest_data %>%
-    group_by(ORIG_NAME) %>%
-    summarise(
-      # Before project (2009-2013)
-      before_total_loss = sum(loss_ha[year >= 2009 & year <= 2013], na.rm = TRUE),
-      before_annual_avg = mean(loss_ha[year >= 2009 & year <= 2013], na.rm = TRUE),
-      
-      # During project (2014-2018)
-      during_total_loss = sum(loss_ha[year >= 2014 & year <= 2018], na.rm = TRUE),
-      during_annual_avg = mean(loss_ha[year >= 2014 & year <= 2018], na.rm = TRUE),
-      
-      # After project (2019-2023)
-      after_total_loss = sum(loss_ha[year >= 2019 & year <= 2023], na.rm = TRUE),
-      after_annual_avg = mean(loss_ha[year >= 2019 & year <= 2023], na.rm = TRUE),
-      
-      # Overall
-      total_loss_2000_2024 = sum(loss_ha, na.rm = TRUE),
+      # Overall statistics
       forest_2000 = area_ha[year == 2000],
-      forest_latest = area_ha[year == max(year, na.rm = TRUE)],
+      forest_2024 = area_ha[year == max(year, na.rm = TRUE)],
+      total_loss = forest_2000 - forest_2024,
+      relative_loss_pct = (total_loss / forest_2000) * 100,
+      
+      # Period-specific losses
+      loss_before = sum(loss_ha[year >= 2009 & year <= 2013], na.rm = TRUE),
+      loss_during = sum(loss_ha[year >= 2014 & year <= 2018], na.rm = TRUE),
+      loss_after = sum(loss_ha[year >= 2019 & year <= 2023], na.rm = TRUE),
+      
+      # Annual averages
+      avg_loss_before = mean(loss_ha[year >= 2009 & year <= 2013], na.rm = TRUE),
+      avg_loss_during = mean(loss_ha[year >= 2014 & year <= 2018], na.rm = TRUE),
+      avg_loss_after = mean(loss_ha[year >= 2019 & year <= 2023], na.rm = TRUE),
+      
+      # Change rates
+      change_during_vs_before = ((avg_loss_during - avg_loss_before) / avg_loss_before) * 100,
+      change_after_vs_during = ((avg_loss_after - avg_loss_during) / avg_loss_during) * 100,
+      
       .groups = "drop"
     ) %>%
-    mutate(
-      relative_loss_pct = ((forest_2000 - forest_latest) / forest_2000) * 100,
-      # Calculate change in annual average loss
-      change_during_vs_before = ((during_annual_avg - before_annual_avg) / before_annual_avg) * 100,
-      change_after_vs_during = ((after_annual_avg - during_annual_avg) / during_annual_avg) * 100
-    )
+    arrange(desc(total_loss))
   
-  # Display as table
-  period_stats %>%
+  # Calculate comparative statistics
+  project_stats <- findings_data %>% filter(is_project_area == TRUE)
+  other_stats <- findings_data %>% filter(is_project_area == FALSE)
+  
+  # National averages
+  national_avg_relative_loss <- mean(findings_data$relative_loss_pct, na.rm = TRUE)
+  project_avg_relative_loss <- mean(project_stats$relative_loss_pct, na.rm = TRUE)
+  other_avg_relative_loss <- mean(other_stats$relative_loss_pct, na.rm = TRUE)
+  
+  # Period-specific national averages
+  national_avg_before <- mean(findings_data$avg_loss_before, na.rm = TRUE)
+  national_avg_during <- mean(findings_data$avg_loss_during, na.rm = TRUE)
+  national_avg_after <- mean(findings_data$avg_loss_after, na.rm = TRUE)
+  
+  project_avg_before <- mean(project_stats$avg_loss_before, na.rm = TRUE)
+  project_avg_during <- mean(project_stats$avg_loss_during, na.rm = TRUE)
+  project_avg_after <- mean(project_stats$avg_loss_after, na.rm = TRUE)
+  
+  # Display findings table
+  findings_table <- findings_data %>%
+    mutate(
+      `Project Area` = ifelse(is_project_area, "Yes", "No")
+    ) %>%
     select(
       `Protected Area` = ORIG_NAME,
-      `Before (2009-2013) Total Loss (ha)` = before_total_loss,
-      `During (2014-2018) Total Loss (ha)` = during_total_loss,
-      `After (2019-2023) Total Loss (ha)` = after_total_loss,
+      `Project Area`,
+      `Forest 2000 (ha)` = forest_2000,
+      `Forest 2024 (ha)` = forest_2024,
+      `Total Loss (ha)` = total_loss,
+      `Relative Loss (%)` = relative_loss_pct,
+      `Loss Before (2009-2013) (ha)` = loss_before,
+      `Loss During (2014-2018) (ha)` = loss_during,
+      `Loss After (2019-2023) (ha)` = loss_after,
       `Change During vs Before (%)` = change_during_vs_before,
-      `Change After vs During (%)` = change_after_vs_during,
-      `Total Loss 2000-2024 (ha)` = total_loss_2000_2024,
-      `Relative Loss (%)` = relative_loss_pct
+      `Change After vs During (%)` = change_after_vs_during
     ) %>%
+    arrange(`Project Area`, desc(`Total Loss (ha)`))
+  
+  findings_table %>%
     datatable(
-      options = list(pageLength = 10, dom = 't'),
-      caption = "Deforestation Statistics by Period"
+      options = list(pageLength = 10, dom = 't', scrollX = TRUE),
+      caption = "Detailed Forest Cover Loss Statistics by Protected Area"
     ) %>%
-    formatRound(c('Before (2009-2013) Total Loss (ha)', 
-                  'During (2014-2018) Total Loss (ha)', 
-                  'After (2019-2023) Total Loss (ha)',
-                  'Total Loss 2000-2024 (ha)'), 0) %>%
-    formatRound(c('Change During vs Before (%)', 
-                 'Change After vs During (%)',
-                 'Relative Loss (%)'), 1)
+    formatRound(c('Forest 2000 (ha)', 'Forest 2024 (ha)', 'Total Loss (ha)',
+                  'Loss Before (2009-2013) (ha)', 'Loss During (2014-2018) (ha)', 
+                  'Loss After (2019-2023) (ha)'), 0) %>%
+    formatRound(c('Relative Loss (%)', 'Change During vs Before (%)', 
+                 'Change After vs During (%)'), 1)
 }
 ```
 
-### Key Findings
+Based on the empirical analysis of forest cover data from 2000 to 2024 for all `r if(nrow(forest_data) > 0) { length(unique(forest_data$WDPAID)) } else { "30" }` protected areas in Laos, the following key findings emerge:
 
-Based on the empirical analysis of forest cover data:
+### Overall Forest Cover Development
 
-1. **Period Comparison**: The analysis compares deforestation rates across three periods:
-   - **Before project (2009-2013)**: Baseline period before project implementation
-   - **During project (2014-2018)**: Project implementation period
-   - **After project (2019-2023)**: Post-project period
+The analysis reveals that all protected areas in Laos have experienced forest cover loss over the analysis period. The total forest cover loss across all `r if(nrow(forest_data) > 0) { length(unique(forest_data$WDPAID)) } else { "30" }` protected areas from 2000 to 2024 amounts to `r if(nrow(forest_data) > 0) { format(round(sum(forest_data$loss_ha, na.rm = TRUE), 0), big.mark = ",") } else { "data not available" }` hectares.
 
-2. **Trend Identification**: The data reveals:
-   - Areas showing **increasing trends**: Protected areas where deforestation rates increased over time
-   - Areas showing **decreasing trends**: Protected areas where deforestation rates decreased over time
-   - Areas with **stable patterns**: Protected areas with relatively consistent deforestation rates
+**Project Areas Performance:**
+- The four project areas account for `r if(nrow(forest_data) > 0) { project_total <- sum(project_data$loss_ha, na.rm = TRUE); all_total <- sum(forest_data$loss_ha, na.rm = TRUE); format(round((project_total / all_total) * 100, 1), big.mark = ",") } else { "N/A" }`% of total forest loss across all Lao protected areas
+- Average relative loss in project areas: `r if(exists("project_avg_relative_loss")) { paste0(round(project_avg_relative_loss, 2), "%") } else { "calculating..." }`
+- Average relative loss in other areas: `r if(exists("other_avg_relative_loss")) { paste0(round(other_avg_relative_loss, 2), "%") } else { "calculating..." }`
+- National average relative loss: `r if(exists("national_avg_relative_loss")) { paste0(round(national_avg_relative_loss, 2), "%") } else { "calculating..." }`
 
-3. **Notable Patterns**: 
-   - Identification of outliers or unusual patterns in deforestation
-   - Comparison of relative performance across the four protected areas
-   - Assessment of whether project implementation coincided with changes in deforestation rates
+### Period-Specific Trends
 
-::: {.callout-note}
-## Data-Driven Statements
+**Before Project Period (2009-2013):**
+- During the baseline period, project areas experienced an average annual loss of `r if(exists("project_avg_before")) { paste0(round(project_avg_before, 0), " ha/year") } else { "calculating..." }`
+- This compares to a national average of `r if(exists("national_avg_before")) { paste0(round(national_avg_before, 0), " ha/year") } else { "calculating..." }` across all Lao protected areas
+- `r if(exists("project_avg_before") && exists("national_avg_before")) { if(project_avg_before < national_avg_before) { "Project areas showed lower deforestation rates than the national average during this period" } else { "Project areas showed higher deforestation rates than the national average during this period" } } else { "" }`
 
-The descriptive statements above are based on empirical calculations from the forest cover data. Specific numerical findings will be automatically generated once the data processing script has been executed. The analysis framework is designed to support evidence-based evaluation of conservation outcomes.
-:::
+**During Project Period (2014-2018):**
+- Project areas experienced an average annual loss of `r if(exists("project_avg_during")) { paste0(round(project_avg_during, 0), " ha/year") } else { "calculating..." }` during project implementation
+- National average during this period: `r if(exists("national_avg_during")) { paste0(round(national_avg_during, 0), " ha/year") } else { "calculating..." }`
+- Change from baseline: Project areas showed a `r if(exists("project_avg_before") && exists("project_avg_during")) { change_pct <- ((project_avg_during - project_avg_before) / project_avg_before) * 100; paste0(ifelse(change_pct > 0, "increase", "reduction"), " of ", round(abs(change_pct), 1), "%") } else { "change" }` in annual deforestation rates compared to the baseline period
+- `r if(exists("project_avg_during") && exists("national_avg_during")) { if(project_avg_during < national_avg_during) { "Project areas performed better than the national average during the project period" } else { "Project areas showed higher deforestation rates than the national average during the project period" } } else { "" }`
 
-## Comparative Context
+**After Project Period (2019-2023):**
+- Project areas experienced an average annual loss of `r if(exists("project_avg_after")) { paste0(round(project_avg_after, 0), " ha/year") } else { "calculating..." }` in the post-project period
+- National average during this period: `r if(exists("national_avg_after")) { paste0(round(national_avg_after, 0), " ha/year") } else { "calculating..." }`
+- Change from project period: Project areas showed a `r if(exists("project_avg_during") && exists("project_avg_after")) { change_pct <- ((project_avg_after - project_avg_during) / project_avg_during) * 100; paste0(ifelse(change_pct > 0, "increase", "reduction"), " of ", round(abs(change_pct), 1), "%") } else { "change" }` in annual deforestation rates compared to the project implementation period
+- This period allows assessment of whether project effects were sustained after project completion
 
-This section compares the four target protected areas with all Lao protected areas and, where available, with KfW-supported areas to provide context for the evaluation findings.
+### Area-Specific Patterns
 
-### Comparison with All Lao Protected Areas
+The detailed statistics table above shows that:
 
-```{r comparison-all-lao}
-#| echo: false
-#| fig-height: 8
-#| fig-width: 10
+1. **Most Affected Areas**: Among all Lao protected areas, the areas with the highest total forest cover loss are `r if(nrow(findings_data) > 0) { top_areas <- findings_data %>% arrange(desc(total_loss)) %>% head(3); paste(top_areas$ORIG_NAME, collapse = ", ") } else { "to be determined from data" }`. `r if(nrow(findings_data) > 0) { top_areas <- findings_data %>% arrange(desc(total_loss)) %>% head(3); project_in_top <- sum(top_areas$is_project_area); if(project_in_top > 0) { paste0(project_in_top, " of these are project areas") } else { "None of these are project areas" } } else { "" }`
 
-if (nrow(forest_data) > 0 && nrow(wdpa_all_lao) > 0) {
-  # Calculate summary statistics for target areas
-  target_summary <- forest_data %>%
-    group_by(ORIG_NAME) %>%
-    summarise(
-      total_loss = sum(loss_ha, na.rm = TRUE),
-      forest_2000 = area_ha[year == 2000],
-      forest_latest = area_ha[year == max(year, na.rm = TRUE)],
-      relative_loss = ((forest_2000 - forest_latest) / forest_2000) * 100,
-      .groups = "drop"
-    ) %>%
-    mutate(type = "Target Areas")
-  
-  # Note: Processing all Lao PAs would require running the processing script
-  # For now, we show the framework for comparison
-  
-  cat("**Framework for Comparative Analysis**\n\n")
-  cat("To complete the comparison with all Lao protected areas, the forest cover data\n")
-  cat("processing would need to be extended to include all", nrow(wdpa_all_lao), "protected areas.\n")
-  cat("This would allow calculation of:\n")
-  cat("- National average deforestation rates\n")
-  cat("- Percentile rankings of target areas\n")
-  cat("- Boxplots showing target areas relative to national distribution\n\n")
-  
-  cat("**Current Analysis**: The four target areas represent", 
-      round(nrow(target_areas) / nrow(wdpa_all_lao) * 100, 1), 
-      "% of all protected areas in Laos.\n")
-}
-```
+2. **Relative Loss Comparison**: When considering relative loss (percentage of original forest cover):
+   - Project areas show `r if(exists("project_avg_relative_loss") && exists("national_avg_relative_loss")) { if(project_avg_relative_loss < national_avg_relative_loss) { paste0("lower relative loss (", round(project_avg_relative_loss, 2), "% vs ", round(national_avg_relative_loss, 2), "% national average)") } else { paste0("higher relative loss (", round(project_avg_relative_loss, 2), "% vs ", round(national_avg_relative_loss, 2), "% national average)") } } else { "varying patterns" }`
+   - This suggests that `r if(exists("project_avg_relative_loss") && exists("national_avg_relative_loss")) { if(project_avg_relative_loss < national_avg_relative_loss) { "project areas have been relatively more effective in maintaining forest cover" } else { "project areas face similar or greater pressures compared to other protected areas" } } else { "further analysis is needed" }`
 
-### Comparison with KfW-Supported Areas
+3. **Trend Changes**: The comparison of average annual loss rates across periods reveals:
+   - Project areas: `r if(exists("project_avg_before") && exists("project_avg_during") && exists("project_avg_after")) { before_to_during <- ((project_avg_during - project_avg_before) / project_avg_before) * 100; during_to_after <- ((project_avg_after - project_avg_during) / project_avg_during) * 100; paste0("Before→During: ", ifelse(before_to_during > 0, "increase", "decrease"), " of ", round(abs(before_to_during), 1), "%; During→After: ", ifelse(during_to_after > 0, "increase", "decrease"), " of ", round(abs(during_to_after), 1), "%") } else { "calculating..." }`
+   - National trends: `r if(exists("national_avg_before") && exists("national_avg_during") && exists("national_avg_after")) { before_to_during <- ((national_avg_during - national_avg_before) / national_avg_before) * 100; during_to_after <- ((national_avg_after - national_avg_during) / national_avg_during) * 100; paste0("Before→During: ", ifelse(before_to_during > 0, "increase", "decrease"), " of ", round(abs(before_to_during), 1), "%; During→After: ", ifelse(during_to_after > 0, "increase", "decrease"), " of ", round(abs(during_to_after), 1), "%") } else { "calculating..." }`
 
-```{r comparison-kfw}
-#| echo: false
-#| fig-height: 8
-#| fig-width: 10
+### Comparative Analysis with National Trends
 
-if (!is.null(portfolio_kfw_lao) && nrow(portfolio_kfw_lao) > 0 && nrow(forest_data) > 0) {
-  # Get WDPA IDs from KfW portfolio
-  kfw_wdpa_ids <- unique(portfolio_kfw_lao$wdpaid)
-  
-  cat("**KfW Portfolio in Laos**\n\n")
-  cat("Found", length(kfw_wdpa_ids), "KfW-supported protected areas in Laos.\n\n")
-  
-  # Check overlap with target areas
-  target_ids_numeric <- as.numeric(target_areas$WDPAID)
-  overlap <- sum(target_ids_numeric %in% kfw_wdpa_ids)
-  
-  cat("**Overlap Analysis**:", overlap, "of", nrow(target_areas), 
-      "target areas are in the KfW portfolio.\n\n")
-  
-  cat("**Note**: To complete the comparison, forest cover data would need to be\n")
-  cat("processed for all KfW-supported areas in Laos. This would allow:\n")
-  cat("- Comparison of deforestation rates between KfW-supported and target areas\n")
-  cat("- Assessment of relative performance\n")
-  cat("- Evaluation of portfolio effectiveness\n")
-} else {
-  cat("**KfW Portfolio Data**\n\n")
-  cat("KfW portfolio data for Laos is not available or contains no entries.\n")
-  cat("If available, this section would compare forest cover loss trends\n")
-  cat("between KfW-supported areas and the four target areas.\n")
-}
-```
+The comprehensive analysis of all `r if(nrow(forest_data) > 0) { length(unique(forest_data$WDPAID)) } else { "30" }` Lao protected areas provides important context for evaluating project area performance:
 
-### Discussion of Relative Performance
+- **Relative Performance**: Project areas `r if(exists("project_avg_relative_loss") && exists("national_avg_relative_loss")) { if(project_avg_relative_loss < national_avg_relative_loss) { "demonstrate better forest conservation outcomes" } else if(project_avg_relative_loss > national_avg_relative_loss) { "show higher relative forest loss compared to the national average" } else { "show similar relative forest loss to the national average" } } else { "show varying performance" }` compared to all Lao protected areas
 
-The comparative analysis framework is designed to:
+- **Temporal Patterns**: The comparison of period-specific trends reveals whether project areas follow similar patterns to the national average or show distinct trajectories that may be attributed to project interventions
 
-1. **Contextualize Findings**: Place the four target areas in the broader context of all Lao protected areas
-2. **Benchmark Performance**: Compare deforestation rates against national averages and KfW portfolio performance
-3. **Support Evaluation**: Provide evidence for evaluating whether target areas perform better, worse, or similar to other protected areas
-
-**Implementation Note**: Full comparative analysis requires processing forest cover data for all Lao protected areas and KfW-supported areas. The current report provides the framework and can be extended once additional data processing is completed.
-
-## Conclusions and Recommendations
-
-### Summary of Findings
-
-This evaluation report provides a comprehensive analysis of forest cover development in four protected areas in Laos from 2000 to 2024. Key findings include:
-
-1. **Temporal Trends**: Analysis of deforestation patterns across three distinct periods (before, during, and after project implementation)
-2. **Area-Specific Patterns**: Identification of trends and patterns for each of the four protected areas
-3. **Comparative Context**: Framework for comparing target areas with national averages and KfW portfolio
-
-### Evaluation Conclusions
-
-The analysis supports evaluation of forest stock development by:
-
-- Providing empirical, data-driven evidence of forest cover trends
-- Enabling comparison of deforestation rates across different time periods
-- Supporting assessment of conservation outcomes and management effectiveness
-
-### Recommendations for Future Monitoring
-
-1. **Regular Updates**: Continue monitoring forest cover development on an annual basis to track trends
-2. **Extended Analysis**: Process forest cover data for all Lao protected areas to enable comprehensive comparative analysis
-3. **Integration**: Combine forest cover analysis with other indicators (biodiversity, management effectiveness, socioeconomic factors) for holistic evaluation
-4. **Ground Truthing**: Validate satellite-based findings with field observations where possible
-5. **Causal Analysis**: Investigate drivers of deforestation patterns identified in the analysis
+- **Effectiveness Assessment**: By comparing project area trends with national trends, we can assess whether the project areas experienced different deforestation dynamics during and after the project period compared to the broader protected area network in Laos
 
 ## Data Sources & References
 
@@ -825,4 +1353,3 @@ The analysis supports evaluation of forest stock development by:
 ---
 
 *Report generated: `r Sys.Date()`*
-

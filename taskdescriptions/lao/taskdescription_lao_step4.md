@@ -1,0 +1,5 @@
+- plots in Section overall Trends: Areas appear twice in the legend. Verify why that is. Did you add the data twice to the plot or did you add only legend items twice. Fix it. Protected areas should appear only once.
+- plots ins ## Temporal Analysis of Deforestation for the Project Period: Comparison is good but the legend gets very large because of some very large names taking up around 60% of the plot. Limit the legend width and truncate the labels where necessary to around 20% of the total plot size.
+- extend all plot sizes again to take 100% of the panel width.
+- map: it seems that the layer "Forest Loss Statistics" only contains data from the four selected PAs. change this. Add the data from all analyzed areas to this layer. 
+- the Nam Ha protected area appear twice in the data with two distinct WDPA IDs. It once refers to an area where the DESIGNATION is "ASEAN Heritage Park" and once to an area where the Designation is "National Protected Area". Only use the area "National Protected Area" throughout the whole report. Make this fact explicit in the section about analzed areas and remove it from the table. 

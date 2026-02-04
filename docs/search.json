@@ -64,7 +64,7 @@
     "href": "reports/threat_assessment_bolivia.html#data-sources-references",
     "title": "Threat Assessment for Protected Areas in Bolivia",
     "section": "Data Sources & References",
-    "text": "Data Sources & References\n\n\nFundación Amigos de la Naturaleza (FAN). 2019. “Reporte de Incendios Forestales En Bolivia 2019.” https://www.fan-bo.org.\n\n\nMargules, Christopher R, and Robert L Pressey. 2000. “Systematic Conservation Planning.” Nature 405 (6783): 243–53.\n\n\nPennington, R Toby, Darién E Prado, and Colin A Pendry. 2000. “Neotropical Seasonally Dry Forests and Quaternary Vegetation Changes.” Journal of Biogeography 27 (2): 261–73.\n\n\nWilson, Kerrie A, Michael I Westphal, Hugh P Possingham, and Jane Elith. 2005. “Measuring and Incorporating Vulnerability into Conservation Planning.” Environmental Management 35 (5): 527–43.\n\n\n\nWDPA: UNEP-WCMC and IUCN (2024), Protected Planet: The World Database on Protected Areas (WDPA)\nGFW: Hansen, M. C., et al. (2013). High-Resolution Global Maps of 21st-Century Forest Cover Change. Science, 342(15 November): 850–53. Data version: GFC-2024-v1.12.\nMODIS MCD64A1: Giglio, L., Boschetti, L., Roy, D. P., Humber, M. L., & Justice, C. O. (2018). The Collection 6 MODIS burned area mapping algorithm and product. Remote Sensing of Environment, 217, 72-85. Available at: https://modis-fire.umd.edu/ba.html\n\n\nReport generated: 2026-01-19",
+    "text": "Data Sources & References\n\n\nFundación Amigos de la Naturaleza (FAN). 2019. “Reporte de Incendios Forestales En Bolivia 2019.” https://www.fan-bo.org.\n\n\nMargules, Christopher R, and Robert L Pressey. 2000. “Systematic Conservation Planning.” Nature 405 (6783): 243–53.\n\n\nPennington, R Toby, Darién E Prado, and Colin A Pendry. 2000. “Neotropical Seasonally Dry Forests and Quaternary Vegetation Changes.” Journal of Biogeography 27 (2): 261–73.\n\n\nWilson, Kerrie A, Michael I Westphal, Hugh P Possingham, and Jane Elith. 2005. “Measuring and Incorporating Vulnerability into Conservation Planning.” Environmental Management 35 (5): 527–43.\n\n\n\nWDPA: UNEP-WCMC and IUCN (2024), Protected Planet: The World Database on Protected Areas (WDPA)\nGFW: Hansen, M. C., et al. (2013). High-Resolution Global Maps of 21st-Century Forest Cover Change. Science, 342(15 November): 850–53. Data version: GFC-2024-v1.12.\nMODIS MCD64A1: Giglio, L., Boschetti, L., Roy, D. P., Humber, M. L., & Justice, C. O. (2018). The Collection 6 MODIS burned area mapping algorithm and product. Remote Sensing of Environment, 217, 72-85. Available at: https://modis-fire.umd.edu/ba.html\n\n\nReport generated: 2026-02-04",
     "crumbs": [
       "Threat Assessment for Protected Areas in Bolivia"
     ]
@@ -130,7 +130,7 @@
     "href": "index.html#available-reports",
     "title": "MAPME Biodiversity Reports",
     "section": "Available Reports",
-    "text": "Available Reports\n\n\n🇧🇴 Bolivia Threat Assessment\nPeriod: 2000-2024\nFocus: Forest Cover Loss & Burned Areas\nAnalysis of threat levels in Bolivian protected areas, examining:\n\nPrimary forest cover loss trends\nBurned area dynamics (MODIS MCD64A1)\nComparison between supported and non-supported areas\n\nView Report →\n\n\n📊 Coming Soon\nAdditional reports for other regions are in development:\n\nCentral America portfolio analysis\nEcuador mangrove assessment\nSelva Maya cross-border analysis"
+    "text": "Available Reports\n\n\n🇧🇴 Bolivia Threat Assessment\nPeriod: 2000-2024\nFocus: Forest Cover Loss & Burned Areas\nAnalysis of threat levels in Bolivian protected areas, examining:\n\nPrimary forest cover loss trends\nBurned area dynamics (MODIS MCD64A1)\nComparison between supported and non-supported areas\n\nView Report →\n\n\n🇱🇦 Laos Forest Cover Evaluation\nPeriod: 2000-2024\nFocus: Forest Cover Loss & Conservation Outcomes\nEvaluation of forest cover development in Lao protected areas, examining:\n\nForest cover loss trends (2000-2024)\nComparative analysis between project and non-project areas\nTemporal dynamics during project phases\n\nView Report →"
   },
   {
     "objectID": "index.html#data-sources",
@@ -215,7 +215,7 @@
     "href": "reports/evaluation_laos_forest_cover.html#analyzed-protected-areas",
     "title": "Evaluation of Forest Cover Development in Protected Areas in Laos",
     "section": "Analyzed Protected Areas",
-    "text": "Analyzed Protected Areas\nThe evaluation focuses on four protected areas in Laos that are part of the evaluation portfolio:",
+    "text": "Analyzed Protected Areas\nThe evaluation focuses on four protected areas in Laos that are part of the evaluation portfolio:\n\n\n\n\n\n\nNoteNote on Nam Ha Protected Area\n\n\n\nNam Ha appears in the WDPA database with two distinct WDPA IDs representing different designations: - WDPA ID 71252: Nam Ha National Protected Area (used in this analysis) - WDPA ID 555756396: Nam Ha ASEAN Heritage Park (excluded from this analysis)\nThis report uses only the National Protected Area designation (WDPA ID 71252) throughout all analyses and visualizations.",
     "crumbs": [
       "Evaluation of Forest Cover Development in Protected Areas in Laos"
     ]
@@ -235,7 +235,7 @@
     "href": "reports/evaluation_laos_forest_cover.html#temporal-analysis-of-deforestation-for-the-project-period",
     "title": "Evaluation of Forest Cover Development in Protected Areas in Laos",
     "section": "Temporal Analysis of Deforestation for the Project Period",
-    "text": "Temporal Analysis of Deforestation for the Project Period\nThis section presents cumulative deforestation trends for three distinct periods, allowing comparison of deforestation rates before, during, and after project implementation.\n\nGraph 1: Cumulative Deforestation (2009-2013)\nThis graph shows cumulative forest loss from 2009 baseline for the period before project implementation.\n\n\n\n\n\n\n\n\nGraph 2: Cumulative Deforestation (2014-2018)\nThis graph shows cumulative forest loss from 2014 baseline for the project implementation period.\n\n\n\n\n\n\n\n\nGraph 3: Cumulative Deforestation (2019-2023)\nThis graph shows cumulative forest loss from 2019 baseline for the post-project period.\n\n\n\n\n\n\n\n\nInterpretation of Trends",
+    "text": "Temporal Analysis of Deforestation for the Project Period\nThis section presents cumulative deforestation trends and forest cover development for project areas and all analyzed protected areas.\n\nCumulative Forest Cover Loss (2001-2024) for Project PAs\n\n\n\n\n\n\n\n\nCumulative Forest Cover Loss (2001-2024) for All PAs\n\n\n\n\n\n\n\n\nForest Cover (2000-2024) for Project PAs\n\n\n\n\n\n\n\n\nForest Cover (2000-2024) for All PAs",
     "crumbs": [
       "Evaluation of Forest Cover Development in Protected Areas in Laos"
     ]
@@ -275,7 +275,27 @@
     "href": "reports/evaluation_laos_forest_cover.html#data-sources-references",
     "title": "Evaluation of Forest Cover Development in Protected Areas in Laos",
     "section": "Data Sources & References",
-    "text": "Data Sources & References\n\nWDPA: UNEP-WCMC and IUCN (2024), Protected Planet: The World Database on Protected Areas (WDPA)\nGFW: Hansen, M. C., et al. (2013). High-Resolution Global Maps of 21st-Century Forest Cover Change. Science, 342(15 November): 850–53. Data version: GFC-2024-v1.12.\nmapme.biodiversity: R package for automated biodiversity indicator calculation\n\n\nReport generated: 2026-02-03",
+    "text": "Data Sources & References\n\nWDPA: UNEP-WCMC and IUCN (2024), Protected Planet: The World Database on Protected Areas (WDPA)\nGFW: Hansen, M. C., et al. (2013). High-Resolution Global Maps of 21st-Century Forest Cover Change. Science, 342(15 November): 850–53. Data version: GFC-2024-v1.12.\nmapme.biodiversity: R package for automated biodiversity indicator calculation\n\n\nReport generated: 2026-02-04",
+    "crumbs": [
+      "Evaluation of Forest Cover Development in Protected Areas in Laos"
+    ]
+  },
+  {
+    "objectID": "reports/evaluation_laos_forest_cover.html#map",
+    "href": "reports/evaluation_laos_forest_cover.html#map",
+    "title": "Evaluation of Forest Cover Development in Protected Areas in Laos",
+    "section": "Map",
+    "text": "Map",
+    "crumbs": [
+      "Evaluation of Forest Cover Development in Protected Areas in Laos"
+    ]
+  },
+  {
+    "objectID": "reports/evaluation_laos_forest_cover.html#key-findings",
+    "href": "reports/evaluation_laos_forest_cover.html#key-findings",
+    "title": "Evaluation of Forest Cover Development in Protected Areas in Laos",
+    "section": "Key Findings",
+    "text": "Key Findings\n\n\n\n\n\n\nBased on the empirical analysis of forest cover data from 2000 to 2024 for all 29 protected areas in Laos, the following key findings emerge:\n\nOverall Forest Cover Development\nThe analysis reveals that all protected areas in Laos have experienced forest cover loss over the analysis period. The total forest cover loss across all 29 protected areas from 2000 to 2024 amounts to 493,745 hectares.\nProject Areas Performance: - The four project areas account for 11.1% of total forest loss across all Lao protected areas - Average relative loss in project areas: 9.08% - Average relative loss in other areas: 12.46% - National average relative loss: 11.99%\n\n\nPeriod-Specific Trends\nBefore Project Period (2009-2013): - During the baseline period, project areas experienced an average annual loss of 537 ha/year - This compares to a national average of 459 ha/year across all Lao protected areas - Project areas showed higher deforestation rates than the national average during this period\nDuring Project Period (2014-2018): - Project areas experienced an average annual loss of 801 ha/year during project implementation - National average during this period: 893 ha/year - Change from baseline: Project areas showed a increase of 49.3% in annual deforestation rates compared to the baseline period - Project areas performed better than the national average during the project period\nAfter Project Period (2019-2023): - Project areas experienced an average annual loss of 800 ha/year in the post-project period - National average during this period: 1310 ha/year - Change from project period: Project areas showed a reduction of 0.2% in annual deforestation rates compared to the project implementation period - This period allows assessment of whether project effects were sustained after project completion\n\n\nArea-Specific Patterns\nThe detailed statistics table above shows that:\n\nMost Affected Areas: Among all Lao protected areas, the areas with the highest total forest cover loss are Phou Sabot Phoungchong, Dong Phou Vieng, Nam Et-Phouloey. None of these are project areas\nRelative Loss Comparison: When considering relative loss (percentage of original forest cover):\n\nProject areas show lower relative loss (9.08% vs 11.99% national average)\nThis suggests that project areas have been relatively more effective in maintaining forest cover\n\nTrend Changes: The comparison of average annual loss rates across periods reveals:\n\nProject areas: Before→During: increase of 49.3%; During→After: decrease of 0.2%\nNational trends: Before→During: increase of 94.7%; During→After: increase of 46.6%\n\n\n\n\nComparative Analysis with National Trends\nThe comprehensive analysis of all 29 Lao protected areas provides important context for evaluating project area performance:\n\nRelative Performance: Project areas demonstrate better forest conservation outcomes compared to all Lao protected areas\nTemporal Patterns: The comparison of period-specific trends reveals whether project areas follow similar patterns to the national average or show distinct trajectories that may be attributed to project interventions\nEffectiveness Assessment: By comparing project area trends with national trends, we can assess whether the project areas experienced different deforestation dynamics during and after the project period compared to the broader protected area network in Laos",
     "crumbs": [
       "Evaluation of Forest Cover Development in Protected Areas in Laos"
     ]

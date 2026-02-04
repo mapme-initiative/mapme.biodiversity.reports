@@ -38,13 +38,18 @@ Analysis of threat levels in Bolivian protected areas, examining:
 :::
 
 ::: {.g-col-12 .g-col-md-6}
-### 📊 Coming Soon
+### 🇱🇦 Laos Forest Cover Evaluation
 
-Additional reports for other regions are in development:
+**Period:** 2000-2024  
+**Focus:** Forest Cover Loss & Conservation Outcomes
 
-- Central America portfolio analysis
-- Ecuador mangrove assessment
-- Selva Maya cross-border analysis
+Evaluation of forest cover development in Lao protected areas, examining:
+
+- Forest cover loss trends (2000-2024)
+- Comparative analysis between project and non-project areas
+- Temporal dynamics during project phases
+
+[View Report →](reports/evaluation_laos_forest_cover.qmd)
 
 :::
 
