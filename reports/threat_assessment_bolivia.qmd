@@ -365,8 +365,27 @@ The map below depicts relative and absolute forest cover loss in the selected ar
 ```{r map-forest-loss}
 #| echo: false
 #| fig-height: 7
-#| out-width: "80%"
+#| out-width: "100%"
 #| classes: map-container
+
+# Load administrative boundaries
+admin1 <- read_sf("../data/admin1_subset.geojson", quiet = TRUE)
+municipalities <- read_sf("../data/municipalities.geojson", quiet = TRUE)
+
+# Ensure geometry is valid and CRS is WGS84
+if (nrow(admin1) > 0) {
+  admin1 <- admin1 %>% st_make_valid()
+  if (st_crs(admin1)$epsg != 4326) {
+    admin1 <- st_transform(admin1, 4326)
+  }
+}
+
+if (nrow(municipalities) > 0) {
+  municipalities <- municipalities %>% st_make_valid()
+  if (st_crs(municipalities)$epsg != 4326) {
+    municipalities <- st_transform(municipalities, 4326)
+  }
+}
 
 # Prepare data for mapping
 # Get KfW-supported areas from wdpa_allPAs (which has bmz_n_1 joined)
@@ -477,6 +496,81 @@ if (nrow(wdpa_nonSupportPA) > 0 && inherits(wdpa_nonSupportPA, "sf")) {
   )
 }
 
+# Add administrative boundaries
+# Create popup and label content with all attributes for Admin 1
+if (nrow(admin1) > 0 && inherits(admin1, "sf")) {
+  # Get all attribute columns (excluding geometry)
+  admin1_attrs <- admin1 %>% st_drop_geometry()
+  
+  # Create popup content as a column in the sf object
+  admin1$popup_content <- apply(admin1_attrs, 1, function(row) {
+    attrs <- paste(names(admin1_attrs), row, sep = ": ", collapse = "<br>")
+    paste0("<b>Admin 1 - Intervention</b><br>", attrs)
+  })
+  
+  # Create label content (simpler, just show name if available)
+  if ("ADM1_ES" %in% names(admin1)) {
+    admin1$label_content <- admin1$ADM1_ES
+  } else if ("Name" %in% names(admin1)) {
+    admin1$label_content <- admin1$Name
+  } else {
+    admin1$label_content <- "Admin 1 - Intervention"
+  }
+  
+  map <- map %>% addPolygons(
+    data = admin1,
+    fillColor = "transparent",
+    fillOpacity = 0,
+    color = "black",
+    weight = 2,
+    opacity = 1,
+    dashArray = "10, 10",  # Dashed line with spacing
+    popup = ~popup_content,
+    label = ~label_content,
+    labelOptions = labelOptions(
+      noHide = FALSE,
+      direction = "auto"
+    ),
+    group = "Admin 1 - Intervention"
+  )
+}
+
+# Create popup and label content with all attributes for Admin 3
+if (nrow(municipalities) > 0 && inherits(municipalities, "sf")) {
+  # Get all attribute columns (excluding geometry)
+  municipalities_attrs <- municipalities %>% st_drop_geometry()
+  
+  # Create popup content as a column in the sf object
+  municipalities$popup_content <- apply(municipalities_attrs, 1, function(row) {
+    attrs <- paste(names(municipalities_attrs), row, sep = ": ", collapse = "<br>")
+    paste0("<b>Admin 3 - Intervention</b><br>", attrs)
+  })
+  
+  # Create label content (simpler, just show name if available)
+  if ("Name" %in% names(municipalities)) {
+    municipalities$label_content <- municipalities$Name
+  } else {
+    municipalities$label_content <- "Admin 3 - Intervention"
+  }
+  
+  map <- map %>% addPolygons(
+    data = municipalities,
+    fillColor = "transparent",
+    fillOpacity = 0,
+    color = "black",
+    weight = 2,
+    opacity = 1,
+    dashArray = "2, 8",  # Dotted line with spacing
+    popup = ~popup_content,
+    label = ~label_content,
+    labelOptions = labelOptions(
+      noHide = FALSE,
+      direction = "auto"
+    ),
+    group = "Admin 3 - Intervention"
+  )
+}
+
 # Add circle markers for forest loss statistics (separate group from tile layers)
 map <- map %>%
   addCircleMarkers(
@@ -503,6 +597,7 @@ map <- map %>%
   addLayersControl(
     baseGroups = c("CartoDB", "OpenStreetMap", "Satellite", "Topography"),
     overlayGroups = c("PAs KfW-supported", "PAs (Others)", "PA Labels",
+                     "Admin 1 - Intervention", "Admin 3 - Intervention",
                      "Forest Loss Statistics",
                      "Forest Cover Loss (2001-2014)",
                      "Forest Cover Loss (2014-2024)",
@@ -760,7 +855,7 @@ The map shows burned area totals for analyzed protected areas. Larger circles in
 ```{r map-burned-area}
 #| echo: false
 #| fig-height: 7
-#| out-width: "80%"
+#| out-width: "100%"
 #| classes: map-container
 
 # Color palette for burned area
@@ -839,6 +934,101 @@ if (nrow(wdpa_nonSupportPA) > 0 && "ORIG_NAME" %in% names(wdpa_nonSupportPA)) {
   )
 }
 
+# Add administrative boundaries (reuse from first map or reload if needed)
+if (!exists("admin1") || nrow(admin1) == 0) {
+  admin1 <- read_sf("../data/admin1_subset.geojson", quiet = TRUE)
+  if (nrow(admin1) > 0) {
+    admin1 <- admin1 %>% st_make_valid()
+    if (st_crs(admin1)$epsg != 4326) {
+      admin1 <- st_transform(admin1, 4326)
+    }
+  }
+}
+
+if (!exists("municipalities") || nrow(municipalities) == 0) {
+  municipalities <- read_sf("../data/municipalities.geojson", quiet = TRUE)
+  if (nrow(municipalities) > 0) {
+    municipalities <- municipalities %>% st_make_valid()
+    if (st_crs(municipalities)$epsg != 4326) {
+      municipalities <- st_transform(municipalities, 4326)
+    }
+  }
+}
+
+# Add Admin 1 layer with popup and label
+if (nrow(admin1) > 0 && inherits(admin1, "sf")) {
+  # Get all attribute columns (excluding geometry)
+  admin1_attrs <- admin1 %>% st_drop_geometry()
+  
+  # Create popup content as a column in the sf object
+  admin1$popup_content <- apply(admin1_attrs, 1, function(row) {
+    attrs <- paste(names(admin1_attrs), row, sep = ": ", collapse = "<br>")
+    paste0("<b>Admin 1 - Intervention</b><br>", attrs)
+  })
+  
+  # Create label content (simpler, just show name if available)
+  if ("ADM1_ES" %in% names(admin1)) {
+    admin1$label_content <- admin1$ADM1_ES
+  } else if ("Name" %in% names(admin1)) {
+    admin1$label_content <- admin1$Name
+  } else {
+    admin1$label_content <- "Admin 1 - Intervention"
+  }
+  
+  map2 <- map2 %>% addPolygons(
+    data = admin1,
+    fillColor = "transparent",
+    fillOpacity = 0,
+    color = "black",
+    weight = 2,
+    opacity = 1,
+    dashArray = "10, 10",  # Dashed line with spacing
+    popup = ~popup_content,
+    label = ~label_content,
+    labelOptions = labelOptions(
+      noHide = FALSE,
+      direction = "auto"
+    ),
+    group = "Admin 1 - Intervention"
+  )
+}
+
+# Add Admin 3 layer with popup and label
+if (nrow(municipalities) > 0 && inherits(municipalities, "sf")) {
+  # Get all attribute columns (excluding geometry)
+  municipalities_attrs <- municipalities %>% st_drop_geometry()
+  
+  # Create popup content as a column in the sf object
+  municipalities$popup_content <- apply(municipalities_attrs, 1, function(row) {
+    attrs <- paste(names(municipalities_attrs), row, sep = ": ", collapse = "<br>")
+    paste0("<b>Admin 3 - Intervention</b><br>", attrs)
+  })
+  
+  # Create label content (simpler, just show name if available)
+  if ("Name" %in% names(municipalities)) {
+    municipalities$label_content <- municipalities$Name
+  } else {
+    municipalities$label_content <- "Admin 3 - Intervention"
+  }
+  
+  map2 <- map2 %>% addPolygons(
+    data = municipalities,
+    fillColor = "transparent",
+    fillOpacity = 0,
+    color = "black",
+    weight = 2,
+    opacity = 1,
+    dashArray = "2, 8",  # Dotted line with spacing
+    popup = ~popup_content,
+    label = ~label_content,
+    labelOptions = labelOptions(
+      noHide = FALSE,
+      direction = "auto"
+    ),
+    group = "Admin 3 - Intervention"
+  )
+}
+
 map2 <- map2 %>%
   addCircleMarkers(
     data = wdpa_allPAs_lossdata_subset,
@@ -860,7 +1050,9 @@ map2 <- map2 %>%
   ) %>%
   addLayersControl(
     baseGroups = c("CartoDB", "OpenStreetMap", "Satellite", "Topography"),
-    overlayGroups = c("PAs KfW-supported", "PAs (Others)", "PA Labels", "Burned Area (2015-2023)"),
+    overlayGroups = c("PAs KfW-supported", "PAs (Others)", "PA Labels",
+                     "Admin 1 - Intervention", "Admin 3 - Intervention",
+                     "Burned Area (2015-2023)"),
     options = layersControlOptions(collapsed = FALSE)
   )
 
