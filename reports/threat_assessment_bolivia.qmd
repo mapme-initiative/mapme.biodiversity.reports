@@ -64,7 +64,7 @@ wdpa_noarea <- c(555558388, 555558386, 555558387, 166865, 900565, 900566, 900567
 
 # ----- Load Protected Areas Data -----
 # Load KfW/GIZ portfolio
-wdpa_kfw <- read_sf("../data/portfolio.gpkg")
+wdpa_kfw <- read_sf("../data/shared/portfolio.gpkg")
 
 # Filter for Bolivia (portfolio uses lowercase columns)
 wdpa_kfw <- wdpa_kfw %>%
@@ -100,9 +100,9 @@ wdpa_kfw$REP_AREA_cat <- cut(
 
 # ----- Load Forest Loss Statistics -----
 # Check if processed data exists, otherwise use placeholder
-if (file.exists("../data/bolivia_forest_loss_2000_2024.csv")) {
+if (file.exists("../data/bolivia/output/bolivia_forest_loss_2000_2024.csv")) {
   gfw_lossstats <- read_csv(
-    "../data/bolivia_forest_loss_2000_2024.csv",
+    "../data/bolivia/output/bolivia_forest_loss_2000_2024.csv",
     show_col_types = FALSE
   )
 } else {
@@ -122,7 +122,7 @@ gfw_lossstats_area <- gfw_lossstats %>%
 
 # ----- Load All PAs Data -----
 wdpa_allPAs <- st_read(
-  "../data/wdpa.gdb", 
+  "../data/bolivia/input/wdpa.gdb", 
   layer = "WDPA_WDOECM_poly_Jan2026_BOL",
   quiet = TRUE
 )
@@ -200,9 +200,9 @@ wdpa_allPAs$absolute_loss_categorized <- cut(
 
 # ----- Load Burned Area Data -----
 # MCD64A1 data available for 2015-2023 (complete tile coverage)
-if (file.exists("../data/bolivia_burned_area_total_2015_2023.csv")) {
+if (file.exists("../data/bolivia/output/bolivia_burned_area_total_2015_2023.csv")) {
   burned_area_data <- read_csv(
-    "../data/bolivia_burned_area_total_2015_2023.csv",
+    "../data/bolivia/output/bolivia_burned_area_total_2015_2023.csv",
     show_col_types = FALSE
   )
   # Convert wdpa_id to character to match WDPAID type in wdpa_allPAs
@@ -369,8 +369,8 @@ The map below depicts relative and absolute forest cover loss in the selected ar
 #| classes: map-container
 
 # Load administrative boundaries
-admin1 <- read_sf("../data/admin1_subset.geojson", quiet = TRUE)
-municipalities <- read_sf("../data/municipalities.geojson", quiet = TRUE)
+admin1 <- read_sf("../data/bolivia/input/admin1_subset.geojson", quiet = TRUE)
+municipalities <- read_sf("../data/bolivia/input/municipalities.geojson", quiet = TRUE)
 
 # Ensure geometry is valid and CRS is WGS84
 if (nrow(admin1) > 0) {
@@ -734,7 +734,7 @@ gfw_lossstats_loss <- gfw_lossstats_loss %>%
 
 # Load names directly from source to avoid any column name issues
 wdpa_source <- st_read(
-  "../data/wdpa.gdb", 
+  "../data/bolivia/input/wdpa.gdb", 
   layer = "WDPA_WDOECM_poly_Jan2026_BOL",
   quiet = TRUE
 )
@@ -867,7 +867,7 @@ pal_burned <- colorFactor(
 # Ensure ORIG_NAME exists in subset (reload if necessary)
 if (!"ORIG_NAME" %in% names(wdpa_allPAs_lossdata_subset)) {
   wdpa_source_names <- st_read(
-    "../data/wdpa.gdb", 
+    "../data/bolivia/input/wdpa.gdb", 
     layer = "WDPA_WDOECM_poly_Jan2026_BOL",
     quiet = TRUE
   ) %>%
@@ -936,7 +936,7 @@ if (nrow(wdpa_nonSupportPA) > 0 && "ORIG_NAME" %in% names(wdpa_nonSupportPA)) {
 
 # Add administrative boundaries (reuse from first map or reload if needed)
 if (!exists("admin1") || nrow(admin1) == 0) {
-  admin1 <- read_sf("../data/admin1_subset.geojson", quiet = TRUE)
+  admin1 <- read_sf("../data/bolivia/input/admin1_subset.geojson", quiet = TRUE)
   if (nrow(admin1) > 0) {
     admin1 <- admin1 %>% st_make_valid()
     if (st_crs(admin1)$epsg != 4326) {
@@ -946,7 +946,7 @@ if (!exists("admin1") || nrow(admin1) == 0) {
 }
 
 if (!exists("municipalities") || nrow(municipalities) == 0) {
-  municipalities <- read_sf("../data/municipalities.geojson", quiet = TRUE)
+  municipalities <- read_sf("../data/bolivia/input/municipalities.geojson", quiet = TRUE)
   if (nrow(municipalities) > 0) {
     municipalities <- municipalities %>% st_make_valid()
     if (st_crs(municipalities)$epsg != 4326) {
@@ -1170,9 +1170,9 @@ if (nrow(lollipop_data_fire) > 0) {
 #| fig-width: 10
 
 # Load annual burned area data if it exists (2015-2023)
-if (file.exists("../data/bolivia_burned_area_annual_2015_2023.csv")) {
+if (file.exists("../data/bolivia/output/bolivia_burned_area_annual_2015_2023.csv")) {
   burned_annual <- read_csv(
-    "../data/bolivia_burned_area_annual_2015_2023.csv",
+    "../data/bolivia/output/bolivia_burned_area_annual_2015_2023.csv",
     show_col_types = FALSE
   )
   
@@ -1189,7 +1189,7 @@ if (file.exists("../data/bolivia_burned_area_annual_2015_2023.csv")) {
   
   # Load names directly from source (fresh, no conflicts)
   wdpa_names <- st_read(
-    "../data/wdpa.gdb", 
+    "../data/bolivia/input/wdpa.gdb", 
     layer = "WDPA_WDOECM_poly_Jan2026_BOL",
     quiet = TRUE
   ) %>%

@@ -65,7 +65,7 @@ project_colors <- c(
 # ----- Load Protected Areas Data -----
 # Load Laos PAs from WDPA file geodatabase
 wdpa_lao <- st_read(
-  "../data/wdpa_lao.gdb",
+  "../data/laos/input/wdpa_lao.gdb",
   layer = "WDPA_WDOECM_poly_Feb2026_LAO",
   quiet = TRUE
 )
@@ -116,9 +116,9 @@ if ("GIS_M_AREA" %in% names(target_areas)) {
 cat("✓ Loaded", nrow(target_areas), "target protected areas\n")
 
 # ----- Load Forest Cover Data -----
-if (file.exists("../data/laos_forest_cover_2000_2024.csv")) {
+if (file.exists("../data/laos/output/laos_forest_cover_2000_2024.csv")) {
   forest_data <- read_csv(
-    "../data/laos_forest_cover_2000_2024.csv",
+    "../data/laos/output/laos_forest_cover_2000_2024.csv",
     show_col_types = FALSE
   )
   

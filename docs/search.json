@@ -257,42 +257,42 @@
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "About",
+    "title": "MAPME Biodiversity Reports",
     "section": "",
     "text": "Open-source geospatial analysis for conservation impact management"
   },
   {
     "objectID": "index.html#welcome",
     "href": "index.html#welcome",
-    "title": "About",
+    "title": "MAPME Biodiversity Reports",
     "section": "Welcome",
     "text": "Welcome\nThis website hosts threat assessment reports and conservation analyses for protected areas worldwide. The analyses leverage open geospatial data and the mapme.biodiversity R package to generate reproducible insights on ecosystem health and conservation pressures."
   },
   {
     "objectID": "index.html#available-reports",
     "href": "index.html#available-reports",
-    "title": "About",
+    "title": "MAPME Biodiversity Reports",
     "section": "Available Reports",
-    "text": "Available Reports\n\n\n🇧🇴 Bolivia Threat Assessment\nPeriod: 2000-2024\nFocus: Forest Cover Loss & Burned Areas\nAnalysis of threat levels in Bolivian protected areas, examining:\n\nPrimary forest cover loss trends\nBurned area dynamics (MODIS MCD64A1)\nComparison between supported and non-supported areas\n\nView Report →\n\n\n🇱🇦 Laos Forest Cover Evaluation\nPeriod: 2000-2024\nFocus: Forest Cover Loss & Conservation Outcomes\nEvaluation of forest cover development in Lao protected areas, examining:\n\nForest cover loss trends (2000-2024)\nComparative analysis between project and non-project areas\nTemporal dynamics during project phases\n\nView Report →"
+    "text": "Available Reports\n\n\n🇧🇴 Bolivia Threat Assessment\nPeriod: 2000-2024\nFocus: Forest Cover Loss & Burned Areas\nAnalysis of threat levels in Bolivian protected areas, examining:\n\nPrimary forest cover loss trends\nBurned area dynamics (MODIS MCD64A1)\nComparison between supported and non-supported areas\n\nView Report →\n\n\n🇱🇦 Laos Forest Cover Evaluation\nPeriod: 2000-2024\nFocus: Forest Cover Loss & Conservation Outcomes\nEvaluation of forest cover development in Lao protected areas, examining:\n\nForest cover loss trends (2000-2024)\nComparative analysis between project and non-project areas\nTemporal dynamics during project phases\n\nView Report →\n\n\nIndia Forest Cover (Tripura)\nPeriod: 2001-2024 Focus: Forest Cover Loss & Conservation Zoning\nAssessment of forest cover loss in Tripura project villages, examining:\n\nForest loss dynamics across three periods\nComparison between project and non-project villages\nImplications for conservation zoning and land-use planning\n\nView Report →"
   },
   {
     "objectID": "index.html#data-sources",
     "href": "index.html#data-sources",
-    "title": "About",
+    "title": "MAPME Biodiversity Reports",
     "section": "Data Sources",
     "text": "Data Sources\nOur analyses rely on globally consistent, openly available datasets:\n\n\n\nDataset\nSource\nResolution\n\n\n\n\nForest Cover\nGlobal Forest Watch (Hansen et al., 2013)\n30m\n\n\nBurned Areas\nMODIS MCD64A1\n500m\n\n\nProtected Areas\nWDPA/IUCN\nVector"
   },
   {
     "objectID": "index.html#methodology",
     "href": "index.html#methodology",
-    "title": "About",
+    "title": "MAPME Biodiversity Reports",
     "section": "Methodology",
     "text": "Methodology\nThe reports in this repository use the mapme.biodiversity R package, which provides:\n\nStandardized access to global environmental datasets\nEfficient zonal statistics computation\nReproducible indicator calculations\nSupport for parallel processing\n\nLearn more about the package at: mapme-initiative.github.io/mapme.biodiversity"
   },
   {
     "objectID": "index.html#about-this-project",
     "href": "index.html#about-this-project",
-    "title": "About",
+    "title": "MAPME Biodiversity Reports",
     "section": "About This Project",
     "text": "About This Project\nThis project is part of the MAPME Initiative (Maps for Planning, Monitoring and Evaluation in Development Cooperation), supporting KfW and partners with data based products to improve impact management of their projects. For more information see https://www.mapme-initiative.org/.\n\n\n\n\n\n\nNoteReproducibility\n\n\n\nAll code and data processing scripts are available in this repository. The analyses can be reproduced using the provided R scripts and openly available data sources.\n\n\n\nLast updated: January 2026"
   },
@@ -407,5 +407,65 @@
     "title": "About",
     "section": "License",
     "text": "License\nThis project is open source. Code is available under the MIT License. Data sources have their own licensing terms - please refer to the original data providers for details."
+  },
+  {
+    "objectID": "reports/forest_cover_india.html#introduction",
+    "href": "reports/forest_cover_india.html#introduction",
+    "title": "Forest Cover Assessment for Project Villages in Tripura, India",
+    "section": "Introduction",
+    "text": "Introduction\nThis report examines forest cover loss dynamics in villages across Tripura, a small state in northeast India. The analysis serves a specific conservation question: a rural development project with conservation components supports 83 villages in the Dhalai and North Tripura districts. The project includes agricultural support, land-use zoning, and the designation of conservation set-aside areas.\nGiven the substantial forest cover loss observed across Tripura in recent years, this analysis assesses:\n\nHow much forest remains in the project villages for conservation zoning\nHow loss has accelerated or decelerated across three periods (2001–2010, 2011–2020, 2021–2024)\nHow project villages compare to the broader trend across all Tripura villages\n\n\n\n\n\n\n\nNoteKey Finding\n\n\n\nProject villages lost approximately 23% of their 2001 forest cover by 2024, with loss rates accelerating sharply after 2010. The most recent period (2021–2024) shows the highest annual loss rate, raising urgent questions about the feasibility of conservation zoning in heavily affected villages.",
+    "crumbs": [
+      "Forest Cover Assessment for Project Villages in Tripura, India"
+    ]
+  },
+  {
+    "objectID": "reports/forest_cover_india.html#data-and-methods",
+    "href": "reports/forest_cover_india.html#data-and-methods",
+    "title": "Forest Cover Assessment for Project Villages in Tripura, India",
+    "section": "Data and Methods",
+    "text": "Data and Methods\n\nVillage Boundary Data\nThe analysis covers 917 village polygons from the ESRI India Living Atlas (Census 2021 boundaries) across all 8 districts of Tripura, plus 4 additional villages matched via geoBoundaries (Census 2011 boundaries). Of these, 83 villages were identified as project villages through a multi-step name-matching process.\nThe matching linked field programme records (VDPIC village names) to official Census boundary polygons. Because village names in northeast India often have multiple spellings — reflecting Bengali, tribal, and English transliterations — the matching used a combination of:\n\nExact name matching after normalizing spelling (removing punctuation, standardizing whitespace)\nFuzzy matching using string similarity algorithms, with manual review of ambiguous cases\nPhonetic normalization specific to Tripura (e.g., the suffix “-cherra”/“-chhara” refers to the same geographic feature — a stream)\nManual overrides for seven villages where automated matching failed due to significant name divergence (e.g., “Narikel Kunja” = “Kunjaban”, both meaning “coconut grove” in Bengali)\n\nEach match was assigned a confidence level: confirmed (exact match or high-similarity score), likely (moderate similarity), or uncertain (lower similarity or parent-village assignment). Nine villages from the field programme could not be matched to any Census polygon — these are sub-hamlets, reserve forest sections, or settlements not recorded as separate Census units.\n\n\nOverview of Project Villages\n\n\n\n\n\n\nColumn descriptions:\n\nDistrict / Block: Administrative location from the field programme records\nVillage Name: Name used in the field programme (VDPIC records)\nMatch Method: How the match was established (exact, fuzzy_high, fuzzy_synonym, manual_override, or tripura_phonetic_fuzzy)\nMatch Score: String similarity score (0–100); blank for exact matches and manual overrides\nConfidence: Overall match quality — confirmed (green on map), likely (blue), or uncertain (orange)\nMatched Name / Census Name: Official names from the matched boundary dataset\n\n\n\nInteractive Map of Study Area\n\n\n\n\n\n\n\n\nForest Cover Data\nForest cover statistics were computed using the mapme.biodiversity R package with data from the Global Forest Watch dataset (Hansen et al., 2013), version GFC-2024-v1.12. The analysis covers the period 2001–2024.\nForest definition used:\n\nCanopy cover threshold: 10% (pixels with at least 10% tree canopy density in the year 2000 are classified as forest)\nMinimum patch size: 1 hectare\nResolution: 30 meters (Landsat-derived)\n\nForest cover loss is defined as a stand-replacement disturbance — a complete removal of tree cover canopy at the 30m pixel level. The GFW dataset detects loss events but does not capture forest degradation (partial canopy reduction) or regrowth.\n\n\nTripura’s Forest Ecosystem\nTripura’s forests are classified primarily as tropical semi-evergreen and moist deciduous types, with significant areas of bamboo brakes — a sub-climax formation resulting from historic shifting cultivation (jhum). The dominant tree species include Dipterocarpus turbinatus, Artocarpus chama, and Castanopsis indica. According to the India State of Forest Report 2023, Tripura maintains approximately 74.7% forest cover relative to its geographic area, though this has been declining — the state lost roughly 95 km2 of forest cover between the 2021 and 2023 assessment periods.\n\n\nAccuracy Considerations\nThe GFW dataset provides globally consistent forest monitoring but has known limitations relevant to this context:\n\nShifting cultivation: The dataset cannot distinguish between permanent deforestation and temporary clearing for jhum cultivation followed by regrowth. In areas with active shifting cultivation, GFW may record “loss” events that are part of a rotational cycle rather than permanent conversion.\nBamboo and plantation forests: GFW treats all tree cover uniformly and cannot distinguish natural forests from bamboo stands or plantations. Bamboo regeneration after clearing may not be captured as “regrowth” if canopy height remains below the detection threshold.\nSmall-scale disturbances: At 30m resolution, selective logging and small clearings below the pixel size may go undetected, potentially underestimating degradation in smallholder landscapes.\nCloud cover: Northeast India’s monsoon climate means persistent cloud cover during parts of the year, which can affect satellite image availability and detection accuracy.\n\nThese limitations should be considered when interpreting the results. The GFW data is best suited for detecting broad-scale loss trends rather than precise village-level accounting.",
+    "crumbs": [
+      "Forest Cover Assessment for Project Villages in Tripura, India"
+    ]
+  },
+  {
+    "objectID": "reports/forest_cover_india.html#forest-cover-loss-in-project-villages",
+    "href": "reports/forest_cover_india.html#forest-cover-loss-in-project-villages",
+    "title": "Forest Cover Assessment for Project Villages in Tripura, India",
+    "section": "Forest Cover Loss in Project Villages",
+    "text": "Forest Cover Loss in Project Villages\n\nCumulative Forest Cover Trajectory\nThe figure below shows how forest cover in project villages has evolved since 2001. Each village’s forest area is expressed as a percentage of its 2001 baseline. The shaded ribbon represents the interquartile range (25th–75th percentile) across all 83 project villages, capturing the spread of outcomes.\n\n\n\n\n\n\n\n\nFigure 1\n\n\n\n\n\n\nPeriod Comparison: Loss Acceleration\nTo assess whether forest loss is accelerating, we compare three periods using annualized relative loss — the percentage of each village’s 2001 forest baseline lost per year within each period. This metric normalizes for the different period lengths (9, 9, and 3 years) and makes trends directly comparable.\n\n\n\n\n\n\n\n\nFigure 2\n\n\n\n\n\n\n\n\n\n\nInterpretation: The data reveals a clear acceleration of forest loss across the three periods. During 2001–2010, the median project village lost approximately 0.53% of its 2001 forest per year. This rate increased substantially in 2011–2020 to 0.61%/year, and accelerated further in 2021–2024 to 1.48%/year. The spread of outcomes (visible in the boxplot) also widens over time, indicating that some villages are experiencing dramatically faster loss than others. The most affected village lost 14.6% of its 2001 baseline in just the 2021–2024 period alone.\n\n\nDistribution of Total Forest Loss (2001–2024)\nThe histogram below shows how total relative forest loss (2001–2024) is distributed across project villages.\n\n\n\n\n\n\n\n\nFigure 3\n\n\n\n\nThe median project village lost 19.8% of its 2001 forest cover by 2024. 10% of villages lost more than 30% of their forest, while 18% of villages lost less than 10%. This wide spread suggests that forest loss pressures vary considerably across the project area, and that conservation zoning may need to be prioritized differently depending on local conditions.\n\n\nComparison: Project Villages vs. All Tripura Villages\n\n\n\n\n\n\n\n\nFigure 4\n\n\n\n\nInterpretation: The comparison shows that project villages and non-project villages across Tripura follow broadly similar loss trends — both groups show accelerating loss over time. In the most recent period (2021–2024), project villages show a median annual loss of 1.48%/year compared to 0.65%/year for non-project villages. This suggests that the forest loss pressures are driven by regional factors (road expansion, population growth, agricultural conversion) rather than village-specific dynamics.\n\n\nTop 15 Most Affected Project Villages\n\n\n\n\n\n\n\n\nForest Cover Loss Map\nThe map below shows forest cover loss across all villages. Point symbology encodes both absolute loss (circle size) and relative loss (circle color). Project villages are shown at full opacity; non-project villages are semi-transparent to allow the project villages to stand out. Toggle the GFW tile layers to see the spatial pattern of loss across three periods.",
+    "crumbs": [
+      "Forest Cover Assessment for Project Villages in Tripura, India"
+    ]
+  },
+  {
+    "objectID": "reports/forest_cover_india.html#summary-and-implications",
+    "href": "reports/forest_cover_india.html#summary-and-implications",
+    "title": "Forest Cover Assessment for Project Villages in Tripura, India",
+    "section": "Summary and Implications",
+    "text": "Summary and Implications\n\nKey Figures\n\n\n\nMetric\nProject Villages (83)\nAll Villages (921)\n\n\n\n\nForest cover 2001\n81,260 ha\n736,089 ha\n\n\nForest cover 2024\n62,399 ha\n581,114 ha\n\n\nTotal loss\n18,861 ha\n154,975 ha\n\n\nRelative loss\n23.2%\n21.1%\n\n\n\n\n\nImplications for Conservation Zoning\nThe accelerating loss trend raises important questions for the project’s conservation components:\n\n8 villages have lost more than 30% of their 2001 forest cover. In these villages, the remaining forest may be too fragmented or reduced for effective conservation zoning without complementary restoration measures.\n33 villages show moderate loss (20–30%). Conservation zoning remains viable but urgent — continued loss at current rates would further reduce the forest base within a few years.\n15 villages retain more than 90% of their 2001 forest and may offer the best prospects for effective conservation set-asides.\n\nThe fact that loss has accelerated in the most recent period (2021–2024) underscores the urgency of implementing land-use zoning measures. Without intervention, the forest base available for conservation in many project villages will continue to shrink rapidly.",
+    "crumbs": [
+      "Forest Cover Assessment for Project Villages in Tripura, India"
+    ]
+  },
+  {
+    "objectID": "reports/forest_cover_india.html#data-sources",
+    "href": "reports/forest_cover_india.html#data-sources",
+    "title": "Forest Cover Assessment for Project Villages in Tripura, India",
+    "section": "Data Sources",
+    "text": "Data Sources\n\n\n\nDataset\nDescription\nSource\n\n\n\n\nGFW Treecover / Lossyear\nAnnual forest cover, version GFC-2024-v1.12\nGlobal Forest Watch\n\n\nESRI India Living Atlas\nVillage boundaries (Census 2021), IAB Village 2024\nESRI Living Atlas India\n\n\ngeoBoundaries ADM5\nVillage boundaries (Census 2011)\ngeoBoundaries\n\n\nIndia State of Forest Report 2023\nNational forest statistics\nForest Survey of India",
+    "crumbs": [
+      "Forest Cover Assessment for Project Villages in Tripura, India"
+    ]
+  },
+  {
+    "objectID": "reports/forest_cover_india.html#references",
+    "href": "reports/forest_cover_india.html#references",
+    "title": "Forest Cover Assessment for Project Villages in Tripura, India",
+    "section": "References",
+    "text": "References\nHansen, M. C., P. V. Potapov, R. Moore, M. Hancher, S. A. Turubanova, A. Tyukavina, D. Thau, S. V. Stehman, S. J. Goetz, T. R. Loveland, A. Kommareddy, A. Egorov, L. Chini, C. O. Justice, and J. R. G. Townshend. 2013. “High-Resolution Global Maps of 21st-Century Forest Cover Change.” Science 342 (6160): 850–53.",
+    "crumbs": [
+      "Forest Cover Assessment for Project Villages in Tripura, India"
+    ]
   }
 ]
