@@ -19,6 +19,8 @@ website:
             href: reports/threat_assessment_bolivia.qmd
           - text: "Laos Forest Cover Evaluation"
             href: reports/evaluation_laos_forest_cover.qmd
+          - text: "India Forest Cover (Tripura)"
+            href: reports/forest_cover_india.qmd
       - text: "About"
         href: about.qmd
     right:
@@ -32,6 +34,7 @@ website:
       contents:
         - reports/threat_assessment_bolivia.qmd
         - reports/evaluation_laos_forest_cover.qmd
+        - reports/forest_cover_india.qmd
   
   page-footer:
     left: |

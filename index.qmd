@@ -53,6 +53,22 @@ Evaluation of forest cover development in Lao protected areas, examining:
 
 :::
 
+::: {.g-col-12 .g-col-md-6}
+### India Forest Cover (Tripura)
+
+**Period:** 2001-2024
+**Focus:** Forest Cover Loss & Conservation Zoning
+
+Assessment of forest cover loss in Tripura project villages, examining:
+
+- Forest loss dynamics across three periods
+- Comparison between project and non-project villages
+- Implications for conservation zoning and land-use planning
+
+[View Report →](reports/forest_cover_india.qmd)
+
+:::
+
 :::
 
 ## Data Sources
