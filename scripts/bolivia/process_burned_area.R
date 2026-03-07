@@ -36,7 +36,7 @@ Sys.setenv(
 # =============================================================================
 # Configuration
 # =============================================================================
-output_dir <- file.path(getwd(), "data", "mapme_resources")
+output_dir <- file.path(getwd(), "data", "shared", "mapme_resources")
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
 mapme_options(
@@ -61,7 +61,7 @@ cat("  Analysis years:", min(analysis_years), "-", max(analysis_years), "\n\n")
 cat("[1/3] Loading protected areas...\n")
 
 wdpa_allPAs <- st_read(
-  "data/wdpa.gdb",
+  "data/bolivia/input/wdpa.gdb",
   layer = "WDPA_WDOECM_poly_Jan2026_BOL",
   quiet = TRUE
 )
@@ -176,11 +176,11 @@ if (length(all_results) > 0) {
     )
   
   # Save files - date range in filename reflects analysis_years
-  write.csv(burned_annual, "data/bolivia_burned_area_annual_2015_2023.csv", row.names = FALSE)
-  write.csv(burned_total, "data/bolivia_burned_area_total_2015_2023.csv", row.names = FALSE)
+  write.csv(burned_annual, "data/bolivia/output/bolivia_burned_area_annual_2015_2023.csv", row.names = FALSE)
+  write.csv(burned_total, "data/bolivia/output/bolivia_burned_area_total_2015_2023.csv", row.names = FALSE)
   
-  cat("      ✓ Saved: data/bolivia_burned_area_annual_2015_2023.csv\n")
-  cat("      ✓ Saved: data/bolivia_burned_area_total_2015_2023.csv\n")
+  cat("      ✓ Saved: data/bolivia/output/bolivia_burned_area_annual_2015_2023.csv\n")
+  cat("      ✓ Saved: data/bolivia/output/bolivia_burned_area_total_2015_2023.csv\n")
   cat("      ✓ Protected areas with data:", length(unique(burned_annual$wdpa_id)), "\n")
   cat("      ✓ Years covered:", paste(sort(unique(burned_annual$year)), collapse = ", "), "\n")
   cat("      ✓ Total records:", nrow(burned_annual), "\n")

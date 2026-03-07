@@ -32,7 +32,7 @@ cat("      Package version: mapme.biodiversity", as.character(packageVersion("ma
 cat("[2/7] Setting up configuration...\n")
 
 # Set output directory for downloaded resources
-output_dir <- file.path(getwd(), "data", "mapme_resources")
+output_dir <- file.path(getwd(), "data", "shared", "mapme_resources")
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
 # Configure mapme.biodiversity options
@@ -64,7 +64,7 @@ cat("[3/7] Loading protected areas from WDPA geodatabase...\n")
 
 # Load all Laos PAs from WDPA file geodatabase
 wdpa_lao <- st_read(
-  "data/wdpa_lao.gdb",
+  "data/laos/input/wdpa_lao.gdb",
   layer = "WDPA_WDOECM_poly_Feb2026_LAO",
   quiet = TRUE
 )
@@ -210,11 +210,11 @@ gfw_stats <- gfw_stats %>%
 # Save full dataset (all Lao PAs)
 write.csv(
   gfw_stats,
-  "data/laos_forest_cover_2000_2024.csv",
+  "data/laos/output/laos_forest_cover_2000_2024.csv",
   row.names = FALSE
 )
 
-cat("      ✓ Saved: data/laos_forest_cover_2000_2024.csv\n")
+cat("      ✓ Saved: data/laos/output/laos_forest_cover_2000_2024.csv\n")
 cat("      Total records:", nrow(gfw_stats), "\n")
 cat("      Project areas:", sum(gfw_stats$is_project_area, na.rm = TRUE), "unique PAs\n")
 cat("      Other areas:", length(unique(gfw_stats$WDPAID[!gfw_stats$is_project_area])), "unique PAs\n\n")
@@ -270,11 +270,11 @@ summary_table <- gfw_stats %>%
 # Save summary table
 write.csv(
   summary_table,
-  "data/laos_forest_cover_summary.csv",
+  "data/laos/output/laos_forest_cover_summary.csv",
   row.names = FALSE
 )
 
-cat("      ✓ Saved: data/laos_forest_cover_summary.csv\n")
+cat("      ✓ Saved: data/laos/output/laos_forest_cover_summary.csv\n")
 cat("      Summary table has", nrow(summary_table), "rows\n\n")
 
 # =============================================================================
@@ -284,11 +284,11 @@ cat("[7/7] Saving processed portfolio...\n")
 
 write_portfolio(
   x = portfolio,
-  dsn = "data/laos_portfolio_processed.gpkg",
+  dsn = "data/laos/output/laos_portfolio_processed.gpkg",
   overwrite = TRUE
 )
 
-writeLines(capture.output(sessionInfo()), "data/laos_processing_session_info.txt")
+writeLines(capture.output(sessionInfo()), "data/laos/output/laos_processing_session_info.txt")
 
 cat("      ✓ Portfolio saved\n")
 cat("      ✓ Session info saved\n\n")
@@ -303,10 +303,10 @@ cat("  End time:", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\n")
 cat("=============================================================================\n\n")
 
 cat("Generated files:\n")
-cat("  1. data/laos_forest_cover_2000_2024.csv\n")
-cat("  2. data/laos_forest_cover_summary.csv\n")
-cat("  3. data/laos_portfolio_processed.gpkg\n")
-cat("  4. data/laos_processing_session_info.txt\n\n")
+cat("  1. data/laos/output/laos_forest_cover_2000_2024.csv\n")
+cat("  2. data/laos/output/laos_forest_cover_summary.csv\n")
+cat("  3. data/laos/output/laos_portfolio_processed.gpkg\n")
+cat("  4. data/laos/output/laos_processing_session_info.txt\n\n")
 
 cat("Summary:\n")
 cat("  - Protected areas processed:", nrow(portfolio), "\n")

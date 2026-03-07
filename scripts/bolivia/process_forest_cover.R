@@ -32,7 +32,7 @@ cat("      Package version: mapme.biodiversity", as.character(packageVersion("ma
 cat("[2/8] Setting up configuration...\n")
 
 # Set output directory for downloaded resources
-output_dir <- file.path(getwd(), "data", "mapme_resources")
+output_dir <- file.path(getwd(), "data", "shared", "mapme_resources")
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
 # Configure mapme.biodiversity options
@@ -69,7 +69,7 @@ cat("[3/8] Loading protected areas from WDPA geodatabase...\n")
 
 # Load all Bolivia PAs from WDPA file geodatabase
 wdpa_allPAs <- st_read(
-  "data/wdpa.gdb",
+  "data/bolivia/input/wdpa.gdb",
   layer = "WDPA_WDOECM_poly_Jan2026_BOL",
   quiet = TRUE
 )
@@ -115,7 +115,7 @@ cat("      ✓ Portfolio ready:", nrow(portfolio), "protected areas\n\n")
 # =============================================================================
 cat("[4/8] Loading KfW portfolio for reference...\n")
 
-portfolio_kfw <- read_sf("data/portfolio.gpkg")
+portfolio_kfw <- read_sf("data/shared/portfolio.gpkg")
 portfolio_kfw <- portfolio_kfw %>%
   filter(grepl("BOL", country))
 
@@ -189,11 +189,11 @@ gfw_lossstats_final <- bind_rows(gfw_lossstats, gfw_loss)
 
 write.csv(
   gfw_lossstats_final,
-  "data/bolivia_forest_loss_2000_2024.csv",
+  "data/bolivia/output/bolivia_forest_loss_2000_2024.csv",
   row.names = FALSE
 )
 
-cat("      ✓ Saved: data/bolivia_forest_loss_2000_2024.csv\n\n")
+cat("      ✓ Saved: data/bolivia/output/bolivia_forest_loss_2000_2024.csv\n\n")
 
 # =============================================================================
 # PART 5: Get Burned Area Resources (MODIS MCD64A1)
@@ -246,11 +246,11 @@ tryCatch({
       .groups = "drop"
     )
   
-  write.csv(burned_annual, "data/bolivia_burned_area_annual_2000_2024.csv", row.names = FALSE)
-  write.csv(burned_total, "data/bolivia_burned_area_total_2000_2024.csv", row.names = FALSE)
+  write.csv(burned_annual, "data/bolivia/output/bolivia_burned_area_annual_2000_2024.csv", row.names = FALSE)
+  write.csv(burned_total, "data/bolivia/output/bolivia_burned_area_total_2000_2024.csv", row.names = FALSE)
   
-  cat("      ✓ Saved: data/bolivia_burned_area_annual_2000_2024.csv\n")
-  cat("      ✓ Saved: data/bolivia_burned_area_total_2000_2024.csv\n")
+  cat("      ✓ Saved: data/bolivia/output/bolivia_burned_area_annual_2000_2024.csv\n")
+  cat("      ✓ Saved: data/bolivia/output/bolivia_burned_area_total_2000_2024.csv\n")
   
 }, error = function(e) {
   cat("      ⚠ Warning: Burned area processing failed:", conditionMessage(e), "\n")
@@ -266,11 +266,11 @@ cat("[8/8] Saving processed portfolio...\n")
 
 write_portfolio(
   x = portfolio,
-  dsn = "data/bolivia_portfolio_processed.gpkg",
+  dsn = "data/bolivia/output/bolivia_portfolio_processed.gpkg",
   overwrite = TRUE
 )
 
-writeLines(capture.output(sessionInfo()), "data/processing_session_info.txt")
+writeLines(capture.output(sessionInfo()), "data/bolivia/output/processing_session_info.txt")
 
 cat("      ✓ Portfolio saved\n")
 cat("      ✓ Session info saved\n\n")
@@ -285,11 +285,11 @@ cat("  End time:", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\n")
 cat("=============================================================================\n\n")
 
 cat("Generated files:\n")
-cat("  1. data/bolivia_forest_loss_2000_2024.csv\n")
-cat("  2. data/bolivia_burned_area_annual_2000_2024.csv\n")
-cat("  3. data/bolivia_burned_area_total_2000_2024.csv\n")
-cat("  4. data/bolivia_portfolio_processed.gpkg\n")
-cat("  5. data/processing_session_info.txt\n\n")
+cat("  1. data/bolivia/output/bolivia_forest_loss_2000_2024.csv\n")
+cat("  2. data/bolivia/output/bolivia_burned_area_annual_2000_2024.csv\n")
+cat("  3. data/bolivia/output/bolivia_burned_area_total_2000_2024.csv\n")
+cat("  4. data/bolivia/output/bolivia_portfolio_processed.gpkg\n")
+cat("  5. data/bolivia/output/processing_session_info.txt\n\n")
 
 cat("Summary:\n")
 cat("  - Protected areas:", nrow(portfolio), "\n")
