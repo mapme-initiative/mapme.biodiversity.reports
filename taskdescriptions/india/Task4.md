@@ -1,0 +1,6 @@
+# Task4 
+
+great. some minor things.. in the section Top 15 Most Affected Project Villages. it would be great if there was a download option, similar to the beginning of the report, that would allow me to download the forest cover loss data for all villages. it           
+  should contain the list of all analysed villages, a column whether they are part of the project villages, cumulated forest cover loss for all three observations periods, and cumulated relative loss for all three observation periods. Furthermore, in the        
+  Forest Cover Loss Map it seems to me, that the polygons of village boundaries and and confidence overlay are not alligned. Did you choose the same polygon as a foundation. check and fix those issues. In addition. make sure to not put in the report that the     
+   project supported 79 villages. in fact it supports 100 villages out of which only 79 aare analysed in the report due to the matching possiblities. make sure to fix that in the wording throughout the report as well.
