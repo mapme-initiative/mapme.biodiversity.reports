@@ -102,6 +102,17 @@ quarto render reports/<report_name>.qmd
 quarto preview
 ```
 
+## Data quality checks
+
+After finishing any data processing or wrangling step — in both R scripts and QMD files — **always verify correctness before moving on**:
+
+- **Check group keys**: When using `group_by()` + `summarise()` or `pivot_wider()`, confirm that the grouping key uniquely identifies each observation. Shared keys (e.g. multiple rows with `lgd_villagecode=0`) will silently produce wrong summary values (`first()`, `min()`, etc. picking up another group's data).
+- **Cross-check derived columns**: Any column derived from another (e.g. `baseline_2001`, `rel_loss`) should be spot-checked against the raw input: `summary()`, `table()`, and comparing a few rows manually.
+- **Check for implausible values**: After computing relative or annualized metrics, check `summary()` for values that are physically impossible (e.g. annual forest loss > 100% of baseline). These indicate a data wrangling bug, not an outlier.
+- **Verify join cardinality**: After `left_join()` or `inner_join()`, compare `nrow()` before and after to detect unexpected duplicates or row loss. Many-to-many joins silently inflate row counts.
+- **Check NA propagation**: After any transformation, run `sum(is.na(...))` on key columns to ensure NAs haven't spread unexpectedly.
+- **Render and review**: After writing a QMD report, always render it (`quarto render reports/<file>.qmd`) and visually inspect the output — tables, chart axes, and map layers — before committing.
+
 ## What NOT to do
 
 - Do not run `get_resources()` or `calc_indicators()` inside `.qmd` files.
