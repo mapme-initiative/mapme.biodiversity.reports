@@ -425,7 +425,7 @@ if (nrow(gfw_stats) > 0) {
       District = csv_district,
       Confidence = confidence
     ) %>%
-    arrange(desc(is_project_village), `Village Name`) %>%
+    arrange(desc(is_project_village), desc(`Total Loss (%)`)) %>%
     select(`Village Name`, District, Block = csv_block, `Project Village`, Confidence,
            `Forest 2001 (ha)`, `Forest 2024 (ha)`,
            `Total Loss (ha)`, `Total Loss (%)`,
@@ -739,54 +739,16 @@ if (nrow(gfw_stats) > 0) {
 }
 ```
 
-### Top 15 Most Affected Project Villages
+### Forest Cover Loss: All Analysed Villages
 
-```{r table-top-loss}
-#| echo: false
-
-if (nrow(gfw_stats) > 0) {
-  top_loss <- proj_summary %>%
-    arrange(desc(rel_loss)) %>%
-    head(15) %>%
-    mutate(
-      forest_2001 = round(forest_2001, 0),
-      forest_2024 = round(forest_2024, 0),
-      abs_loss = round(abs_loss, 0),
-      rel_loss = round(rel_loss, 1)
-    ) %>%
-    select(
-      `Village` = csv_name,
-      `Block` = csv_block,
-      `Forest 2001 (ha)` = forest_2001,
-      `Forest 2024 (ha)` = forest_2024,
-      `Loss (ha)` = abs_loss,
-      `Loss (%)` = rel_loss
-    )
-
-  top_loss %>%
-    datatable(
-      options = list(dom = 't', pageLength = 15, scrollX = TRUE),
-      caption = "Top 15 project villages by relative forest cover loss (2001-2024)",
-      rownames = FALSE
-    ) %>%
-    formatStyle(
-      'Loss (%)',
-      background = styleColorBar(range(top_loss$`Loss (%)`), '#fc8d59'),
-      backgroundSize = '98% 88%',
-      backgroundRepeat = 'no-repeat',
-      backgroundPosition = 'center'
-    )
-}
-```
-
-### Download: Forest Cover Loss for All Analysed Villages
-
-The table below provides the complete dataset for all 921 analysed villages, including cumulative forest cover loss for each of the three observation periods. Use the download buttons to export the full table as CSV or Excel.
+The table below covers all 921 analysed villages, sorted by project village first and then by descending total forest cover loss. The **Total Loss (%)** column uses a color bar for quick visual comparison. Use the download buttons to export the full dataset as CSV or Excel.
 
 ```{r table-download-all}
 #| echo: false
 
 if (nrow(gfw_stats) > 0 && exists("download_data")) {
+  loss_range <- range(download_data$`Total Loss (%)`, na.rm = TRUE)
+
   download_data %>%
     datatable(
       filter = 'top',
@@ -800,12 +762,19 @@ if (nrow(gfw_stats) > 0 && exists("download_data")) {
           list(extend = 'excel', text = 'Download Excel', filename = 'tripura_village_forest_loss')
         )
       ),
-      caption = "Forest cover loss by village and period — all 921 analysed villages"
+      caption = "Forest cover loss by village and period — all 921 analysed villages (project villages first, sorted by total loss)"
     ) %>%
     formatRound(
       columns = c('Forest 2001 (ha)', 'Forest 2024 (ha)', 'Total Loss (ha)',
                   'Loss 2001-2010 (ha)', 'Loss 2011-2020 (ha)', 'Loss 2021-2024 (ha)'),
       digits = 0
+    ) %>%
+    formatStyle(
+      'Total Loss (%)',
+      background = styleColorBar(loss_range, '#fc8d59'),
+      backgroundSize = '98% 88%',
+      backgroundRepeat = 'no-repeat',
+      backgroundPosition = 'center'
     ) %>%
     formatStyle(
       'Project Village',
