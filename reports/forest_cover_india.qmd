@@ -7,7 +7,7 @@ author:
 date: "2026-03-07"
 date-modified: last-modified
 abstract: |
-  This report assesses forest cover loss dynamics in 83 project villages and 838 control
+  This report assesses forest cover loss dynamics in 83 of 100 project villages and 838 control
   villages across Tripura state, India, using Global Forest Watch data (2001-2024). The
   analysis examines whether sufficient forest remains in project villages for planned
   conservation zoning and land-use planning activities, and compares loss trends across
@@ -137,7 +137,7 @@ if (nrow(gfw_stats) > 0) {
 
 ## Introduction
 
-This report examines forest cover loss dynamics in villages across Tripura, a small state in northeast India. The analysis serves a specific conservation question: a rural development project with conservation components supports 83 villages in the Dhalai and North Tripura districts. The project includes agricultural support, land-use zoning, and the designation of conservation set-aside areas.
+This report examines forest cover loss dynamics in villages across Tripura, a small state in northeast India. The analysis serves a specific conservation question: a rural development project with conservation components supports **100 villages** in the Dhalai and North Tripura districts. The project includes agricultural support, land-use zoning, and the designation of conservation set-aside areas. Of the 100 project villages, **83 could be matched to official Census boundary polygons** and are included in this analysis.
 
 Given the substantial forest cover loss observed across Tripura in recent years, this analysis assesses:
 
@@ -154,7 +154,7 @@ Project villages lost approximately **23% of their 2001 forest cover** by 2024, 
 
 ### Village Boundary Data
 
-The analysis covers **917 village polygons** from the ESRI India Living Atlas (Census 2021 boundaries) across all 8 districts of Tripura, plus 4 additional villages matched via geoBoundaries (Census 2011 boundaries). Of these, **83 villages** were identified as project villages through a multi-step name-matching process.
+The analysis covers **917 village polygons** from the ESRI India Living Atlas (Census 2021 boundaries) across all 8 districts of Tripura, plus 4 additional villages matched via geoBoundaries (Census 2011 boundaries). The project supports **100 villages** in the Dhalai and North Tripura districts; of these, **83 could be matched to official Census boundary polygons** and are included in this analysis. The remaining 17 villages could not be matched due to naming ambiguity, missing Census records, or being sub-hamlets not delineated as separate Census units.
 
 The matching linked field programme records (VDPIC village names) to official Census boundary polygons. Because village names in northeast India often have multiple spellings — reflecting Bengali, tribal, and English transliterations — the matching used a combination of:
 
@@ -163,7 +163,7 @@ The matching linked field programme records (VDPIC village names) to official Ce
 - **Phonetic normalization** specific to Tripura (e.g., the suffix "-cherra"/"-chhara" refers to the same geographic feature — a stream)
 - **Manual overrides** for seven villages where automated matching failed due to significant name divergence (e.g., "Narikel Kunja" = "Kunjaban", both meaning "coconut grove" in Bengali)
 
-Each match was assigned a confidence level: **confirmed** (exact match or high-similarity score), **likely** (moderate similarity), or **uncertain** (lower similarity or parent-village assignment). Nine villages from the field programme could not be matched to any Census polygon — these are sub-hamlets, reserve forest sections, or settlements not recorded as separate Census units.
+Each match was assigned a confidence level: **confirmed** (exact match or high-similarity score), **likely** (moderate similarity), or **uncertain** (lower similarity or parent-village assignment). Seventeen villages from the field programme could not be matched to any Census polygon — these include sub-hamlets, reserve forest sections, newly settled areas not recorded as separate Census units, and villages where name ambiguity made any reliable match impossible.
 
 ### Overview of Project Villages
 
@@ -199,7 +199,7 @@ if (nrow(gfw_stats) > 0) {
           list(extend = 'excel', text = 'Download Excel')
         )
       ),
-      caption = "Project villages matched to Census boundary polygons (90 of 99)"
+      caption = "Project villages matched to Census boundary polygons (83 of 100)"
     )
 }
 ```
@@ -391,6 +391,47 @@ if (nrow(gfw_stats) > 0) {
       # Label for hover: prefer csv_name (project), fall back to name
       village_label = coalesce(csv_name, name)
     )
+
+  # Build comprehensive download table for all analysed villages
+  period_wide <- period_stats %>%
+    select(vid, period, period_loss_ha, period_loss_rel) %>%
+    mutate(
+      loss_ha_col  = paste0("loss_ha_",  gsub("-", "_", period)),
+      loss_rel_col = paste0("loss_pct_", gsub("-", "_", period))
+    ) %>%
+    select(vid, loss_ha_col, loss_rel_col, period_loss_ha, period_loss_rel) %>%
+    pivot_longer(c(loss_ha_col, loss_rel_col), names_to = "col_type", values_to = "col_name") %>%
+    mutate(value = ifelse(col_type == "loss_ha_col", period_loss_ha, period_loss_rel)) %>%
+    select(vid, col_name, value) %>%
+    pivot_wider(names_from = col_name, values_from = value)
+
+  download_data <- village_summary %>%
+    select(vid, name, csv_name, csv_district, csv_block,
+           confidence, is_project_village, forest_2001, forest_2024, abs_loss, rel_loss) %>%
+    left_join(period_wide, by = "vid") %>%
+    mutate(
+      `Village Name`       = coalesce(csv_name, name),
+      `Project Village`    = ifelse(is_project_village, "Yes", "No"),
+      `Forest 2001 (ha)`   = round(forest_2001, 1),
+      `Forest 2024 (ha)`   = round(forest_2024, 1),
+      `Total Loss (ha)`    = round(abs_loss, 1),
+      `Total Loss (%)`     = round(rel_loss, 1),
+      `Loss 2001-2010 (ha)`  = round(loss_ha_2001_2010, 1),
+      `Loss 2001-2010 (%)`   = round(loss_pct_2001_2010, 1),
+      `Loss 2011-2020 (ha)`  = round(loss_ha_2011_2020, 1),
+      `Loss 2011-2020 (%)`   = round(loss_pct_2011_2020, 1),
+      `Loss 2021-2024 (ha)`  = round(loss_ha_2021_2024, 1),
+      `Loss 2021-2024 (%)`   = round(loss_pct_2021_2024, 1),
+      District = csv_district,
+      Confidence = confidence
+    ) %>%
+    arrange(desc(is_project_village), `Village Name`) %>%
+    select(`Village Name`, District, Block = csv_block, `Project Village`, Confidence,
+           `Forest 2001 (ha)`, `Forest 2024 (ha)`,
+           `Total Loss (ha)`, `Total Loss (%)`,
+           `Loss 2001-2010 (ha)`, `Loss 2001-2010 (%)`,
+           `Loss 2011-2020 (ha)`, `Loss 2011-2020 (%)`,
+           `Loss 2021-2024 (ha)`, `Loss 2021-2024 (%)`)
 
   # Period-level data for all villages (project + non-project)
   # Uses the corrected true_baseline_2001 from period_stats
@@ -738,6 +779,41 @@ if (nrow(gfw_stats) > 0) {
 }
 ```
 
+### Download: Forest Cover Loss for All Analysed Villages
+
+The table below provides the complete dataset for all 921 analysed villages, including cumulative forest cover loss for each of the three observation periods. Use the download buttons to export the full table as CSV or Excel.
+
+```{r table-download-all}
+#| echo: false
+
+if (nrow(gfw_stats) > 0 && exists("download_data")) {
+  download_data %>%
+    datatable(
+      filter = 'top',
+      extensions = 'Buttons',
+      options = list(
+        dom = 'Bfrtip',
+        scrollX = TRUE,
+        pageLength = 10,
+        buttons = list(
+          list(extend = 'csv',   text = 'Download CSV',   filename = 'tripura_village_forest_loss'),
+          list(extend = 'excel', text = 'Download Excel', filename = 'tripura_village_forest_loss')
+        )
+      ),
+      caption = "Forest cover loss by village and period — all 921 analysed villages"
+    ) %>%
+    formatRound(
+      columns = c('Forest 2001 (ha)', 'Forest 2024 (ha)', 'Total Loss (ha)',
+                  'Loss 2001-2010 (ha)', 'Loss 2011-2020 (ha)', 'Loss 2021-2024 (ha)'),
+      digits = 0
+    ) %>%
+    formatStyle(
+      'Project Village',
+      backgroundColor = styleEqual(c('Yes', 'No'), c('#e8f4fd', 'white'))
+    )
+}
+```
+
 ### Forest Cover Loss Map
 
 The map below shows forest cover loss across all villages. Point symbology encodes both **absolute loss** (circle size) and **relative loss** (circle color). Project villages are shown at full opacity; non-project villages are semi-transparent to allow the project villages to stand out. Toggle the GFW tile layers to see the spatial pattern of loss across three periods. The **Confidence Overlay** layer shows the village boundaries color-coded by match confidence (as in the first map above) and can be toggled on for reference.
@@ -782,6 +858,23 @@ if (nrow(gfw_stats) > 0) {
 
   map_proj <- village_map_data %>% filter(is_project_village == TRUE)
   map_ctrl <- village_map_data %>% filter(is_project_village == FALSE)
+
+  # Build confidence overlay from ESRI polygons (same source as Village Boundaries layer)
+  # to ensure pixel-perfect alignment. Join confidence from gfw_stats by objectid.
+  village_conf_info <- gfw_stats %>%
+    filter(year == 2001, !is.na(objectid), is_project_village == TRUE) %>%
+    select(objectid, confidence, csv_name, csv_block, match_method) %>%
+    distinct(objectid, .keep_all = TRUE)
+
+  esri_conf_confirmed <- all_villages %>%
+    inner_join(village_conf_info %>% filter(confidence == "confirmed"),
+               by = "objectid")
+  esri_conf_likely <- all_villages %>%
+    inner_join(village_conf_info %>% filter(confidence == "likely"),
+               by = "objectid")
+  esri_conf_uncertain <- all_villages %>%
+    inner_join(village_conf_info %>% filter(confidence == "uncertain"),
+               by = "objectid")
 
   map_proj$popup <- paste0(
     "<b>", map_proj$csv_name, "</b> (Project Village)<br>",
@@ -863,7 +956,8 @@ if (nrow(gfw_stats) > 0) {
       group = "Village Boundaries",
       label = ~name
     ) %>%
-    # Confidence overlay (hidden by default) — same styling as first map
+    # Confidence overlay (hidden by default) — uses ESRI polygons (same base as
+    # "Village Boundaries") to ensure pixel-perfect alignment between layers.
     addPolygons(
       data = non_project,
       fillColor = "transparent",
@@ -875,7 +969,7 @@ if (nrow(gfw_stats) > 0) {
       label = ~name
     ) %>%
     addPolygons(
-      data = vdpic_confirmed,
+      data = esri_conf_confirmed,
       fillColor = "transparent",
       fillOpacity = 0,
       color = "green",
@@ -885,7 +979,7 @@ if (nrow(gfw_stats) > 0) {
       label = ~csv_name
     ) %>%
     addPolygons(
-      data = vdpic_likely,
+      data = esri_conf_likely,
       fillColor = "transparent",
       fillOpacity = 0,
       color = "blue",
@@ -895,7 +989,7 @@ if (nrow(gfw_stats) > 0) {
       label = ~csv_name
     ) %>%
     addPolygons(
-      data = vdpic_uncertain,
+      data = esri_conf_uncertain,
       fillColor = "transparent",
       fillOpacity = 0,
       color = "orange",
@@ -971,7 +1065,7 @@ if (nrow(gfw_stats) > 0) {
 
   cat(paste0(
     "### Key Figures\n\n",
-    "| Metric | Project Villages (83) | All Villages (921) |\n",
+    "| Metric | Project Villages (83 of 100) | All Villages (921) |\n",
     "|--------|----------------------|--------------------|\n",
     "| Forest cover 2001 | ", format(round(total_proj_2001, 0), big.mark = ","), " ha | ",
     format(round(total_all_2001, 0), big.mark = ","), " ha |\n",
