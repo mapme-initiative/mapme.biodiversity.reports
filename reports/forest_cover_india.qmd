@@ -7,7 +7,7 @@ author:
 date: "2026-03-07"
 date-modified: last-modified
 abstract: |
-  This report assesses forest cover loss dynamics in 83 project villages and 838 control
+  This report assesses forest cover loss dynamics in 83 of 100 project villages and 838 control
   villages across Tripura state, India, using Global Forest Watch data (2001-2024). The
   analysis examines whether sufficient forest remains in project villages for planned
   conservation zoning and land-use planning activities, and compares loss trends across
@@ -65,32 +65,53 @@ vdpic <- st_read(
   quiet = TRUE
 ) %>% st_make_valid()
 
-# ----- Prepare Project Village Summary -----
+# ----- Prepare Data -----
 if (nrow(gfw_stats) > 0) {
-  # Baseline year data
+
+  # Add a unique village identifier (vid) that works for both ESRI and
+  # geoBoundaries-direct (gb_direct) villages. ESRI villages use their
+  # numeric objectid; the 4 gb_direct project villages have objectid=NA
+  # and are identified by their csv_id instead.
+  gfw_stats <- gfw_stats %>%
+    mutate(vid = ifelse(!is.na(objectid),
+                        as.character(objectid),
+                        paste0("gb_", csv_id)))
+
+  # Compute a CORRECT per-village baseline from the year-2001 observation.
+  # NOTE: the baseline_2001 column in the CSV is WRONG for 53 non-project
+  # villages with lgd_villagecode=0 (they share the same group in the
+  # processing script, so first(area_ha) returns the first village's value
+  # for all 53). We recompute it here directly from the data.
+  true_baseline_lookup <- gfw_stats %>%
+    filter(year == 2001) %>%
+    select(vid, true_baseline_2001 = area_ha)
+
+  # Baseline year data (raw, for aggregate totals)
   baseline <- gfw_stats %>% filter(year == 2001)
   latest   <- gfw_stats %>% filter(year == 2024)
 
-  # Project villages data
+  # Project and control subsets
   proj_stats <- gfw_stats %>% filter(is_project_village == TRUE)
   ctrl_stats <- gfw_stats %>% filter(is_project_village == FALSE)
 
-  # Join confidence info to village geometries for mapping
+  # Join confidence info for mapping
   vdpic_matched <- vdpic %>% filter(confidence != "unmatched" | is.na(confidence))
 
-  # Compute per-village summary
+  # Per-village summary (uses correct per-objectid baseline from area_ha[year==2001])
   village_summary <- gfw_stats %>%
-    group_by(objectid, name, csv_name, csv_district, csv_block,
+    group_by(vid, objectid, name, csv_name, csv_district, csv_block,
              confidence, match_method, is_project_village) %>%
     summarise(
       forest_2001 = area_ha[year == 2001],
       forest_2024 = area_ha[year == 2024],
       abs_loss    = area_ha[year == 2001] - area_ha[year == 2024],
-      rel_loss    = (area_ha[year == 2001] - area_ha[year == 2024]) / area_ha[year == 2001] * 100,
+      rel_loss    = (area_ha[year == 2001] - area_ha[year == 2024]) /
+                     area_ha[year == 2001] * 100,
       .groups = "drop"
     )
 
-  # Period-level stats per village
+  # Period-level stats per village — using vid as the unique key and the
+  # CORRECTED true_baseline_2001 for relative loss calculations.
   period_stats <- gfw_stats %>%
     filter(year %in% c(2001, 2010, 2011, 2020, 2021, 2024)) %>%
     mutate(
@@ -104,18 +125,19 @@ if (nrow(gfw_stats) > 0) {
         TRUE ~ "end"
       )
     ) %>%
-    select(objectid, name, csv_name, is_project_village, period, period_pos, area_ha, baseline_2001) %>%
+    select(vid, name, csv_name, is_project_village, period, period_pos, area_ha) %>%
     pivot_wider(names_from = period_pos, values_from = area_ha) %>%
+    left_join(true_baseline_lookup, by = "vid") %>%
     mutate(
       period_loss_ha  = start - end,
-      period_loss_rel = period_loss_ha / baseline_2001 * 100
+      period_loss_rel = period_loss_ha / true_baseline_2001 * 100
     )
 }
 ```
 
 ## Introduction
 
-This report examines forest cover loss dynamics in villages across Tripura, a small state in northeast India. The analysis serves a specific conservation question: a rural development project with conservation components supports 83 villages in the Dhalai and North Tripura districts. The project includes agricultural support, land-use zoning, and the designation of conservation set-aside areas.
+This report examines forest cover loss dynamics in villages across Tripura, a small state in northeast India. The analysis serves a specific conservation question: a rural development project with conservation components supports **100 villages** in the Dhalai and North Tripura districts. The project includes agricultural support, land-use zoning, and the designation of conservation set-aside areas. Of the 100 project villages, **83 could be matched to official Census boundary polygons** and are included in this analysis.
 
 Given the substantial forest cover loss observed across Tripura in recent years, this analysis assesses:
 
@@ -132,16 +154,16 @@ Project villages lost approximately **23% of their 2001 forest cover** by 2024, 
 
 ### Village Boundary Data
 
-The analysis covers **917 village polygons** from the ESRI India Living Atlas (Census 2021 boundaries) across all 8 districts of Tripura, plus 4 additional villages matched via geoBoundaries (Census 2011 boundaries). Of these, **83 villages** were identified as project villages through a multi-step name-matching process.
+The analysis covers **917 village polygons** from the ESRI India Living Atlas (Census 2021 boundaries) across all 8 districts of Tripura, plus 4 additional villages matched via geoBoundaries (Census 2011 boundaries). The project supports **100 villages** in the Dhalai and North Tripura districts; of these, **83 could be matched to official Census boundary polygons** and are included in this analysis. The remaining 17 villages could not be matched due to naming ambiguity, missing Census records, or being sub-hamlets not delineated as separate Census units.
 
-The matching linked field programme records (VDPIC village names) to official Census boundary polygons. Because village names in northeast India often have multiple spellings --- reflecting Bengali, tribal, and English transliterations --- the matching used a combination of:
+The matching linked field programme records (VDPIC village names) to official Census boundary polygons. Because village names in northeast India often have multiple spellings — reflecting Bengali, tribal, and English transliterations — the matching used a combination of:
 
 - **Exact name matching** after normalizing spelling (removing punctuation, standardizing whitespace)
 - **Fuzzy matching** using string similarity algorithms, with manual review of ambiguous cases
-- **Phonetic normalization** specific to Tripura (e.g., the suffix "-cherra"/"-chhara" refers to the same geographic feature --- a stream)
+- **Phonetic normalization** specific to Tripura (e.g., the suffix "-cherra"/"-chhara" refers to the same geographic feature — a stream)
 - **Manual overrides** for seven villages where automated matching failed due to significant name divergence (e.g., "Narikel Kunja" = "Kunjaban", both meaning "coconut grove" in Bengali)
 
-Each match was assigned a confidence level: **confirmed** (exact match or high-similarity score), **likely** (moderate similarity), or **uncertain** (lower similarity or parent-village assignment). Nine villages from the field programme could not be matched to any Census polygon --- these are sub-hamlets, reserve forest sections, or settlements not recorded as separate Census units.
+Each match was assigned a confidence level: **confirmed** (exact match or high-similarity score), **likely** (moderate similarity), or **uncertain** (lower similarity or parent-village assignment). Seventeen villages from the field programme could not be matched to any Census polygon — these include sub-hamlets, reserve forest sections, newly settled areas not recorded as separate Census units, and villages where name ambiguity made any reliable match impossible.
 
 ### Overview of Project Villages
 
@@ -177,7 +199,7 @@ if (nrow(gfw_stats) > 0) {
           list(extend = 'excel', text = 'Download Excel')
         )
       ),
-      caption = "Project villages matched to Census boundary polygons (90 of 99)"
+      caption = "Project villages matched to Census boundary polygons (83 of 100)"
     )
 }
 ```
@@ -187,8 +209,8 @@ if (nrow(gfw_stats) > 0) {
 - **District / Block**: Administrative location from the field programme records
 - **Village Name**: Name used in the field programme (VDPIC records)
 - **Match Method**: How the match was established (exact, fuzzy_high, fuzzy_synonym, manual_override, or tripura_phonetic_fuzzy)
-- **Match Score**: String similarity score (0--100); blank for exact matches and manual overrides
-- **Confidence**: Overall match quality --- confirmed (green on map), likely (blue), or uncertain (orange)
+- **Match Score**: String similarity score (0–100); blank for exact matches and manual overrides
+- **Confidence**: Overall match quality — confirmed (green on map), likely (blue), or uncertain (orange)
 - **Matched Name / Census Name**: Official names from the matched boundary dataset
 
 ### Interactive Map of Study Area
@@ -205,13 +227,12 @@ vdpic_likely    <- vdpic %>% filter(confidence == "likely")
 vdpic_uncertain <- vdpic %>% filter(confidence == "uncertain" & !st_is_empty(geometry))
 
 # Non-project villages (all_villages minus matched ones)
-# Get objectids of matched project villages
 proj_objectids <- gfw_stats %>%
-  filter(is_project_village == TRUE & year == 2001) %>%
+  filter(is_project_village == TRUE & year == 2001 & !is.na(objectid)) %>%
   pull(objectid) %>%
   unique()
 
-non_project <- all_villages %>% filter(!objectid %in% proj_objectids)
+non_project  <- all_villages %>% filter(!objectid %in% proj_objectids)
 project_esri <- all_villages %>% filter(objectid %in% proj_objectids)
 
 map_attribution <- "Forest Loss: Hansen et al. (2013) | Village Boundaries: ESRI India Living Atlas"
@@ -304,7 +325,7 @@ map1
 
 ### Forest Cover Data
 
-Forest cover statistics were computed using the [mapme.biodiversity](https://github.com/mapme-initiative/mapme.biodiversity) R package with data from the **Global Forest Watch** dataset (Hansen et al., 2013), version GFC-2024-v1.12. The analysis covers the period **2001--2024**.
+Forest cover statistics were computed using the [mapme.biodiversity](https://github.com/mapme-initiative/mapme.biodiversity) R package with data from the **Global Forest Watch** dataset (Hansen et al., 2013), version GFC-2024-v1.12. The analysis covers the period **2001–2024**.
 
 **Forest definition used:**
 
@@ -312,11 +333,11 @@ Forest cover statistics were computed using the [mapme.biodiversity](https://git
 - **Minimum patch size**: 1 hectare
 - **Resolution**: 30 meters (Landsat-derived)
 
-Forest cover loss is defined as a *stand-replacement disturbance* --- a complete removal of tree cover canopy at the 30m pixel level. The GFW dataset detects loss events but does not capture forest degradation (partial canopy reduction) or regrowth.
+Forest cover loss is defined as a *stand-replacement disturbance* — a complete removal of tree cover canopy at the 30m pixel level. The GFW dataset detects loss events but does not capture forest degradation (partial canopy reduction) or regrowth.
 
 ### Tripura's Forest Ecosystem
 
-Tripura's forests are classified primarily as **tropical semi-evergreen** and **moist deciduous** types, with significant areas of bamboo brakes --- a sub-climax formation resulting from historic shifting cultivation (jhum). The dominant tree species include *Dipterocarpus turbinatus*, *Artocarpus chama*, and *Castanopsis indica*. According to the India State of Forest Report 2023, Tripura maintains approximately **74.7% forest cover** relative to its geographic area, though this has been declining --- the state lost roughly 95 km^2^ of forest cover between the 2021 and 2023 assessment periods.
+Tripura's forests are classified primarily as **tropical semi-evergreen** and **moist deciduous** types, with significant areas of bamboo brakes — a sub-climax formation resulting from historic shifting cultivation (jhum). The dominant tree species include *Dipterocarpus turbinatus*, *Artocarpus chama*, and *Castanopsis indica*. According to the India State of Forest Report 2023, Tripura maintains approximately **74.7% forest cover** relative to its geographic area, though this has been declining — the state lost roughly 95 km^2^ of forest cover between the 2021 and 2023 assessment periods.
 
 ### Accuracy Considerations
 
@@ -335,12 +356,14 @@ These limitations should be considered when interpreting the results. The GFW da
 #| include: false
 
 if (nrow(gfw_stats) > 0) {
-  # Compute annual relative loss trajectory per village (relative to 2001 baseline)
+  # Compute annual relative loss trajectory per project village,
+  # using the CORRECT per-village 2001 baseline (area_ha at year==2001).
   proj_trajectory <- proj_stats %>%
-    group_by(objectid) %>%
+    group_by(vid) %>%
     mutate(
-      rel_forest_remaining = area_ha / baseline_2001 * 100,
-      cum_rel_loss = (baseline_2001 - area_ha) / baseline_2001 * 100
+      true_baseline = area_ha[year == 2001],
+      rel_forest_remaining = area_ha / true_baseline * 100,
+      cum_rel_loss = (true_baseline - area_ha) / true_baseline * 100
     ) %>%
     ungroup()
 
@@ -352,26 +375,66 @@ if (nrow(gfw_stats) > 0) {
       q25_remaining    = quantile(rel_forest_remaining, 0.25, na.rm = TRUE),
       q75_remaining    = quantile(rel_forest_remaining, 0.75, na.rm = TRUE),
       mean_remaining   = mean(rel_forest_remaining, na.rm = TRUE),
-      median_cum_loss  = median(cum_rel_loss, na.rm = TRUE),
-      q25_cum_loss     = quantile(cum_rel_loss, 0.25, na.rm = TRUE),
-      q75_cum_loss     = quantile(cum_rel_loss, 0.75, na.rm = TRUE),
       .groups = "drop"
     )
 
-  # Period-level data for project villages
+  # Period-level data for project villages only
   proj_periods <- period_stats %>%
     filter(is_project_village == TRUE) %>%
     mutate(
-      # Annualized relative loss (% of 2001 baseline per year)
       period_years = case_when(
         period == "2001-2010" ~ 9,
         period == "2011-2020" ~ 9,
         period == "2021-2024" ~ 3
       ),
-      annual_rel_loss = period_loss_rel / period_years
+      annual_rel_loss = period_loss_rel / period_years,
+      # Label for hover: prefer csv_name (project), fall back to name
+      village_label = coalesce(csv_name, name)
     )
 
-  # Same for all villages (for comparison)
+  # Build comprehensive download table for all analysed villages
+  period_wide <- period_stats %>%
+    select(vid, period, period_loss_ha, period_loss_rel) %>%
+    mutate(
+      loss_ha_col  = paste0("loss_ha_",  gsub("-", "_", period)),
+      loss_rel_col = paste0("loss_pct_", gsub("-", "_", period))
+    ) %>%
+    select(vid, loss_ha_col, loss_rel_col, period_loss_ha, period_loss_rel) %>%
+    pivot_longer(c(loss_ha_col, loss_rel_col), names_to = "col_type", values_to = "col_name") %>%
+    mutate(value = ifelse(col_type == "loss_ha_col", period_loss_ha, period_loss_rel)) %>%
+    select(vid, col_name, value) %>%
+    pivot_wider(names_from = col_name, values_from = value)
+
+  download_data <- village_summary %>%
+    select(vid, name, csv_name, csv_district, csv_block,
+           confidence, is_project_village, forest_2001, forest_2024, abs_loss, rel_loss) %>%
+    left_join(period_wide, by = "vid") %>%
+    mutate(
+      `Village Name`       = coalesce(csv_name, name),
+      `Project Village`    = ifelse(is_project_village, "Yes", "No"),
+      `Forest 2001 (ha)`   = round(forest_2001, 1),
+      `Forest 2024 (ha)`   = round(forest_2024, 1),
+      `Total Loss (ha)`    = round(abs_loss, 1),
+      `Total Loss (%)`     = round(rel_loss, 1),
+      `Loss 2001-2010 (ha)`  = round(loss_ha_2001_2010, 1),
+      `Loss 2001-2010 (%)`   = round(loss_pct_2001_2010, 1),
+      `Loss 2011-2020 (ha)`  = round(loss_ha_2011_2020, 1),
+      `Loss 2011-2020 (%)`   = round(loss_pct_2011_2020, 1),
+      `Loss 2021-2024 (ha)`  = round(loss_ha_2021_2024, 1),
+      `Loss 2021-2024 (%)`   = round(loss_pct_2021_2024, 1),
+      District = csv_district,
+      Confidence = confidence
+    ) %>%
+    arrange(desc(is_project_village), desc(`Total Loss (%)`)) %>%
+    select(`Village Name`, District, Block = csv_block, `Project Village`, Confidence,
+           `Forest 2001 (ha)`, `Forest 2024 (ha)`,
+           `Total Loss (ha)`, `Total Loss (%)`,
+           `Loss 2001-2010 (ha)`, `Loss 2001-2010 (%)`,
+           `Loss 2011-2020 (ha)`, `Loss 2011-2020 (%)`,
+           `Loss 2021-2024 (ha)`, `Loss 2021-2024 (%)`)
+
+  # Period-level data for all villages (project + non-project)
+  # Uses the corrected true_baseline_2001 from period_stats
   all_periods <- period_stats %>%
     mutate(
       period_years = case_when(
@@ -381,13 +444,18 @@ if (nrow(gfw_stats) > 0) {
       ),
       annual_rel_loss = period_loss_rel / period_years,
       village_type = ifelse(is_project_village, "Project Villages", "Non-Project Villages")
-    )
+    ) %>%
+    # Remove villages with implausible values: annual loss > 100% is physically
+    # impossible (a village cannot lose more than 100% of its baseline forest in a year).
+    # Such values signal data issues (e.g. villages whose geometry changed between
+    # census vintages, or very small baseline areas causing rounding artefacts).
+    filter(annual_rel_loss <= 100 & annual_rel_loss >= -10)
 }
 ```
 
 ### Cumulative Forest Cover Trajectory
 
-The figure below shows how forest cover in project villages has evolved since 2001. Each village's forest area is expressed as a percentage of its 2001 baseline. The shaded ribbon represents the interquartile range (25th--75th percentile) across all 83 project villages, capturing the spread of outcomes.
+The figure below shows how forest cover in project villages has evolved since 2001. Each village's forest area is expressed as a percentage of its 2001 baseline. The shaded ribbon represents the interquartile range (25th–75th percentile) across all 83 project villages, capturing the spread of outcomes.
 
 ```{r fig-trajectory}
 #| echo: false
@@ -423,27 +491,22 @@ if (nrow(gfw_stats) > 0) {
     )
 
   ggplotly(p_traj, tooltip = c("x", "y")) %>%
-    layout(
-      hovermode = "x unified",
-      margin = list(t = 80)
-    )
+    layout(hovermode = "x unified", margin = list(t = 80))
 }
 ```
 
 ### Period Comparison: Loss Acceleration
 
-To assess whether forest loss is accelerating, we compare three periods using **annualized relative loss** --- the percentage of each village's 2001 forest baseline lost per year within each period. This metric normalizes for the different period lengths (9, 9, and 3 years) and makes trends directly comparable.
+To assess whether forest loss is accelerating, we compare three periods using **annualized relative loss** — the percentage of each village's 2001 forest baseline lost per year within each period. This metric normalizes for the different period lengths (9, 9, and 3 years) and makes trends directly comparable.
 
 ```{r fig-boxplots}
 #| echo: false
 #| fig-height: 5.5
 
 if (nrow(gfw_stats) > 0) {
-  # Order periods chronologically
   proj_periods$period <- factor(proj_periods$period,
                                  levels = c("2001-2010", "2011-2020", "2021-2024"))
 
-  # Period summary for annotation
   period_medians <- proj_periods %>%
     group_by(period) %>%
     summarise(
@@ -453,17 +516,26 @@ if (nrow(gfw_stats) > 0) {
       .groups = "drop"
     )
 
-  # Colors for periods
   period_colors <- c("2001-2010" = "#4575b4", "2011-2020" = "#fc8d59", "2021-2024" = "#d73027")
 
-  p_box <- ggplot(proj_periods, aes(x = period, y = annual_rel_loss, fill = period)) +
-    geom_boxplot(alpha = 0.7, outlier.shape = 21, outlier.size = 2, outlier.alpha = 0.5) +
-    geom_jitter(width = 0.15, alpha = 0.3, size = 1.2, color = "grey30") +
+  # Build hover text for individual village points
+  proj_periods <- proj_periods %>%
+    mutate(hover_label = paste0(
+      village_label,
+      "\nPeriod: ", period,
+      "\nAnnual loss: ", round(annual_rel_loss, 2), "%/yr"
+    ))
+
+  p_box <- ggplot(proj_periods,
+                  aes(x = period, y = annual_rel_loss, fill = period)) +
+    geom_boxplot(alpha = 0.7, outlier.shape = NA) +
+    geom_jitter(aes(text = hover_label),
+                width = 0.15, alpha = 0.4, size = 1.5, color = "grey30") +
     scale_fill_manual(values = period_colors) +
     scale_y_continuous(labels = function(x) paste0(x, "%")) +
     labs(
       title = "Annualized Forest Cover Loss by Period",
-      subtitle = "Each point represents one project village (83 villages)",
+      subtitle = "Each point represents one project village (83 villages) — hover for village name",
       x = NULL,
       y = "Annual loss (% of 2001 baseline per year)"
     ) +
@@ -476,7 +548,7 @@ if (nrow(gfw_stats) > 0) {
       panel.grid.major.x = element_blank()
     )
 
-  ggplotly(p_box) %>%
+  ggplotly(p_box, tooltip = "text") %>%
     layout(margin = list(t = 80))
 }
 ```
@@ -515,25 +587,25 @@ if (nrow(gfw_stats) > 0) {
 
   cat(paste0(
     "\n**Interpretation:** The data reveals a clear acceleration of forest loss across the three periods. ",
-    "During 2001--2010, the median project village lost approximately **",
+    "During 2001–2010, the median project village lost approximately **",
     round(pm$median_annual[pm$period == "2001-2010"], 2),
     "% of its 2001 forest per year**. ",
-    "This rate increased substantially in 2011--2020 to **",
+    "This rate increased substantially in 2011–2020 to **",
     round(pm$median_annual[pm$period == "2011-2020"], 2),
-    "%/year**, and accelerated further in 2021--2024 to **",
+    "%/year**, and accelerated further in 2021–2024 to **",
     round(pm$median_annual[pm$period == "2021-2024"], 2),
     "%/year**. ",
     "The spread of outcomes (visible in the boxplot) also widens over time, indicating that ",
     "some villages are experiencing dramatically faster loss than others. ",
     "The most affected village lost ", round(max(proj_periods$period_loss_rel[proj_periods$period == "2021-2024"], na.rm = TRUE), 1),
-    "% of its 2001 baseline in just the 2021--2024 period alone.\n"
+    "% of its 2001 baseline in just the 2021–2024 period alone.\n"
   ))
 }
 ```
 
-### Distribution of Total Forest Loss (2001--2024)
+### Distribution of Total Forest Loss (2001–2024)
 
-The histogram below shows how total relative forest loss (2001--2024) is distributed across project villages.
+The histogram below shows how total relative forest loss (2001–2024) is distributed across project villages.
 
 ```{r fig-histogram}
 #| echo: false
@@ -589,6 +661,8 @@ if (nrow(gfw_stats) > 0) {
 
 ### Comparison: Project Villages vs. All Tripura Villages
 
+The plot below compares annualized relative loss between project and non-project villages across the same three periods. Villages with implausible annual loss values (above 100% of the 2001 baseline per year) — arising from a small number of census partition polygons with very small baseline areas — are excluded from this comparison.
+
 ```{r fig-comparison}
 #| echo: false
 #| fig-height: 5.5
@@ -597,15 +671,25 @@ if (nrow(gfw_stats) > 0) {
   all_periods$period <- factor(all_periods$period,
                                 levels = c("2001-2010", "2011-2020", "2021-2024"))
 
+  # Determine y-axis range from the box whiskers (not outliers)
+  # Use 1.5*IQR rule to set sensible upper bound
+  p95 <- quantile(all_periods$annual_rel_loss, 0.95, na.rm = TRUE)
+  y_max <- ceiling(p95 * 1.2)
+
   p_comp <- ggplot(all_periods, aes(x = period, y = annual_rel_loss, fill = village_type)) +
-    geom_boxplot(alpha = 0.7, outlier.shape = 21, outlier.size = 1.5,
-                 outlier.alpha = 0.3, position = position_dodge(0.8)) +
+    geom_boxplot(
+      alpha = 0.7,
+      outlier.shape = NA,      # Hide outliers — they would dominate the scale
+      position = position_dodge(0.8)
+    ) +
+    coord_cartesian(ylim = c(0, y_max)) +  # Zoom axis without removing data
     scale_fill_manual(values = c("Project Villages" = "#2166ac",
                                   "Non-Project Villages" = "#b2182b")) +
     scale_y_continuous(labels = function(x) paste0(x, "%")) +
     labs(
       title = "Forest Loss Comparison: Project vs. Non-Project Villages",
-      subtitle = "Annualized loss as % of 2001 baseline, by period",
+      subtitle = paste0("Annualized loss as % of 2001 baseline, by period",
+                        "\n(Outliers hidden; y-axis capped at ", y_max, "% for readability)"),
       x = NULL,
       y = "Annual loss (% of 2001 baseline per year)",
       fill = NULL
@@ -621,8 +705,8 @@ if (nrow(gfw_stats) > 0) {
 
   ggplotly(p_comp) %>%
     layout(
-      margin = list(t = 80),
-      legend = list(orientation = "h", x = 0.2, y = -0.15)
+      margin = list(t = 90),
+      legend = list(orientation = "h", x = 0.2, y = -0.2)
     )
 }
 ```
@@ -644,8 +728,8 @@ if (nrow(gfw_stats) > 0) {
 
   cat(paste0(
     "\n**Interpretation:** The comparison shows that project villages and non-project villages across ",
-    "Tripura follow broadly similar loss trends --- both groups show accelerating loss over time. ",
-    "In the most recent period (2021--2024), project villages show a median annual loss of **",
+    "Tripura follow broadly similar loss trends — both groups show accelerating loss over time. ",
+    "In the most recent period (2021–2024), project villages show a median annual loss of **",
     round(proj_med$med[proj_med$period == "2021-2024"], 2), "%/year** compared to **",
     round(ctrl_med$med[ctrl_med$period == "2021-2024"], 2),
     "%/year** for non-project villages. ",
@@ -655,49 +739,53 @@ if (nrow(gfw_stats) > 0) {
 }
 ```
 
-### Top 15 Most Affected Project Villages
+### Forest Cover Loss: All Analysed Villages
 
-```{r table-top-loss}
+The table below covers all 921 analysed villages, sorted by project village first and then by descending total forest cover loss. The **Total Loss (%)** column uses a color bar for quick visual comparison. Use the download buttons to export the full dataset as CSV or Excel.
+
+```{r table-download-all}
 #| echo: false
 
-if (nrow(gfw_stats) > 0) {
-  top_loss <- proj_summary %>%
-    arrange(desc(rel_loss)) %>%
-    head(15) %>%
-    mutate(
-      forest_2001 = round(forest_2001, 0),
-      forest_2024 = round(forest_2024, 0),
-      abs_loss = round(abs_loss, 0),
-      rel_loss = round(rel_loss, 1)
-    ) %>%
-    select(
-      `Village` = csv_name,
-      `Block` = csv_block,
-      `Forest 2001 (ha)` = forest_2001,
-      `Forest 2024 (ha)` = forest_2024,
-      `Loss (ha)` = abs_loss,
-      `Loss (%)` = rel_loss
-    )
+if (nrow(gfw_stats) > 0 && exists("download_data")) {
+  loss_range <- range(download_data$`Total Loss (%)`, na.rm = TRUE)
 
-  top_loss %>%
+  download_data %>%
     datatable(
-      options = list(dom = 't', pageLength = 15, scrollX = TRUE),
-      caption = "Top 15 project villages by relative forest cover loss (2001-2024)",
-      rownames = FALSE
+      filter = 'top',
+      extensions = 'Buttons',
+      options = list(
+        dom = 'Bfrtip',
+        scrollX = TRUE,
+        pageLength = 10,
+        buttons = list(
+          list(extend = 'csv',   text = 'Download CSV',   filename = 'tripura_village_forest_loss'),
+          list(extend = 'excel', text = 'Download Excel', filename = 'tripura_village_forest_loss')
+        )
+      ),
+      caption = "Forest cover loss by village and period — all 921 analysed villages (project villages first, sorted by total loss)"
+    ) %>%
+    formatRound(
+      columns = c('Forest 2001 (ha)', 'Forest 2024 (ha)', 'Total Loss (ha)',
+                  'Loss 2001-2010 (ha)', 'Loss 2011-2020 (ha)', 'Loss 2021-2024 (ha)'),
+      digits = 0
     ) %>%
     formatStyle(
-      'Loss (%)',
-      background = styleColorBar(range(top_loss$`Loss (%)`), '#fc8d59'),
+      'Total Loss (%)',
+      background = styleColorBar(loss_range, '#fc8d59'),
       backgroundSize = '98% 88%',
       backgroundRepeat = 'no-repeat',
       backgroundPosition = 'center'
+    ) %>%
+    formatStyle(
+      'Project Village',
+      backgroundColor = styleEqual(c('Yes', 'No'), c('#e8f4fd', 'white'))
     )
 }
 ```
 
 ### Forest Cover Loss Map
 
-The map below shows forest cover loss across all villages. Point symbology encodes both **absolute loss** (circle size) and **relative loss** (circle color). Project villages are shown at full opacity; non-project villages are semi-transparent to allow the project villages to stand out. Toggle the GFW tile layers to see the spatial pattern of loss across three periods.
+The map below shows forest cover loss across all villages. Point symbology encodes both **absolute loss** (circle size) and **relative loss** (circle color). Project villages are shown at full opacity; non-project villages are semi-transparent to allow the project villages to stand out. Toggle the GFW tile layers to see the spatial pattern of loss across three periods. The **Confidence Overlay** layer shows the village boundaries color-coded by match confidence (as in the first map above) and can be toggled on for reference.
 
 ```{r map-forest-loss}
 #| echo: false
@@ -711,16 +799,18 @@ if (nrow(gfw_stats) > 0) {
     st_centroid() %>%
     st_transform(4326)
 
+  # Join village_summary by objectid (numeric); drop NA-objectid gb_direct villages
+  # from the map since we don't have their polygon centroids in all_villages
   village_map_data <- village_centroids %>%
     st_drop_geometry() %>%
-    left_join(village_summary, by = "objectid") %>%
+    left_join(
+      village_summary %>% filter(!is.na(objectid)),
+      by = "objectid"
+    ) %>%
     bind_cols(
       st_coordinates(village_centroids) %>% as_tibble() %>% rename(lng = X, lat = Y)
     ) %>%
     filter(!is.na(rel_loss))
-
-  # Also add gb_direct villages if they exist
-  gb_direct <- village_summary %>% filter(is.na(objectid) | !objectid %in% all_villages$objectid)
 
   # Categorize losses
   village_map_data$rel_loss_cat <- cut(
@@ -735,11 +825,26 @@ if (nrow(gfw_stats) > 0) {
     labels = c("<10 ha", "10-50 ha", "50-200 ha", "200-1000 ha", ">1000 ha")
   )
 
-  # Separate project and non-project for different opacity
   map_proj <- village_map_data %>% filter(is_project_village == TRUE)
   map_ctrl <- village_map_data %>% filter(is_project_village == FALSE)
 
-  # Create labels
+  # Build confidence overlay from ESRI polygons (same source as Village Boundaries layer)
+  # to ensure pixel-perfect alignment. Join confidence from gfw_stats by objectid.
+  village_conf_info <- gfw_stats %>%
+    filter(year == 2001, !is.na(objectid), is_project_village == TRUE) %>%
+    select(objectid, confidence, csv_name, csv_block, match_method) %>%
+    distinct(objectid, .keep_all = TRUE)
+
+  esri_conf_confirmed <- all_villages %>%
+    inner_join(village_conf_info %>% filter(confidence == "confirmed"),
+               by = "objectid")
+  esri_conf_likely <- all_villages %>%
+    inner_join(village_conf_info %>% filter(confidence == "likely"),
+               by = "objectid")
+  esri_conf_uncertain <- all_villages %>%
+    inner_join(village_conf_info %>% filter(confidence == "uncertain"),
+               by = "objectid")
+
   map_proj$popup <- paste0(
     "<b>", map_proj$csv_name, "</b> (Project Village)<br>",
     "Block: ", map_proj$csv_block, "<br>",
@@ -758,20 +863,18 @@ if (nrow(gfw_stats) > 0) {
     round(map_ctrl$rel_loss, 1), "%)"
   )
 
-  # Color palette
   pal_loss <- colorFactor(
     palette = rev(brewer.pal(5, "RdYlGn")),
     domain = village_map_data$rel_loss_cat
   )
 
-  # Radius function
   get_radius <- function(abs_cat) {
     case_when(
-      abs_cat == ">1000 ha" ~ 10,
-      abs_cat == "200-1000 ha" ~ 7,
-      abs_cat == "50-200 ha" ~ 5,
-      abs_cat == "10-50 ha" ~ 3.5,
-      TRUE ~ 2
+      abs_cat == ">1000 ha"     ~ 10,
+      abs_cat == "200-1000 ha"  ~ 7,
+      abs_cat == "50-200 ha"    ~ 5,
+      abs_cat == "10-50 ha"     ~ 3.5,
+      TRUE                      ~ 2
     )
   }
 
@@ -801,7 +904,7 @@ if (nrow(gfw_stats) > 0) {
       group = "Primary Forests (2001)",
       attribution = map_attribution
     ) %>%
-    # Village polygon outlines (project villages highlighted)
+    # Plain village polygon outlines (all grey, project villages slightly thicker)
     addPolygons(
       data = non_project,
       fillColor = "transparent",
@@ -821,6 +924,48 @@ if (nrow(gfw_stats) > 0) {
       opacity = 0.8,
       group = "Village Boundaries",
       label = ~name
+    ) %>%
+    # Confidence overlay (hidden by default) — uses ESRI polygons (same base as
+    # "Village Boundaries") to ensure pixel-perfect alignment between layers.
+    addPolygons(
+      data = non_project,
+      fillColor = "transparent",
+      fillOpacity = 0,
+      color = "darkgrey",
+      weight = 1,
+      opacity = 0.5,
+      group = "Confidence Overlay",
+      label = ~name
+    ) %>%
+    addPolygons(
+      data = esri_conf_confirmed,
+      fillColor = "transparent",
+      fillOpacity = 0,
+      color = "green",
+      weight = 2,
+      opacity = 0.9,
+      group = "Confidence Overlay",
+      label = ~csv_name
+    ) %>%
+    addPolygons(
+      data = esri_conf_likely,
+      fillColor = "transparent",
+      fillOpacity = 0,
+      color = "blue",
+      weight = 2,
+      opacity = 0.9,
+      group = "Confidence Overlay",
+      label = ~csv_name
+    ) %>%
+    addPolygons(
+      data = esri_conf_uncertain,
+      fillColor = "transparent",
+      fillOpacity = 0,
+      color = "orange",
+      weight = 2,
+      opacity = 0.9,
+      group = "Confidence Overlay",
+      label = ~csv_name
     ) %>%
     # Non-project circle markers (semi-transparent)
     addCircleMarkers(
@@ -857,12 +1002,13 @@ if (nrow(gfw_stats) > 0) {
     addLayersControl(
       baseGroups = c("CartoDB", "OpenStreetMap", "Satellite", "Topography"),
       overlayGroups = c("Project Village Loss", "Non-Project Loss",
-                        "Village Boundaries",
+                        "Village Boundaries", "Confidence Overlay",
                         "GFW Loss (2001-2010)", "GFW Loss (2011-2020)",
                         "GFW Loss (2021-2024)", "Primary Forests (2001)"),
       options = layersControlOptions(collapsed = FALSE)
     ) %>%
-    hideGroup(c("GFW Loss (2001-2010)", "GFW Loss (2011-2020)",
+    hideGroup(c("Confidence Overlay",
+                "GFW Loss (2001-2010)", "GFW Loss (2011-2020)",
                 "GFW Loss (2021-2024)", "Primary Forests (2001)"))
 
   map2
@@ -888,7 +1034,7 @@ if (nrow(gfw_stats) > 0) {
 
   cat(paste0(
     "### Key Figures\n\n",
-    "| Metric | Project Villages (83) | All Villages (921) |\n",
+    "| Metric | Project Villages (83 of 100) | All Villages (921) |\n",
     "|--------|----------------------|--------------------|\n",
     "| Forest cover 2001 | ", format(round(total_proj_2001, 0), big.mark = ","), " ha | ",
     format(round(total_all_2001, 0), big.mark = ","), " ha |\n",
@@ -900,10 +1046,9 @@ if (nrow(gfw_stats) > 0) {
     round(total_all_rel, 1), "% |\n\n"
   ))
 
-  n_severe <- sum(village_summary$rel_loss[village_summary$is_project_village == TRUE] > 30, na.rm = TRUE)
-  n_moderate <- sum(village_summary$rel_loss[village_summary$is_project_village == TRUE] > 20 &
-                     village_summary$rel_loss[village_summary$is_project_village == TRUE] <= 30, na.rm = TRUE)
-  n_low <- sum(village_summary$rel_loss[village_summary$is_project_village == TRUE] <= 10, na.rm = TRUE)
+  n_severe   <- sum(proj_summary$rel_loss > 30, na.rm = TRUE)
+  n_moderate <- sum(proj_summary$rel_loss > 20 & proj_summary$rel_loss <= 30, na.rm = TRUE)
+  n_low      <- sum(proj_summary$rel_loss <= 10, na.rm = TRUE)
 
   cat(paste0(
     "### Implications for Conservation Zoning\n\n",
@@ -911,11 +1056,11 @@ if (nrow(gfw_stats) > 0) {
     "- **", n_severe, " villages** have lost more than 30% of their 2001 forest cover. In these villages, ",
     "the remaining forest may be too fragmented or reduced for effective conservation zoning without ",
     "complementary restoration measures.\n",
-    "- **", n_moderate, " villages** show moderate loss (20--30%). Conservation zoning remains viable but ",
-    "urgent --- continued loss at current rates would further reduce the forest base within a few years.\n",
+    "- **", n_moderate, " villages** show moderate loss (20–30%). Conservation zoning remains viable but ",
+    "urgent — continued loss at current rates would further reduce the forest base within a few years.\n",
     "- **", n_low, " villages** retain more than 90% of their 2001 forest and may offer the best prospects ",
     "for effective conservation set-asides.\n\n",
-    "The fact that loss has accelerated in the most recent period (2021--2024) underscores the urgency ",
+    "The fact that loss has accelerated in the most recent period (2021–2024) underscores the urgency ",
     "of implementing land-use zoning measures. Without intervention, the forest base available for ",
     "conservation in many project villages will continue to shrink rapidly.\n"
   ))
@@ -933,4 +1078,4 @@ if (nrow(gfw_stats) > 0) {
 
 ## References
 
-Hansen, M. C., P. V. Potapov, R. Moore, M. Hancher, S. A. Turubanova, A. Tyukavina, D. Thau, S. V. Stehman, S. J. Goetz, T. R. Loveland, A. Kommareddy, A. Egorov, L. Chini, C. O. Justice, and J. R. G. Townshend. 2013. "High-Resolution Global Maps of 21st-Century Forest Cover Change." *Science* 342 (6160): 850--53.
+Hansen, M. C., P. V. Potapov, R. Moore, M. Hancher, S. A. Turubanova, A. Tyukavina, D. Thau, S. V. Stehman, S. J. Goetz, T. R. Loveland, A. Kommareddy, A. Egorov, L. Chini, C. O. Justice, and J. R. G. Townshend. 2013. "High-Resolution Global Maps of 21st-Century Forest Cover Change." *Science* 342 (6160): 850–53.
