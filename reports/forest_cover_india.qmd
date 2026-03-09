@@ -112,19 +112,30 @@ if (nrow(gfw_stats) > 0) {
 
   # Period-level stats per village — using vid as the unique key and the
   # CORRECTED true_baseline_2001 for relative loss calculations.
-  period_stats <- gfw_stats %>%
-    filter(year %in% c(2001, 2010, 2011, 2020, 2021, 2024)) %>%
-    mutate(
-      period = case_when(
-        year %in% c(2001, 2010) ~ "2001-2010",
-        year %in% c(2011, 2020) ~ "2011-2020",
-        year %in% c(2021, 2024) ~ "2021-2024"
-      ),
-      period_pos = case_when(
-        year %in% c(2001, 2011, 2021) ~ "start",
-        TRUE ~ "end"
-      )
-    ) %>%
+  #
+  # NOTE on period boundaries: area_ha[year == Y] = forest remaining AFTER
+  # year Y's losses. To ensure each period captures all losses within its
+  # labelled range (and that P1 + P2 + P3 = Total Loss), the periods use
+  # contiguous boundaries: P2 starts at area[2010] (end of P1) and P3 starts
+  # at area[2020] (end of P2). This way:
+  #   P1 = area[2001]-area[2010]  captures losses in years 2002-2010 (9 years)
+  #   P2 = area[2010]-area[2020]  captures losses in years 2011-2020 (10 years)
+  #   P3 = area[2020]-area[2024]  captures losses in years 2021-2024 (4 years)
+  #   P1 + P2 + P3 = area[2001] - area[2024] = Total Loss ✓
+  period_stats <- bind_rows(
+    gfw_stats %>%
+      filter(year %in% c(2001, 2010)) %>%
+      mutate(period = "2001-2010",
+             period_pos = ifelse(year == 2001, "start", "end")),
+    gfw_stats %>%
+      filter(year %in% c(2010, 2020)) %>%
+      mutate(period = "2011-2020",
+             period_pos = ifelse(year == 2010, "start", "end")),
+    gfw_stats %>%
+      filter(year %in% c(2020, 2024)) %>%
+      mutate(period = "2021-2024",
+             period_pos = ifelse(year == 2020, "start", "end"))
+  ) %>%
     select(vid, name, csv_name, is_project_village, period, period_pos, area_ha) %>%
     pivot_wider(names_from = period_pos, values_from = area_ha) %>%
     left_join(true_baseline_lookup, by = "vid") %>%
@@ -383,9 +394,9 @@ if (nrow(gfw_stats) > 0) {
     filter(is_project_village == TRUE) %>%
     mutate(
       period_years = case_when(
-        period == "2001-2010" ~ 9,
-        period == "2011-2020" ~ 9,
-        period == "2021-2024" ~ 3
+        period == "2001-2010" ~ 9,   # losses 2002-2010
+        period == "2011-2020" ~ 10,  # losses 2011-2020
+        period == "2021-2024" ~ 4    # losses 2021-2024
       ),
       annual_rel_loss = period_loss_rel / period_years,
       # Label for hover: prefer csv_name (project), fall back to name
@@ -438,9 +449,9 @@ if (nrow(gfw_stats) > 0) {
   all_periods <- period_stats %>%
     mutate(
       period_years = case_when(
-        period == "2001-2010" ~ 9,
-        period == "2011-2020" ~ 9,
-        period == "2021-2024" ~ 3
+        period == "2001-2010" ~ 9,   # losses 2002-2010
+        period == "2011-2020" ~ 10,  # losses 2011-2020
+        period == "2021-2024" ~ 4    # losses 2021-2024
       ),
       annual_rel_loss = period_loss_rel / period_years,
       village_type = ifelse(is_project_village, "Project Villages", "Non-Project Villages")
@@ -497,7 +508,7 @@ if (nrow(gfw_stats) > 0) {
 
 ### Period Comparison: Loss Acceleration
 
-To assess whether forest loss is accelerating, we compare three periods using **annualized relative loss** — the percentage of each village's 2001 forest baseline lost per year within each period. This metric normalizes for the different period lengths (9, 9, and 3 years) and makes trends directly comparable.
+To assess whether forest loss is accelerating, we compare three periods using **annualized relative loss** — the percentage of each village's 2001 forest baseline lost per year within each period. This metric normalizes for the different period lengths (9, 10, and 4 years) and makes trends directly comparable.
 
 ```{r fig-boxplots}
 #| echo: false
